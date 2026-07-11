@@ -1,0 +1,40 @@
+{
+  "common": {
+    "appName": "ERP Smart",
+    "tagline": "Simple, powerful business management",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "language": {
+    "switch": "Language",
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "nav": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "login": "Login",
+    "signup": "Sign up",
+    "dashboard": "Dashboard"
+  },
+  "marketing": {
+    "heroTitle": "Manage your business in one place",
+    "heroSubtitle": "A simple ERP platform for small and medium businesses",
+    "getStarted": "Get started",
+    "learnMore": "Learn more"
+  },
+  "app": {
+    "welcome": "Welcome to ERP Smart",
+    "placeholder": "Application shell — features coming soon"
+  }
+}

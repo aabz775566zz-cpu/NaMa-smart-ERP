@@ -1,0 +1,30 @@
+{
+  "name": "erp-smart",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@erp-smart/web",
+    "dev:marketing": "turbo run dev --filter=@erp-smart/marketing",
+    "dev:api": "turbo run dev --filter=@erp-smart/api",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "db:generate": "prisma generate --schema=database/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=database/prisma/schema.prisma",
+    "db:studio": "prisma studio --schema=database/prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "npm@10.9.2"
+}

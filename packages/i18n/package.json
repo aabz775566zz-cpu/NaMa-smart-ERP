@@ -1,0 +1,21 @@
+{
+  "name": "@erp-smart/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./messages/*": "./messages/*"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@erp-smart/types": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
