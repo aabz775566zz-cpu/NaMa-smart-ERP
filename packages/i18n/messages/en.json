@@ -32,9 +32,5 @@
     "heroSubtitle": "A simple ERP platform for small and medium businesses",
     "getStarted": "Get started",
     "learnMore": "Learn more"
-  },
-  "app": {
-    "welcome": "Welcome to ERP Smart",
-    "placeholder": "Application shell — features coming soon"
   }
 }
