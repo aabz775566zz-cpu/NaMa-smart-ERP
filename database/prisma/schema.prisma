@@ -1,5 +1,7 @@
 // ERP Smart database schema
-// Phase 1: connection only. Models (Users, Roles, Permissions, ...) arrive in Phase 2.
+// Phase 2: Identity and Access Management (User, Company, Membership, Role,
+// Permission, RefreshToken, ActivityLog). Business modules (Customer, Product,
+// Sale, Invoice, ...) arrive in Phase 3.
 
 generator client {
   provider = "prisma-client-js"
@@ -8,4 +10,146 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum PlatformRole {
+  USER
+  SUPER_ADMIN
+}
+
+enum MembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id                     String       @id @default(cuid())
+  email                  String       @unique
+  passwordHash           String?
+  fullName               String
+  phone                  String?
+  avatarUrl              String?
+  isEmailVerified        Boolean      @default(false)
+  emailVerifyToken       String?      @unique
+  emailVerifyExpiresAt   DateTime?
+  passwordResetToken     String?      @unique
+  passwordResetExpiresAt DateTime?
+  status                 UserStatus   @default(ACTIVE)
+  platformRole           PlatformRole @default(USER)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  memberships   Membership[]
+  refreshTokens RefreshToken[]
+  activityLogs  ActivityLog[]
+
+  @@index([passwordResetToken])
+  @@index([emailVerifyToken])
+}
+
+model Company {
+  id                 String   @id @default(cuid())
+  name               String
+  businessType       String?
+  country            String?
+  currency           String   @default("USD")
+  logoUrl            String?
+  subscriptionPlan   String   @default("FREE")
+  subscriptionStatus String   @default("TRIALING")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  memberships  Membership[]
+  roles        Role[]
+  activityLogs ActivityLog[]
+}
+
+model Membership {
+  id        String           @id @default(cuid())
+  userId    String
+  companyId String
+  roleId    String
+  status    MembershipStatus @default(ACTIVE)
+  invitedAt DateTime?
+  joinedAt  DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  role    Role    @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, companyId])
+  @@index([companyId])
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  companyId String? // null = system role template shared by all companies
+  key       String // OWNER | MANAGER | ACCOUNTANT | EMPLOYEE | custom-slug
+  name      String
+  isSystem  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  company     Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  memberships Membership[]
+  permissions RolePermission[]
+
+  @@unique([companyId, key])
+}
+
+model Permission {
+  id     String @id @default(cuid())
+  module String
+  action String
+
+  roles RolePermission[]
+
+  @@unique([module, action])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  companyId String?
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([userId])
 }

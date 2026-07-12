@@ -16,7 +16,11 @@
     "test": "turbo run test",
     "db:generate": "prisma generate --schema=database/prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema=database/prisma/schema.prisma",
-    "db:studio": "prisma studio --schema=database/prisma/schema.prisma"
+    "db:studio": "prisma studio --schema=database/prisma/schema.prisma",
+    "db:seed": "prisma db seed --schema=database/prisma/schema.prisma"
+  },
+  "prisma": {
+    "seed": "ts-node --project database/prisma/tsconfig.json database/prisma/seed.ts"
   },
   "devDependencies": {
     "prettier": "^3.5.3",
@@ -32,6 +36,7 @@
     "@prisma/client@6.19.3": true,
     "@prisma/engines@6.19.3": true,
     "prisma@6.19.3": true,
-    "sharp@0.34.5": true
+    "sharp@0.34.5": true,
+    "argon2@0.44.0": true
   }
 }
