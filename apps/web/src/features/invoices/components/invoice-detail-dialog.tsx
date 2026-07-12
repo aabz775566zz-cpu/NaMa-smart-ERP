@@ -19,12 +19,14 @@ import {
 } from '@erp-smart/ui';
 import { Printer } from 'lucide-react';
 
+import { useCompany } from '@/features/settings/hooks';
 import { useFormatMoney } from '@/lib/format/money';
 import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 import { useInvoice, useMarkInvoicePaid } from '../hooks';
 import { InvoiceStatusBadge } from './invoice-status-badge';
+import { WhatsAppShareButton } from './whatsapp-share-button';
 
 export function InvoiceDetailDialog({
   invoiceId,
@@ -40,6 +42,7 @@ export function InvoiceDetailDialog({
   const markPaidMutation = useMarkInvoicePaid();
   const formatMoney = useFormatMoney();
   const { messages } = useLocale();
+  const { data: company } = useCompany();
 
   function handleMarkPaid() {
     if (!invoice) return;
@@ -122,6 +125,15 @@ export function InvoiceDetailDialog({
 
         {invoice ? (
           <DialogFooter>
+            {company ? (
+              <WhatsAppShareButton
+                variant="outline"
+                phone={invoice.sale.customer?.phone}
+                companyName={company.name}
+                invoiceNumber={invoice.invoiceNumber}
+                total={formatMoney(invoice.totalAmount)}
+              />
+            ) : null}
             <Button
               variant="outline"
               onClick={() => window.open(`/invoices/${invoice.id}/print`, '_blank', 'noopener,noreferrer')}

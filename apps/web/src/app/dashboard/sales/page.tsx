@@ -1,7 +1,7 @@
 'use client';
 
 import type { Sale, SaleStatus } from '@erp-smart/types';
-import { Button, EmptyState, Skeleton, toast } from '@erp-smart/ui';
+import { Button, EmptyState, Skeleton, ToastAction, toast } from '@erp-smart/ui';
 import { ShieldAlert, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -11,8 +11,12 @@ import { SaleFormDialog } from '@/features/sales/components/sale-form-dialog';
 import { SalesTable } from '@/features/sales/components/sales-table';
 import { SalesToolbar } from '@/features/sales/components/sales-toolbar';
 import { useCompleteSale, useSales } from '@/features/sales/hooks';
+import { useCompany } from '@/features/settings/hooks';
 import { exportToCsv } from '@/lib/csv-export';
+import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
+import { buildWhatsAppLink, interpolate } from '@/lib/whatsapp';
 
 export default function SalesPage() {
   const permissions = usePermissions();
@@ -23,6 +27,9 @@ export default function SalesPage() {
   const salesQuery = useSales(statusFilter, { enabled: canRead });
   const customersQuery = useCustomers({ enabled: canRead && canReadCustomers });
   const completeMutation = useCompleteSale();
+  const { data: company } = useCompany();
+  const { messages } = useLocale();
+  const formatMoney = useFormatMoney();
 
   const [formOpen, setFormOpen] = useState(false);
   const [cancellingSale, setCancellingSale] = useState<Sale | null>(null);
@@ -30,6 +37,12 @@ export default function SalesPage() {
   const customerNameById = useMemo(() => {
     const map = new Map<string, string>();
     customersQuery.data?.forEach((customer) => map.set(customer.id, customer.name));
+    return map;
+  }, [customersQuery.data]);
+
+  const customerPhoneById = useMemo(() => {
+    const map = new Map<string, string | null>();
+    customersQuery.data?.forEach((customer) => map.set(customer.id, customer.phone));
     return map;
   }, [customersQuery.data]);
 
@@ -48,7 +61,27 @@ export default function SalesPage() {
   function handleComplete(sale: Sale) {
     completeMutation.mutate(sale.id, {
       onSuccess: (result) => {
-        toast({ title: 'Sale completed', description: `Invoice ${result.invoice.invoiceNumber} generated.` });
+        const phone = sale.customerId ? customerPhoneById.get(sale.customerId) : null;
+        const message = company
+          ? interpolate(messages.invoice.whatsAppMessage, {
+              company: company.name,
+              number: result.invoice.invoiceNumber,
+              total: formatMoney(result.totalAmount),
+            })
+          : null;
+
+        toast({
+          title: 'Sale completed',
+          description: `Invoice ${result.invoice.invoiceNumber} generated.`,
+          action: message ? (
+            <ToastAction
+              altText={messages.invoice.sendWhatsApp}
+              onClick={() => window.open(buildWhatsAppLink(phone, message), '_blank', 'noopener,noreferrer')}
+            >
+              {messages.invoice.sendWhatsApp}
+            </ToastAction>
+          ) : undefined,
+        });
       },
       onError: (error) => {
         toast({ variant: 'destructive', title: 'Failed to complete sale', description: error.message });

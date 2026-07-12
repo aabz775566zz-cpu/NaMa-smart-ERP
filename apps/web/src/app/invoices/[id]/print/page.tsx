@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { use, useEffect } from 'react';
 
 import { InvoicePrintView } from '@/features/invoices/components/invoice-print-view';
+import { WhatsAppShareButton } from '@/features/invoices/components/whatsapp-share-button';
 import { useInvoice } from '@/features/invoices/hooks';
 import { BrandedLoader } from '@/components/branded-loader';
+import { useFormatMoney } from '@/lib/format/money';
 import { useLocale } from '@/lib/locale/locale-context';
 import { useCompany } from '@/features/settings/hooks';
 import { useAuthStore } from '@/lib/store';
@@ -27,6 +29,7 @@ export default function InvoicePrintPage({ params }: { params: Promise<{ id: str
   const { data: invoice, isLoading: invoiceLoading } = useInvoice(id);
   const { data: company, isLoading: companyLoading } = useCompany();
   const { messages } = useLocale();
+  const formatMoney = useFormatMoney();
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -48,7 +51,14 @@ export default function InvoicePrintPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="min-h-screen bg-neutral-100 py-8 print:bg-white print:py-0">
-      <div className="mx-auto mb-4 flex max-w-2xl justify-end px-2 print:hidden">
+      <div className="mx-auto mb-4 flex max-w-2xl justify-end gap-2 px-2 print:hidden">
+        <WhatsAppShareButton
+          variant="outline"
+          phone={invoice.sale.customer?.phone}
+          companyName={company.name}
+          invoiceNumber={invoice.invoiceNumber}
+          total={formatMoney(invoice.totalAmount)}
+        />
         <Button onClick={() => window.print()}>
           <Printer />
           {messages.invoice.print}
