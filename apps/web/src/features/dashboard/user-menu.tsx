@@ -16,11 +16,13 @@ import { LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 
 import { useLogout } from '@/features/auth';
+import { useLocale } from '@/lib/locale/locale-context';
 import { useCurrentUser } from '@/lib/store';
 
 export function UserMenu() {
   const user = useCurrentUser();
   const logoutMutation = useLogout();
+  const { messages } = useLocale();
 
   if (!user) return null;
 
@@ -49,13 +51,13 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/dashboard/profile">
             <User />
-            Profile
+            {messages.userMenu.profile}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logoutMutation.mutate()} disabled={logoutMutation.isPending}>
           <LogOut />
-          {logoutMutation.isPending ? 'Signing out…' : 'Sign out'}
+          {logoutMutation.isPending ? messages.userMenu.signingOut : messages.userMenu.signOut}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

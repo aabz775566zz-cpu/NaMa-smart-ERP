@@ -3,7 +3,11 @@ export interface BrandConfig {
   tagline: string;
   logoUrl: string | null;
   supportEmail: string;
-  websiteUrl: string;
+  /** Where the actual product (login/register/dashboard) lives — apps/marketing's
+   * CTAs link here. Was previously named `websiteUrl` and (incorrectly) pointed
+   * at the marketing site's own port; renamed since it was unused anywhere
+   * else in the codebase, so nothing depended on the old name/value. */
+  webAppUrl: string;
 }
 
 // "ERP Smart" is the working title used throughout this project's docs and
@@ -20,5 +24,5 @@ export const brandConfig: BrandConfig = {
   tagline: 'Simple, powerful business management',
   logoUrl: null,
   supportEmail: 'support@example.com',
-  websiteUrl: 'http://localhost:3001',
+  webAppUrl: process.env.NEXT_PUBLIC_WEB_APP_URL ?? 'http://localhost:3000',
 };

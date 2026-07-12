@@ -8,12 +8,14 @@ import { DASHBOARD_NAV_ITEMS } from '@/features/dashboard/nav-items';
 import { OnboardingChecklist, useOnboardingChecklistVisible } from '@/features/dashboard/onboarding-checklist';
 import { DashboardReportView } from '@/features/reports/components/dashboard-report-view';
 import { useCompany } from '@/features/settings/hooks';
+import { useLocale } from '@/lib/locale/locale-context';
 import { useCurrentUser, usePermissions } from '@/lib/store';
 
 export default function DashboardHomePage() {
   const user = useCurrentUser();
   const permissions = usePermissions();
   const { data: company } = useCompany();
+  const { messages } = useLocale();
   const canViewReports = permissions.includes('REPORTS:READ');
   const showChecklist = useOnboardingChecklistVisible();
 
@@ -52,7 +54,7 @@ export default function DashboardHomePage() {
                 className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-accent"
               >
                 <item.icon className="h-4 w-4 shrink-0 text-primary" />
-                <span className="flex-1 truncate">{item.label}</span>
+                <span className="flex-1 truncate">{messages.nav[item.labelKey]}</span>
                 <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </Link>
             ))}

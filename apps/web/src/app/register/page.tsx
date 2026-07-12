@@ -7,10 +7,12 @@ import { useState } from 'react';
 
 import { useRegister } from '@/features/auth';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { useLocale } from '@/lib/locale/locale-context';
 
 export default function RegisterPage() {
   const router = useRouter();
   const registerMutation = useRegister();
+  const { messages } = useLocale();
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
@@ -33,15 +35,15 @@ export default function RegisterPage() {
     <AuthShell>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Create your company</CardTitle>
-          <CardDescription>Set up your workspace in under a minute.</CardDescription>
+          <CardTitle>{messages.auth.registerTitle}</CardTitle>
+          <CardDescription>{messages.auth.registerDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField label="Full name" htmlFor="fullName" required>
+            <FormField label={messages.auth.fullNameLabel} htmlFor="fullName" required>
               <Input id="fullName" required value={fullName} onChange={(event) => setFullName(event.target.value)} />
             </FormField>
-            <FormField label="Company name" htmlFor="companyName" required>
+            <FormField label={messages.auth.companyNameLabel} htmlFor="companyName" required>
               <Input
                 id="companyName"
                 required
@@ -49,7 +51,7 @@ export default function RegisterPage() {
                 onChange={(event) => setCompanyName(event.target.value)}
               />
             </FormField>
-            <FormField label="Email" htmlFor="email" required>
+            <FormField label={messages.auth.emailLabel} htmlFor="email" required>
               <Input
                 id="email"
                 type="email"
@@ -59,7 +61,7 @@ export default function RegisterPage() {
                 onChange={(event) => setEmail(event.target.value)}
               />
             </FormField>
-            <FormField label="Password" htmlFor="password" description="At least 8 characters." required>
+            <FormField label={messages.auth.passwordLabel} htmlFor="password" description={messages.auth.passwordHint} required>
               <Input
                 id="password"
                 type="password"
@@ -71,13 +73,13 @@ export default function RegisterPage() {
               />
             </FormField>
             <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-              {registerMutation.isPending ? 'Creating…' : 'Create account'}
+              {registerMutation.isPending ? messages.auth.creatingAccount : messages.auth.createAccountButton}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            {messages.auth.alreadyHaveAccount}{' '}
             <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
-              Sign in
+              {messages.auth.signInLink}
             </Link>
           </p>
         </CardContent>

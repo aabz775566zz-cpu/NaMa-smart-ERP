@@ -1,12 +1,10 @@
+'use client';
+
 import { brandConfig } from '@erp-smart/branding';
 import { Logo } from '@erp-smart/ui';
 import { Check } from 'lucide-react';
 
-const VALUE_PROPS = [
-  'Track products, stock, and sales in one place',
-  'Invite your team with role-based permissions',
-  'A clear financial picture, always up to date',
-];
+import { useLocale } from '@/lib/locale/locale-context';
 
 /**
  * Shared shell for every auth-flow screen (login, register, forgot/reset
@@ -17,6 +15,9 @@ const VALUE_PROPS = [
  * smaller screens.
  */
 export function AuthShell({ children }: { children: React.ReactNode }) {
+  const { messages } = useLocale();
+  const valueProps = [messages.auth.valueProp1, messages.auth.valueProp2, messages.auth.valueProp3];
+
   return (
     <main className="flex min-h-screen">
       <div className="flex w-full flex-col items-center justify-center gap-8 p-4 lg:w-1/2">
@@ -30,7 +31,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         <div className="space-y-5">
           <p className="text-3xl font-semibold leading-snug text-primary-foreground">{brandConfig.tagline}</p>
           <ul className="space-y-3">
-            {VALUE_PROPS.map((item) => (
+            {valueProps.map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-primary-foreground/80">
                 <Check className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>{item}</span>

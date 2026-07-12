@@ -7,10 +7,12 @@ import { useState } from 'react';
 
 import { useLogin } from '@/features/auth';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { useLocale } from '@/lib/locale/locale-context';
 
 export default function LoginPage() {
   const router = useRouter();
   const loginMutation = useLogin();
+  const { messages } = useLocale();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,12 +33,12 @@ export default function LoginPage() {
     <AuthShell>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Sign in</CardTitle>
-          <CardDescription>Welcome back — sign in to your company account.</CardDescription>
+          <CardTitle>{messages.auth.loginTitle}</CardTitle>
+          <CardDescription>{messages.auth.loginDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField label="Email" htmlFor="email" required>
+            <FormField label={messages.auth.emailLabel} htmlFor="email" required>
               <Input
                 id="email"
                 type="email"
@@ -46,7 +48,7 @@ export default function LoginPage() {
                 onChange={(event) => setEmail(event.target.value)}
               />
             </FormField>
-            <FormField label="Password" htmlFor="password" required>
+            <FormField label={messages.auth.passwordLabel} htmlFor="password" required>
               <Input
                 id="password"
                 type="password"
@@ -58,17 +60,17 @@ export default function LoginPage() {
             </FormField>
             <div className="text-end">
               <Link href="/forgot-password" className="text-sm text-primary underline-offset-4 hover:underline">
-                Forgot password?
+                {messages.auth.forgotPassword}
               </Link>
             </div>
             <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-              {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
+              {loginMutation.isPending ? messages.auth.signingIn : messages.auth.signInButton}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            No account?{' '}
+            {messages.auth.noAccount}{' '}
             <Link href="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-              Register
+              {messages.auth.registerLink}
             </Link>
           </p>
         </CardContent>

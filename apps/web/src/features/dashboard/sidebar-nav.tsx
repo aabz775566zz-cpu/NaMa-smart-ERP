@@ -14,9 +14,10 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
-import { DASHBOARD_NAV_ITEMS, NAV_GROUP_LABELS, type DashboardNavGroup, type DashboardNavItem } from './nav-items';
+import { DASHBOARD_NAV_ITEMS, NAV_GROUP_LABEL_KEYS, type DashboardNavGroup, type DashboardNavItem } from './nav-items';
 
 const CONTENT_GROUPS: DashboardNavGroup[] = ['overview', 'operations', 'insights'];
 
@@ -27,6 +28,7 @@ const CONTENT_GROUPS: DashboardNavGroup[] = ['overview', 'operations', 'insights
 export function DashboardSidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const permissions = usePermissions();
+  const { messages } = useLocale();
 
   const visibleItems = DASHBOARD_NAV_ITEMS.filter(
     (item) => !item.requiredPermission || permissions.includes(item.requiredPermission),
@@ -42,7 +44,7 @@ export function DashboardSidebarNav({ onNavigate }: { onNavigate?: () => void })
       <SidebarNavItem key={item.href} asChild active={isActive(item)}>
         <Link href={item.href} onClick={onNavigate}>
           <item.icon />
-          {item.label}
+          {messages.nav[item.labelKey]}
         </Link>
       </SidebarNavItem>
     );
@@ -60,7 +62,9 @@ export function DashboardSidebarNav({ onNavigate }: { onNavigate?: () => void })
             if (items.length === 0) return null;
             return (
               <SidebarGroup key={group}>
-                {group !== 'overview' ? <SidebarGroupLabel>{NAV_GROUP_LABELS[group]}</SidebarGroupLabel> : null}
+                {group !== 'overview' ? (
+                  <SidebarGroupLabel>{messages.nav[NAV_GROUP_LABEL_KEYS[group]]}</SidebarGroupLabel>
+                ) : null}
                 {items.map(renderItem)}
               </SidebarGroup>
             );
