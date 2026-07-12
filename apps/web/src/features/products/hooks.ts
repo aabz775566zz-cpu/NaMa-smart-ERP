@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import * as productsApi from './api';
-import type { CreateProductInput, UpdateProductInput } from './api';
+import type { CreateCategoryInput, CreateProductInput, UpdateProductInput } from './api';
 
 export const productsKeys = {
   all: ['products'] as const,
@@ -31,6 +31,16 @@ export function useCategories(options?: { enabled?: boolean }) {
     queryKey: categoriesKeys.lists(),
     queryFn: productsApi.listCategories,
     enabled: options?.enabled ?? true,
+  });
+}
+
+export function useCreateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateCategoryInput) => productsApi.createCategory(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: categoriesKeys.lists() });
+    },
   });
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import type { Product, ProductStatus } from '@erp-smart/types';
+import type { Category, Product, ProductStatus } from '@erp-smart/types';
 import {
   Button,
   Dialog,
@@ -14,17 +14,21 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
   Textarea,
   toast,
 } from '@erp-smart/ui';
+import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { useCategories, useCreateProduct, useUpdateProduct } from '../hooks';
 import type { CreateProductInput } from '../api';
+import { CategoryQuickCreateDialog } from './category-quick-create-dialog';
 
 const NO_CATEGORY = '__none__';
+const CREATE_CATEGORY = '__create__';
 const STATUS_OPTIONS: ProductStatus[] = ['ACTIVE', 'INACTIVE', 'DISCONTINUED'];
 
 interface ProductFormValues {
@@ -82,6 +86,7 @@ export function ProductFormDialog({
 
   const [values, setValues] = useState<ProductFormValues>(emptyValues());
   const [errors, setErrors] = useState<FormErrors>({});
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -140,11 +145,16 @@ export function ProductFormDialog({
       });
   }
 
+  function handleCategoryCreated(category: Category) {
+    setValues((v) => ({ ...v, categoryId: category.id }));
+  }
+
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit product' : 'Add product'}</DialogTitle>
           <DialogDescription>
@@ -171,7 +181,13 @@ export function ProductFormDialog({
             <FormField label="Category" htmlFor="product-category">
               <Select
                 value={values.categoryId}
-                onValueChange={(value) => setValues((v) => ({ ...v, categoryId: value }))}
+                onValueChange={(value) => {
+                  if (value === CREATE_CATEGORY) {
+                    setCategoryDialogOpen(true);
+                    return;
+                  }
+                  setValues((v) => ({ ...v, categoryId: value }));
+                }}
               >
                 <SelectTrigger id="product-category">
                   <SelectValue placeholder="No category" />
@@ -183,6 +199,13 @@ export function ProductFormDialog({
                       {category.name}
                     </SelectItem>
                   ))}
+                  <SelectSeparator />
+                  <SelectItem value={CREATE_CATEGORY}>
+                    <span className="flex items-center gap-1.5 text-primary">
+                      <Plus className="h-3.5 w-3.5" />
+                      New category
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </FormField>
@@ -258,7 +281,14 @@ export function ProductFormDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <CategoryQuickCreateDialog
+        open={categoryDialogOpen}
+        onOpenChange={setCategoryDialogOpen}
+        onCreated={handleCategoryCreated}
+      />
+    </>
   );
 }

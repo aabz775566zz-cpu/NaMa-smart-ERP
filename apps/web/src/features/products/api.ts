@@ -38,3 +38,11 @@ export function deleteProduct(id: string) {
 export function listCategories() {
   return apiClient.get<Category[]>('/categories');
 }
+
+export interface CreateCategoryInput {
+  name: string;
+}
+
+export function createCategory(input: CreateCategoryInput) {
+  return apiClient.post<Category>('/categories', input);
+}
