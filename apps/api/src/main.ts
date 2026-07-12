@@ -1,16 +1,58 @@
 import 'reflect-metadata';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
+const PLACEHOLDER_JWT_SECRET = 'change-me-in-production';
+const DEFAULT_DEV_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
+
+// Fails fast in production rather than silently signing tokens with a
+// secret that's checked into .env.example — dev/staging just get a loud
+// warning so a placeholder never blocks local work.
+function checkJwtSecret(logger: Logger) {
+  const secret = process.env.JWT_SECRET;
+  const isPlaceholder = !secret || secret === PLACEHOLDER_JWT_SECRET;
+  if (!isPlaceholder) return;
+
+  const message =
+    'JWT_SECRET is unset or still the placeholder value from .env.example. ' +
+    'Every access/refresh token issued with it is forgeable by anyone who has read the repo.';
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(`${message} Refusing to start in production.`);
+  }
+  logger.warn(`${message} Rotate it before deploying.`);
+}
+
+// CORS_ORIGINS is an optional comma-separated override; unset keeps the
+// existing localhost dev origins exactly as before.
+function resolveCorsOrigins(logger: Logger): string[] {
+  const raw = process.env.CORS_ORIGINS;
+  if (!raw) return DEFAULT_DEV_ORIGINS;
+
+  const origins = raw
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  if (origins.length === 0) {
+    logger.warn('CORS_ORIGINS was set but empty after parsing — falling back to default dev origins.');
+    return DEFAULT_DEV_ORIGINS;
+  }
+  return origins;
+}
+
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+  checkJwtSecret(logger);
+
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: resolveCorsOrigins(logger),
     credentials: true,
   });
 

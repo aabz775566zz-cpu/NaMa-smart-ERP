@@ -3,6 +3,8 @@
 import type { SaleStatus } from '@erp-smart/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { productsKeys } from '@/features/products/hooks';
+
 import * as salesApi from './api';
 import type { CreateSaleInput } from './api';
 
@@ -39,6 +41,11 @@ export function useCompleteSale() {
     mutationFn: (id: string) => salesApi.completeSale(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: salesKeys.lists() });
+      // Completing a sale decrements Product.quantityOnHand via internal
+      // SALE-type inventory movements — same effect as Inventory's manual
+      // adjustments, which already invalidate this cache (see
+      // features/inventory/hooks.ts's useCreateAdjustment).
+      queryClient.invalidateQueries({ queryKey: productsKeys.lists() });
     },
   });
 }
