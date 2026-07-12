@@ -40,6 +40,13 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
+  @Throttle({ default: { limit: 3, ttl: 300000 } })
+  @HttpCode(HttpStatus.OK)
+  @Post('resend-verification')
+  resendVerification(@CurrentUser('sub') userId: string) {
+    return this.authService.resendVerification(userId);
+  }
+
   @Public()
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)

@@ -101,6 +101,32 @@ export class CompaniesService {
     return membership;
   }
 
+  async resendInvite(companyId: string, membershipId: string, actingUserId: string) {
+    const membership = await this.prisma.membership.findUnique({
+      where: { id: membershipId },
+      include: { user: true },
+    });
+    if (!membership || membership.companyId !== companyId) {
+      throw new NotFoundException('Membership not found.');
+    }
+    if (membership.status !== 'INVITED') {
+      throw new BadRequestException('This member has already accepted their invitation.');
+    }
+
+    const inviteToken = generateRandomToken();
+    const inviteExpiresAt = hoursFromNow(72);
+    await this.prisma.user.update({
+      where: { id: membership.userId },
+      data: { passwordResetToken: inviteToken, passwordResetExpiresAt: inviteExpiresAt },
+    });
+
+    await this.prisma.activityLog.create({
+      data: { userId: actingUserId, companyId, action: 'MEMBER_INVITE_RESENT', metadata: { membershipId } },
+    });
+
+    await this.mailer.sendInviteEmail(membership.user.email, inviteToken);
+  }
+
   async updateMemberRole(
     companyId: string,
     membershipId: string,

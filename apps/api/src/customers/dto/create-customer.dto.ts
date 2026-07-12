@@ -2,7 +2,7 @@ import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-valid
 
 export class CreateCustomerDto {
   @IsString()
-  @MinLength(1)
+  @MinLength(1, { message: 'Please enter a customer name.' })
   @MaxLength(200)
   name!: string;
 
@@ -12,7 +12,7 @@ export class CreateCustomerDto {
   phone?: string;
 
   @IsOptional()
-  @IsEmail()
+  @IsEmail({}, { message: 'Please enter a valid email address.' })
   email?: string;
 
   @IsOptional()

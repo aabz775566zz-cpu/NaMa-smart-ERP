@@ -182,6 +182,27 @@ export class AuthService {
     return { accessToken: this.jwtService.sign(payload), user: payload };
   }
 
+  // Authenticated (unlike register's initial send) — the user is already
+  // logged in at this point since verification isn't a login gate, just a
+  // trust signal. Silently no-ops if already verified rather than erroring,
+  // so a stale "resend" click from an old tab is harmless.
+  async resendVerification(userId: string) {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    if (user.isEmailVerified) {
+      return { alreadyVerified: true };
+    }
+
+    const emailVerifyToken = generateRandomToken();
+    const emailVerifyExpiresAt = hoursFromNow(24);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { emailVerifyToken, emailVerifyExpiresAt },
+    });
+
+    await this.mailer.sendVerificationEmail(user.email, emailVerifyToken);
+    return { alreadyVerified: false };
+  }
+
   async verifyEmail(token: string) {
     const user = await this.prisma.user.findUnique({ where: { emailVerifyToken: token } });
     if (!user || !user.emailVerifyExpiresAt || user.emailVerifyExpiresAt < new Date()) {

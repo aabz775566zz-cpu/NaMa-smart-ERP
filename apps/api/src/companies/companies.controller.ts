@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
@@ -38,6 +39,18 @@ export class CompaniesController {
     @Body() dto: InviteMemberDto,
   ) {
     return this.companiesService.inviteMember(companyId, userId, dto);
+  }
+
+  @RequirePermission('USERS:CREATE')
+  @Throttle({ default: { limit: 3, ttl: 300000 } })
+  @HttpCode(HttpStatus.OK)
+  @Post('me/members/:membershipId/resend-invite')
+  resendInvite(
+    @CurrentUser('companyId') companyId: string,
+    @CurrentUser('sub') userId: string,
+    @Param('membershipId') membershipId: string,
+  ) {
+    return this.companiesService.resendInvite(companyId, membershipId, userId);
   }
 
   @RequirePermission('USERS:UPDATE')
