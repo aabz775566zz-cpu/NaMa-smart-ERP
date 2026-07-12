@@ -4,6 +4,8 @@ import { EmptyState, Skeleton, StatCard, Table, TableBody, TableCell, TableHead,
 import { BarChart3, DollarSign, Receipt } from 'lucide-react';
 import { useState } from 'react';
 
+import { useFormatMoney } from '@/lib/format/money';
+
 import { useSalesReport } from '../hooks';
 import { DateRangeFilter } from './date-range-filter';
 
@@ -11,6 +13,7 @@ export function SalesReportView() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const { data, isLoading, isError, error } = useSalesReport({ from: from || undefined, to: to || undefined });
+  const formatMoney = useFormatMoney();
 
   return (
     <div className="space-y-4">
@@ -39,9 +42,9 @@ export function SalesReportView() {
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <StatCard label="Total revenue" value={data.totalRevenue} icon={<DollarSign />} />
+            <StatCard label="Total revenue" value={formatMoney(data.totalRevenue)} icon={<DollarSign />} />
             <StatCard label="Total sales" value={data.totalSales} icon={<Receipt />} />
-            <StatCard label="Average sale value" value={data.averageSaleValue} icon={<BarChart3 />} />
+            <StatCard label="Average sale value" value={formatMoney(data.averageSaleValue)} icon={<BarChart3 />} />
           </div>
 
           {data.dailyBreakdown.length === 0 ? (
@@ -59,7 +62,7 @@ export function SalesReportView() {
                   {data.dailyBreakdown.map((entry) => (
                     <TableRow key={entry.date}>
                       <TableCell className="text-muted-foreground">{entry.date}</TableCell>
-                      <TableCell className="font-medium text-foreground">{entry.revenue}</TableCell>
+                      <TableCell className="font-medium text-foreground">{formatMoney(entry.revenue)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

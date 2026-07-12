@@ -11,9 +11,16 @@ import {
   DialogTitle,
   FormField,
   Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   toast,
 } from '@erp-smart/ui';
 import { useEffect, useState } from 'react';
+
+import { CURRENCY_OPTIONS } from '@/lib/format/money';
 
 import type { UpdateCompanyInput } from '../api';
 import { useUpdateCompany } from '../hooks';
@@ -116,11 +123,21 @@ export function CompanyEditDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Currency" htmlFor="company-currency">
-              <Input
-                id="company-currency"
+              <Select
                 value={values.currency}
-                onChange={(event) => setValues((v) => ({ ...v, currency: event.target.value }))}
-              />
+                onValueChange={(value) => setValues((v) => ({ ...v, currency: value }))}
+              >
+                <SelectTrigger id="company-currency">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCY_OPTIONS.map((option) => (
+                    <SelectItem key={option.code} value={option.code}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FormField>
             <FormField label="Logo URL" htmlFor="company-logo-url">
               <Input

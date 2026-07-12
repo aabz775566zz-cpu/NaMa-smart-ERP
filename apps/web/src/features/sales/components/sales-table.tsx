@@ -17,6 +17,7 @@ import {
 } from '@erp-smart/ui';
 import { CheckCircle2, MoreHorizontal, XCircle } from 'lucide-react';
 
+import { useFormatMoney } from '@/lib/format/money';
 import { useHasPermission } from '@/lib/store';
 
 import { SaleStatusBadge } from './sale-status-badge';
@@ -38,6 +39,7 @@ export function SalesTable({
   const canComplete = useHasPermission('SALES:CREATE');
   const canCancel = useHasPermission('SALES:DELETE');
   const canAct = canComplete || canCancel;
+  const formatMoney = useFormatMoney();
 
   return (
     <div className="rounded-lg border border-border">
@@ -63,7 +65,7 @@ export function SalesTable({
                 <TableCell className="text-foreground">
                   {sale.customerId ? (customerNameById.get(sale.customerId) ?? '—') : 'Walk-in customer'}
                 </TableCell>
-                <TableCell className="font-medium text-foreground">{sale.totalAmount}</TableCell>
+                <TableCell className="font-medium text-foreground">{formatMoney(sale.totalAmount)}</TableCell>
                 <TableCell className="text-muted-foreground">
                   <span className="inline-flex items-center gap-2">
                     {sale.paymentMethod}

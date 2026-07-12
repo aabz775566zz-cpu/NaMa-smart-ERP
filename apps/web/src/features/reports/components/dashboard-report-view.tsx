@@ -4,10 +4,13 @@ import { EmptyState, Skeleton, StatCard } from '@erp-smart/ui';
 import { AlertTriangle, DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
 import Link from 'next/link';
 
+import { useFormatMoney } from '@/lib/format/money';
+
 import { useDashboardReport } from '../hooks';
 
 export function DashboardReportView() {
   const { data, isLoading, isError, error } = useDashboardReport();
+  const formatMoney = useFormatMoney();
 
   if (isLoading) {
     return (
@@ -33,7 +36,7 @@ export function DashboardReportView() {
       <Link href="/dashboard/reports">
         <StatCard
           label="Revenue this month"
-          value={data.revenueThisMonth}
+          value={formatMoney(data.revenueThisMonth)}
           icon={<DollarSign />}
           className="transition-colors hover:border-primary"
         />

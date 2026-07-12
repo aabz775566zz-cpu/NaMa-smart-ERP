@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react';
 import { CustomerFormDialog } from '@/features/customers/components/customer-form-dialog';
 import { useCustomers } from '@/features/customers/hooks';
 import { useProducts } from '@/features/products/hooks';
+import { useFormatMoney } from '@/lib/format/money';
 
 import type { CreateSaleInput } from '../api';
 import { useCreateSale } from '../hooks';
@@ -51,6 +52,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
   const { data: customers } = useCustomers();
   const { data: products } = useProducts();
   const createMutation = useCreateSale();
+  const formatMoney = useFormatMoney();
 
   const [customerId, setCustomerId] = useState(NO_CUSTOMER);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
@@ -294,7 +296,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           </div>
 
           <div className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
-            Estimated total: {previewTotal.toFixed(2)}{' '}
+            Estimated total: {formatMoney(previewTotal)}{' '}
             <span className="text-xs">(the server computes the authoritative total from live prices)</span>
           </div>
 

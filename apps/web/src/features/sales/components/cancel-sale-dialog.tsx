@@ -12,6 +12,8 @@ import {
   toast,
 } from '@erp-smart/ui';
 
+import { useFormatMoney } from '@/lib/format/money';
+
 import { useCancelSale } from '../hooks';
 
 // There is no DELETE /sales/:id — a sale can only be cancelled (DRAFT ->
@@ -28,6 +30,7 @@ export function CancelSaleDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const cancelMutation = useCancelSale();
+  const formatMoney = useFormatMoney();
 
   function handleConfirm() {
     if (!sale) return;
@@ -48,7 +51,9 @@ export function CancelSaleDialog({
         <DialogHeader>
           <DialogTitle>Cancel sale</DialogTitle>
           <DialogDescription>
-            {sale ? `This will cancel this draft sale (total ${sale.totalAmount}). This action cannot be undone.` : null}
+            {sale
+              ? `This will cancel this draft sale (total ${formatMoney(sale.totalAmount)}). This action cannot be undone.`
+              : null}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

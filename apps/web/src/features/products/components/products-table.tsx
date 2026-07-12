@@ -17,6 +17,7 @@ import {
 } from '@erp-smart/ui';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
+import { useFormatMoney } from '@/lib/format/money';
 import { useHasPermission } from '@/lib/store';
 
 import { ProductStatusBadge } from './product-status-badge';
@@ -35,6 +36,7 @@ export function ProductsTable({
   const canUpdate = useHasPermission('PRODUCTS:UPDATE');
   const canDelete = useHasPermission('PRODUCTS:DELETE');
   const canAct = canUpdate || canDelete;
+  const formatMoney = useFormatMoney();
 
   return (
     <div className="rounded-lg border border-border">
@@ -61,7 +63,7 @@ export function ProductsTable({
                 <TableCell className="text-muted-foreground">
                   {product.categoryId ? (categoryNameById.get(product.categoryId) ?? '—') : '—'}
                 </TableCell>
-                <TableCell>{product.sellingPrice}</TableCell>
+                <TableCell>{formatMoney(product.sellingPrice)}</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center gap-2">
                     {product.quantityOnHand}

@@ -3,10 +3,13 @@
 import { EmptyState, Skeleton, StatCard, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp-smart/ui';
 import { AlertTriangle, Boxes, Package, Wallet } from 'lucide-react';
 
+import { useFormatMoney } from '@/lib/format/money';
+
 import { useInventoryReport } from '../hooks';
 
 export function InventoryReportView() {
   const { data, isLoading, isError, error } = useInventoryReport();
+  const formatMoney = useFormatMoney();
 
   if (isLoading) {
     return (
@@ -32,7 +35,7 @@ export function InventoryReportView() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total products" value={data.totalProducts} icon={<Package />} />
         <StatCard label="Units in stock" value={data.totalUnitsInStock} icon={<Boxes />} />
-        <StatCard label="Stock value" value={data.stockValue} icon={<Wallet />} />
+        <StatCard label="Stock value" value={formatMoney(data.stockValue)} icon={<Wallet />} />
         <StatCard label="Low stock items" value={data.lowStockCount} icon={<AlertTriangle />} />
       </div>
 

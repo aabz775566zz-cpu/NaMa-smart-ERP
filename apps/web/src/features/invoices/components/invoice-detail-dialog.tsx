@@ -18,6 +18,7 @@ import {
   toast,
 } from '@erp-smart/ui';
 
+import { useFormatMoney } from '@/lib/format/money';
 import { useHasPermission } from '@/lib/store';
 
 import { useInvoice, useMarkInvoicePaid } from '../hooks';
@@ -35,6 +36,7 @@ export function InvoiceDetailDialog({
   const { data: invoice, isLoading } = useInvoice(open ? invoiceId : null);
   const canUpdate = useHasPermission('INVOICES:UPDATE');
   const markPaidMutation = useMarkInvoicePaid();
+  const formatMoney = useFormatMoney();
 
   function handleMarkPaid() {
     if (!invoice) return;
@@ -86,8 +88,8 @@ export function InvoiceDetailDialog({
                     <TableRow key={item.id}>
                       <TableCell>{item.product.name}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{item.unitPrice}</TableCell>
-                      <TableCell>{item.lineTotal}</TableCell>
+                      <TableCell>{formatMoney(item.unitPrice)}</TableCell>
+                      <TableCell>{formatMoney(item.lineTotal)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -97,19 +99,19 @@ export function InvoiceDetailDialog({
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>{invoice.sale.subtotal}</span>
+                <span>{formatMoney(invoice.sale.subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Discount</span>
-                <span>-{invoice.sale.discountTotal}</span>
+                <span>-{formatMoney(invoice.sale.discountTotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Tax</span>
-                <span>{invoice.sale.taxTotal}</span>
+                <span>{formatMoney(invoice.sale.taxTotal)}</span>
               </div>
               <div className="flex justify-between font-medium text-foreground">
                 <span>Total</span>
-                <span>{invoice.totalAmount}</span>
+                <span>{formatMoney(invoice.totalAmount)}</span>
               </div>
             </div>
           </div>

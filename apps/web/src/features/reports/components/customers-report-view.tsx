@@ -3,6 +3,8 @@
 import { EmptyState, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp-smart/ui';
 import { useState } from 'react';
 
+import { useFormatMoney } from '@/lib/format/money';
+
 import { useCustomersReport } from '../hooks';
 import { DateRangeFilter } from './date-range-filter';
 
@@ -10,6 +12,7 @@ export function CustomersReportView() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [limit, setLimit] = useState('');
+  const formatMoney = useFormatMoney();
   const { data, isLoading, isError, error } = useCustomersReport({
     from: from || undefined,
     to: to || undefined,
@@ -64,7 +67,7 @@ export function CustomersReportView() {
               {data.map((entry) => (
                 <TableRow key={entry.customerId}>
                   <TableCell className="font-medium text-foreground">{entry.customerName}</TableCell>
-                  <TableCell>{entry.totalSpent}</TableCell>
+                  <TableCell>{formatMoney(entry.totalSpent)}</TableCell>
                   <TableCell>{entry.purchaseCount}</TableCell>
                 </TableRow>
               ))}

@@ -4,6 +4,7 @@ import type { Invoice } from '@erp-smart/types';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp-smart/ui';
 import { CheckCircle2, Eye } from 'lucide-react';
 
+import { useFormatMoney } from '@/lib/format/money';
 import { useHasPermission } from '@/lib/store';
 
 import { InvoiceStatusBadge } from './invoice-status-badge';
@@ -18,6 +19,7 @@ export function InvoicesTable({
   onMarkPaid: (invoice: Invoice) => void;
 }) {
   const canUpdate = useHasPermission('INVOICES:UPDATE');
+  const formatMoney = useFormatMoney();
 
   return (
     <div className="rounded-lg border border-border">
@@ -42,7 +44,7 @@ export function InvoicesTable({
               <TableCell className="text-muted-foreground">
                 {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : '—'}
               </TableCell>
-              <TableCell className="font-medium text-foreground">{invoice.totalAmount}</TableCell>
+              <TableCell className="font-medium text-foreground">{formatMoney(invoice.totalAmount)}</TableCell>
               <TableCell>
                 <InvoiceStatusBadge status={invoice.status} />
               </TableCell>
