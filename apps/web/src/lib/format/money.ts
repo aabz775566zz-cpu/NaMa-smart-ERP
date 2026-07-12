@@ -37,6 +37,7 @@ export function formatMoney(value: string | number, currencyCode: string): strin
 // Intl.NumberFormat doesn't recognize, falling back to the plain-number
 // path in formatMoney above).
 export const CURRENCY_OPTIONS: Array<{ code: string; label: string }> = [
+  { code: 'YER', label: 'Yemeni Rial (YER)' },
   { code: 'USD', label: 'US Dollar (USD)' },
   { code: 'EUR', label: 'Euro (EUR)' },
   { code: 'GBP', label: 'British Pound (GBP)' },
