@@ -49,10 +49,13 @@ export function CustomerFormDialog({
   open,
   onOpenChange,
   customer,
+  onCreated,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   customer?: Customer | null;
+  /** Called with the new record after a successful create — not fired on edit. */
+  onCreated?: (customer: Customer) => void;
 }) {
   const isEdit = Boolean(customer);
   const createMutation = useCreateCustomer();
@@ -96,8 +99,9 @@ export function CustomerFormDialog({
         : createMutation.mutateAsync(input);
 
     submit
-      .then(() => {
+      .then((result) => {
         toast({ title: isEdit ? 'Customer updated' : 'Customer created' });
+        if (!isEdit) onCreated?.(result);
         onOpenChange(false);
       })
       .catch((error: Error) => {

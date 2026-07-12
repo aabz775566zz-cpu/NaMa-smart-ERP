@@ -1,6 +1,6 @@
 'use client';
 
-import type { PaymentMethod, PaymentStatus } from '@erp-smart/types';
+import type { Customer, PaymentMethod, PaymentStatus } from '@erp-smart/types';
 import {
   Button,
   Dialog,
@@ -14,6 +14,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
   toast,
@@ -21,6 +22,7 @@ import {
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { CustomerFormDialog } from '@/features/customers/components/customer-form-dialog';
 import { useCustomers } from '@/features/customers/hooks';
 import { useProducts } from '@/features/products/hooks';
 
@@ -28,6 +30,7 @@ import type { CreateSaleInput } from '../api';
 import { useCreateSale } from '../hooks';
 
 const NO_CUSTOMER = '__none__';
+const CREATE_CUSTOMER = '__create__';
 const PAYMENT_METHODS: PaymentMethod[] = ['CASH', 'CARD', 'TRANSFER', 'OTHER'];
 const PAYMENT_STATUSES: PaymentStatus[] = ['UNPAID', 'PARTIAL', 'PAID'];
 
@@ -54,6 +57,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
   const [taxTotal, setTaxTotal] = useState('');
   const [items, setItems] = useState<LineItemDraft[]>([emptyLineItem()]);
   const [error, setError] = useState<string | null>(null);
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -93,6 +97,10 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
     setItems((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function handleCustomerCreated(customer: Customer) {
+    setCustomerId(customer.id);
+  }
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
@@ -124,7 +132,8 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>New sale</DialogTitle>
@@ -134,7 +143,16 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormField label="Customer" htmlFor="sale-customer">
-            <Select value={customerId} onValueChange={setCustomerId}>
+            <Select
+              value={customerId}
+              onValueChange={(value) => {
+                if (value === CREATE_CUSTOMER) {
+                  setCustomerDialogOpen(true);
+                  return;
+                }
+                setCustomerId(value);
+              }}
+            >
               <SelectTrigger id="sale-customer">
                 <SelectValue placeholder="Walk-in customer" />
               </SelectTrigger>
@@ -145,6 +163,13 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                     {customer.name}
                   </SelectItem>
                 ))}
+                <SelectSeparator />
+                <SelectItem value={CREATE_CUSTOMER}>
+                  <span className="flex items-center gap-1.5 text-primary">
+                    <Plus className="h-3.5 w-3.5" />
+                    New customer
+                  </span>
+                </SelectItem>
               </SelectContent>
             </Select>
           </FormField>
@@ -266,6 +291,13 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+
+      <CustomerFormDialog
+        open={customerDialogOpen}
+        onOpenChange={setCustomerDialogOpen}
+        onCreated={handleCustomerCreated}
+      />
+    </>
   );
 }
