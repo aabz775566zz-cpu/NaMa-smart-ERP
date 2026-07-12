@@ -38,6 +38,10 @@ export function inviteMember(input: InviteMemberInput) {
   return apiClient.post<Member>('/companies/me/invitations', input);
 }
 
+export function resendInvite(membershipId: string) {
+  return apiClient.post<void>(`/companies/me/members/${membershipId}/resend-invite`);
+}
+
 export function updateMemberRole(membershipId: string, input: UpdateMemberInput) {
   return apiClient.patch<Member>(`/companies/me/members/${membershipId}`, input);
 }

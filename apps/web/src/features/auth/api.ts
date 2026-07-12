@@ -79,3 +79,11 @@ export function resetPassword(input: ResetPasswordInput) {
 export function acceptInvite(input: AcceptInviteInput) {
   return apiClient.post<void>('/auth/accept-invite', input);
 }
+
+export interface ResendVerificationResponse {
+  alreadyVerified: boolean;
+}
+
+export function resendVerification() {
+  return apiClient.post<ResendVerificationResponse>('/auth/resend-verification');
+}

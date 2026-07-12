@@ -50,6 +50,12 @@ export function useInviteMember() {
   });
 }
 
+export function useResendInvite() {
+  return useMutation({
+    mutationFn: (membershipId: string) => settingsApi.resendInvite(membershipId),
+  });
+}
+
 export function useUpdateMemberRole() {
   const queryClient = useQueryClient();
   return useMutation({

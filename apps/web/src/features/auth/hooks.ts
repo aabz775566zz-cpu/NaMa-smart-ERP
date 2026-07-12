@@ -60,6 +60,10 @@ export function useAcceptInvite() {
   return useMutation({ mutationFn: (input: AcceptInviteInput) => authApi.acceptInvite(input) });
 }
 
+export function useResendVerification() {
+  return useMutation({ mutationFn: () => authApi.resendVerification() });
+}
+
 /** Attempts a silent refresh once on mount, using the httpOnly refresh
  * cookie the browser already holds. This is what lets a hard page reload
  * restore the session without forcing a fresh login — the access token

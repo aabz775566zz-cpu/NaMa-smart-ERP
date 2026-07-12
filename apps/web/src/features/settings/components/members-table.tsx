@@ -16,9 +16,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  toast,
 } from '@erp-smart/ui';
-import { MoreHorizontal, ShieldCheck, UserMinus } from 'lucide-react';
+import { MailPlus, MoreHorizontal, ShieldCheck, UserMinus } from 'lucide-react';
 
+import { useResendInvite } from '@/features/settings/hooks';
 import { useHasPermission } from '@/lib/store';
 
 const STATUS_VARIANT: Record<MembershipStatus, 'success' | 'secondary' | 'destructive'> = {
@@ -38,7 +40,20 @@ export function MembersTable({
 }) {
   const canUpdateRole = useHasPermission('USERS:UPDATE');
   const canRemove = useHasPermission('USERS:DELETE');
-  const canAct = canUpdateRole || canRemove;
+  const canInvite = useHasPermission('USERS:CREATE');
+  const canAct = canUpdateRole || canRemove || canInvite;
+  const resendInviteMutation = useResendInvite();
+
+  function handleResendInvite(member: Member) {
+    resendInviteMutation.mutate(member.id, {
+      onSuccess: () => {
+        toast({ title: 'Invitation resent', description: `A new invite link was sent to ${member.user.email}.` });
+      },
+      onError: (error: Error) => {
+        toast({ variant: 'destructive', title: 'Failed to resend invitation', description: error.message });
+      },
+    });
+  }
 
   return (
     <div className="rounded-lg border border-border">
@@ -58,6 +73,7 @@ export function MembersTable({
             // OWNER membership (see CompaniesService.removeMember()) — hide
             // the actions entirely for that row rather than let them fail.
             const isOwner = member.role.key === 'OWNER';
+            const isInvited = member.status === 'INVITED';
             const initials = member.user.fullName.slice(0, 2).toUpperCase();
             return (
               <TableRow key={member.id}>
@@ -87,6 +103,15 @@ export function MembersTable({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {canInvite && isInvited ? (
+                            <DropdownMenuItem
+                              onClick={() => handleResendInvite(member)}
+                              disabled={resendInviteMutation.isPending}
+                            >
+                              <MailPlus />
+                              Resend invitation
+                            </DropdownMenuItem>
+                          ) : null}
                           {canUpdateRole ? (
                             <DropdownMenuItem onClick={() => onChangeRole(member)}>
                               <ShieldCheck />
