@@ -17,8 +17,10 @@ import {
   TableRow,
   toast,
 } from '@erp-smart/ui';
+import { Printer } from 'lucide-react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 import { useInvoice, useMarkInvoicePaid } from '../hooks';
@@ -37,6 +39,7 @@ export function InvoiceDetailDialog({
   const canUpdate = useHasPermission('INVOICES:UPDATE');
   const markPaidMutation = useMarkInvoicePaid();
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
 
   function handleMarkPaid() {
     if (!invoice) return;
@@ -117,11 +120,20 @@ export function InvoiceDetailDialog({
           </div>
         )}
 
-        {invoice && canUpdate && invoice.status === 'ISSUED' ? (
+        {invoice ? (
           <DialogFooter>
-            <Button onClick={handleMarkPaid} disabled={markPaidMutation.isPending}>
-              {markPaidMutation.isPending ? 'Marking…' : 'Mark as paid'}
+            <Button
+              variant="outline"
+              onClick={() => window.open(`/invoices/${invoice.id}/print`, '_blank', 'noopener,noreferrer')}
+            >
+              <Printer />
+              {messages.invoice.print} / {messages.invoice.downloadPdf}
             </Button>
+            {canUpdate && invoice.status === 'ISSUED' ? (
+              <Button onClick={handleMarkPaid} disabled={markPaidMutation.isPending}>
+                {markPaidMutation.isPending ? 'Marking…' : 'Mark as paid'}
+              </Button>
+            ) : null}
           </DialogFooter>
         ) : null}
       </DialogContent>

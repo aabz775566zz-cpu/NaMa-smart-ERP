@@ -68,8 +68,30 @@
   },
   "marketing": {
     "heroTitle": "أدر أعمالك من مكان واحد",
-    "heroSubtitle": "منصة ERP بسيطة للشركات الصغيرة والمتوسطة",
+    "heroSubtitle": "برنامج بسيط لإدارة متجرك أو تجارتك",
     "getStarted": "ابدأ الآن",
     "learnMore": "اعرف المزيد"
+  },
+  "invoice": {
+    "title": "فاتورة",
+    "invoiceNumber": "رقم الفاتورة",
+    "issueDate": "التاريخ",
+    "billTo": "بيانات العميل",
+    "walkInCustomer": "عميل نقدي",
+    "product": "المنتج",
+    "quantity": "الكمية",
+    "unitPrice": "سعر الوحدة",
+    "lineTotal": "المجموع",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "tax": "الضريبة",
+    "grandTotal": "المبلغ المستحق",
+    "paymentStatusIssued": "غير مدفوعة",
+    "paymentStatusPaid": "مدفوعة",
+    "thankYou": "شكراً لتعاملكم معنا.",
+    "print": "طباعة",
+    "downloadPdf": "تحميل PDF",
+    "sendWhatsApp": "إرسال عبر واتساب",
+    "whatsAppMessage": "السلام عليكم،\nهذه فاتورتك من متجر {{company}}.\nرقم الفاتورة: {{number}}\nالإجمالي: {{total}}\nشكراً لتعاملك معنا"
   }
 }

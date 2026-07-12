@@ -71,5 +71,27 @@
     "heroSubtitle": "A simple ERP platform for small and medium businesses",
     "getStarted": "Get started",
     "learnMore": "Learn more"
+  },
+  "invoice": {
+    "title": "Invoice",
+    "invoiceNumber": "Invoice #",
+    "issueDate": "Date",
+    "billTo": "Bill To",
+    "walkInCustomer": "Walk-in customer",
+    "product": "Product",
+    "quantity": "Qty",
+    "unitPrice": "Unit Price",
+    "lineTotal": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "tax": "Tax",
+    "grandTotal": "Total Due",
+    "paymentStatusIssued": "Unpaid",
+    "paymentStatusPaid": "Paid",
+    "thankYou": "Thank you for your business.",
+    "print": "Print",
+    "downloadPdf": "Download PDF",
+    "sendWhatsApp": "Send via WhatsApp",
+    "whatsAppMessage": "Hello,\nHere is your invoice from {{company}}.\nInvoice #{{number}}\nTotal: {{total}}\nThank you for your business."
   }
 }
