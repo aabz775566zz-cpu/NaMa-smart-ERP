@@ -12,6 +12,8 @@ export type {
 } from './auth';
 export type { ProductStatus, Category, Product } from './product';
 export type { Customer } from './customer';
+export type { MembershipStatus, Company, Member, AssignableRoleKey, SystemRole } from './company';
+export type { UserStatus, UserProfile } from './user';
 export type { InventoryMovementType, InventoryMovement } from './inventory';
 export type {
   SaleStatus,

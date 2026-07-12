@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@erp-smart/ui';
 import { LogOut, User } from 'lucide-react';
+import Link from 'next/link';
 
 import { useLogout } from '@/features/auth';
 import { useCurrentUser } from '@/lib/store';
@@ -45,9 +46,11 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <User />
-          Profile (coming soon)
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/profile">
+            <User />
+            Profile
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logoutMutation.mutate()} disabled={logoutMutation.isPending}>

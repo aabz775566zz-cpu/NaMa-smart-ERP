@@ -1,6 +1,16 @@
 import type { PermissionKey } from '@erp-smart/types';
 import type { LucideIcon } from 'lucide-react';
-import { BarChart3, Boxes, FileText, LayoutDashboard, Package, ShoppingCart, Sparkles, Users } from 'lucide-react';
+import {
+  BarChart3,
+  Boxes,
+  FileText,
+  LayoutDashboard,
+  Package,
+  Settings,
+  ShoppingCart,
+  Sparkles,
+  Users,
+} from 'lucide-react';
 
 export interface DashboardNavItem {
   label: string;
@@ -19,4 +29,7 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   { label: 'Invoices', href: '/dashboard/invoices', icon: FileText, requiredPermission: 'INVOICES:READ' },
   { label: 'Reports', href: '/dashboard/reports', icon: BarChart3, requiredPermission: 'REPORTS:READ' },
   { label: 'AI Assistant', href: '/dashboard/ai', icon: Sparkles },
+  // No requiredPermission — GET /companies/me has no permission requirement,
+  // so every authenticated user can at least view their company's info.
+  { label: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
