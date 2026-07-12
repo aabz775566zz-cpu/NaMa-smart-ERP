@@ -22,7 +22,7 @@ export default function RegisterPage() {
     registerMutation.mutate(
       { fullName, companyName, email, password },
       {
-        onSuccess: () => router.push('/'),
+        onSuccess: () => router.push('/dashboard'),
         onError: (error) => {
           toast({ variant: 'destructive', title: 'Registration failed', description: error.message });
         },

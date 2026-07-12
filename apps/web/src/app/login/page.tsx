@@ -22,7 +22,7 @@ export default function LoginPage() {
     loginMutation.mutate(
       { email, password },
       {
-        onSuccess: () => router.push('/'),
+        onSuccess: () => router.push('/dashboard'),
         onError: (error) => {
           toast({ variant: 'destructive', title: 'Login failed', description: error.message });
         },
