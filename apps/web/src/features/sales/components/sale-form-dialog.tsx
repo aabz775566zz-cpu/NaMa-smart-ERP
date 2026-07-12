@@ -9,6 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  EmptyState,
   FormField,
   Input,
   Select,
@@ -19,7 +20,8 @@ import {
   SelectValue,
   toast,
 } from '@erp-smart/ui';
-import { Plus, Trash2 } from 'lucide-react';
+import { Package, Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { CustomerFormDialog } from '@/features/customers/components/customer-form-dialog';
@@ -208,48 +210,63 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">Items</span>
-              <Button type="button" variant="outline" size="sm" onClick={addItem}>
-                <Plus />
-                Add line
-              </Button>
+              {products && products.length > 0 ? (
+                <Button type="button" variant="outline" size="sm" onClick={addItem}>
+                  <Plus />
+                  Add line
+                </Button>
+              ) : null}
             </div>
-            <div className="space-y-2">
-              {items.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Select value={item.productId} onValueChange={(value) => updateItem(index, { productId: value })}>
-                    <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Select a product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products?.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name}
-                          {product.sku ? ` (${product.sku})` : ''}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="number"
-                    min="1"
-                    step="1"
-                    className="w-24"
-                    value={item.quantity}
-                    onChange={(event) => updateItem(index, { quantity: event.target.value })}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeItem(index)}
-                    disabled={items.length === 1}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Remove line</span>
+            {products && products.length === 0 ? (
+              <EmptyState
+                icon={<Package />}
+                title="No products yet"
+                description="Add a product before creating a sale."
+                action={
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/dashboard/products">Go to Products</Link>
                   </Button>
-                </div>
-              ))}
-            </div>
+                }
+              />
+            ) : (
+              <div className="space-y-2">
+                {items.map((item, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Select value={item.productId} onValueChange={(value) => updateItem(index, { productId: value })}>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Select a product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products?.map((product) => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name}
+                            {product.sku ? ` (${product.sku})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="number"
+                      min="1"
+                      step="1"
+                      className="w-24"
+                      value={item.quantity}
+                      onChange={(event) => updateItem(index, { quantity: event.target.value })}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeItem(index)}
+                      disabled={items.length === 1}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Remove line</span>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
             {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
           </div>
 
