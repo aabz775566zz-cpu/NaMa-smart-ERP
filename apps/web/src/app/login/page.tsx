@@ -7,10 +7,6 @@ import { useState } from 'react';
 
 import { useLogin } from '@/features/auth';
 
-// Deliberately minimal and functional, not the final designed auth
-// experience — this page exists in Step 1 to prove the API client, auth
-// store, and design-system primitives work together end to end. Full auth
-// UX polish is a later pass.
 export default function LoginPage() {
   const router = useRouter();
   const loginMutation = useLogin();
@@ -35,7 +31,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
-          <CardDescription>Foundation verification screen — not the final design.</CardDescription>
+          <CardDescription>Welcome back — sign in to your company account.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

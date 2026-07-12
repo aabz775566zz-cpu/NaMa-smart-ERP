@@ -7,8 +7,6 @@ import { useState } from 'react';
 
 import { useRegister } from '@/features/auth';
 
-// Same scope note as the login page — minimal and functional, proving the
-// foundation end to end, not the final onboarding experience.
 export default function RegisterPage() {
   const router = useRouter();
   const registerMutation = useRegister();
@@ -35,7 +33,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Create your company</CardTitle>
-          <CardDescription>Foundation verification screen — not the final design.</CardDescription>
+          <CardDescription>Set up your workspace in under a minute.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
