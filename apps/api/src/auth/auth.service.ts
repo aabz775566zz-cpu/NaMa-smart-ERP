@@ -98,11 +98,7 @@ export class AuthService {
       return { user, company, membership };
     });
 
-    await this.mailer.send(
-      user.email,
-      'Verify your ERP Smart account',
-      `Verification token: ${emailVerifyToken}`,
-    );
+    await this.mailer.sendVerificationEmail(user.email, emailVerifyToken);
 
     const payload = await this.buildJwtPayload(user, membership);
     return this.issueTokens(user, payload, res);
@@ -209,7 +205,7 @@ export class AuthService {
         where: { id: user.id },
         data: { passwordResetToken: token, passwordResetExpiresAt: hoursFromNow(1) },
       });
-      await this.mailer.send(user.email, 'Reset your ERP Smart password', `Reset token: ${token}`);
+      await this.mailer.sendPasswordResetEmail(user.email, token);
     }
   }
 

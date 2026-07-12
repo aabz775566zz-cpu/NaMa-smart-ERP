@@ -96,11 +96,7 @@ export class CompaniesService {
       },
     });
 
-    await this.mailer.send(
-      user.email,
-      "You've been invited to join a company on ERP Smart",
-      `Accept your invite with token: ${inviteToken}`,
-    );
+    await this.mailer.sendInviteEmail(user.email, inviteToken);
 
     return membership;
   }
