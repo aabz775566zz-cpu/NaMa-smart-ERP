@@ -53,6 +53,7 @@ model User {
   activityLogs       ActivityLog[]
   inventoryMovements InventoryMovement[]
   sales              Sale[]
+  paymentsRecorded   Payment[]            @relation("PaymentsRecorded")
   aiConversations    AIConversation[]
   aiUsageLogs        AIUsageLog[]
 
@@ -81,6 +82,7 @@ model Company {
   inventoryMovements InventoryMovement[]
   sales              Sale[]
   invoices           Invoice[]
+  payments           Payment[]
   counters           CompanyCounter[]
   aiConversations    AIConversation[]
   aiMessages         AIMessage[]
@@ -230,8 +232,9 @@ model Customer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  sales   Sale[]
+  company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sales    Sale[]
+  payments Payment[]
 
   @@index([companyId])
 }
@@ -318,6 +321,30 @@ model SaleItem {
   product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   @@index([companyId, saleId])
+}
+
+// Deliberately customer-level only — no saleId. Which sale(s) a payment
+// covers is derived at read time by walking a customer's completed sales
+// oldest-first against their payment total (see PaymentsService.computeLedger),
+// never stored, so there is exactly one source of truth for "how much is
+// owed": SUM(completed sale totals) - SUM(payments). Sale.paymentStatus and
+// Invoice.status are kept as an accurate cache of that computation, written
+// whenever a payment is recorded — never hand-toggled independently.
+model Payment {
+  id              String        @id @default(cuid())
+  companyId       String
+  customerId      String
+  amount          Decimal       @db.Decimal(14, 2)
+  method          PaymentMethod @default(CASH)
+  note            String?
+  createdByUserId String
+  createdAt       DateTime      @default(now())
+
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  createdBy User     @relation("PaymentsRecorded", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, customerId, createdAt])
 }
 
 enum InvoiceStatus {

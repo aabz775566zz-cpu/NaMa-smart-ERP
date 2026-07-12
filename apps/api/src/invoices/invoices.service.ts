@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import type { InvoiceStatus, Prisma } from '@prisma/client';
 
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
+import { PaymentsService } from '../payments/payments.service';
 
 const INVOICE_STATUSES = ['ISSUED', 'PAID'] as const;
 
@@ -25,7 +26,10 @@ interface InvoiceTxClient {
 
 @Injectable()
 export class InvoicesService {
-  constructor(private readonly tenantPrisma: TenantGuardedPrismaService) {}
+  constructor(
+    private readonly tenantPrisma: TenantGuardedPrismaService,
+    private readonly paymentsService: PaymentsService,
+  ) {}
 
   private get db() {
     return this.tenantPrisma.client;
@@ -82,7 +86,7 @@ export class InvoicesService {
     return invoice;
   }
 
-  async markPaid(companyId: string, id: string) {
+  async markPaid(companyId: string, id: string, userId: string) {
     const invoice = await this.db.invoice.findFirst({ where: { id, companyId } });
     if (!invoice) {
       throw new NotFoundException('Invoice not found.');
@@ -91,11 +95,31 @@ export class InvoicesService {
       throw new ConflictException('Invoice is already marked as paid.');
     }
 
-    const [updatedInvoice] = await this.db.$transaction([
-      this.db.invoice.update({ where: { id, companyId }, data: { status: 'PAID' } }),
-      this.db.sale.update({ where: { id: invoice.saleId, companyId }, data: { paymentStatus: 'PAID' } }),
-    ]);
+    const sale = await this.db.sale.findFirst({ where: { id: invoice.saleId, companyId } });
+    if (!sale) {
+      throw new NotFoundException('Sale not found.');
+    }
 
-    return updatedInvoice;
+    if (sale.customerId) {
+      // Ledger-backed customer — record the sale's remaining balance as an
+      // implicit payment so Payment stays the single source of truth, then
+      // let the ledger reconcile status fields (see PaymentsService).
+      await this.db.$transaction(async (tx) => {
+        await this.paymentsService.settleSaleInFull(
+          tx,
+          companyId,
+          { id: sale.id, customerId: sale.customerId },
+          userId,
+        );
+      });
+    } else {
+      // Walk-in sale — no customer ledger involved, flip status directly.
+      await this.db.$transaction([
+        this.db.invoice.update({ where: { id, companyId }, data: { status: 'PAID' } }),
+        this.db.sale.update({ where: { id: invoice.saleId, companyId }, data: { paymentStatus: 'PAID' } }),
+      ]);
+    }
+
+    return this.db.invoice.findFirst({ where: { id, companyId } });
   }
 }

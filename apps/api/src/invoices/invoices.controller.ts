@@ -27,7 +27,11 @@ export class InvoicesController {
   @RequirePermission('INVOICES:UPDATE')
   @HttpCode(HttpStatus.OK)
   @Post(':id/mark-paid')
-  markPaid(@CurrentUser('companyId') companyId: string, @Param('id') id: string) {
-    return this.invoicesService.markPaid(companyId, id);
+  markPaid(
+    @CurrentUser('companyId') companyId: string,
+    @CurrentUser('sub') userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.invoicesService.markPaid(companyId, id, userId);
   }
 }

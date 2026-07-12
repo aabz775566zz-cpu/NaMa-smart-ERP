@@ -12,6 +12,7 @@ import { MailerModule } from './common/mailer/mailer.module';
 import { CustomersModule } from './customers/customers.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { InvoicesModule } from './invoices/invoices.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { ReportsModule } from './reports/reports.module';
@@ -33,6 +34,7 @@ import { UsersModule } from './users/users.module';
     InventoryModule,
     SalesModule,
     InvoicesModule,
+    PaymentsModule,
     ReportsModule,
     AiModule,
   ],

@@ -16,6 +16,7 @@ const TENANT_SCOPED_MODELS = new Set<string>([
   'Sale',
   'SaleItem',
   'Invoice',
+  'Payment',
   'CompanyCounter',
   'AIConversation',
   'AIMessage',
