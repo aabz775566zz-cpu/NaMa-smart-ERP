@@ -1,0 +1,11 @@
+// ERP Smart database schema
+// Phase 1: connection only. Models (Users, Roles, Permissions, ...) arrive in Phase 2.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
