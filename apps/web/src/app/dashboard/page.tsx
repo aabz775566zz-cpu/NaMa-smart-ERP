@@ -3,8 +3,9 @@
 import { Card, CardHeader, CardTitle } from '@erp-smart/ui';
 import Link from 'next/link';
 
-import { DashboardReportView } from '@/features/reports/components/dashboard-report-view';
 import { DASHBOARD_NAV_ITEMS } from '@/features/dashboard/nav-items';
+import { OnboardingChecklist } from '@/features/dashboard/onboarding-checklist';
+import { DashboardReportView } from '@/features/reports/components/dashboard-report-view';
 import { useCompany } from '@/features/settings/hooks';
 import { useCurrentUser, usePermissions } from '@/lib/store';
 
@@ -28,6 +29,8 @@ export default function DashboardHomePage() {
           {user?.email} · {user?.roleKey}
         </p>
       </div>
+
+      <OnboardingChecklist />
 
       {canViewReports ? <DashboardReportView /> : null}
 
