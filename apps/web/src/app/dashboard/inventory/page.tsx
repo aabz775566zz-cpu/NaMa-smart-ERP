@@ -1,0 +1,89 @@
+'use client';
+
+import { EmptyState, Skeleton } from '@erp-smart/ui';
+import { Boxes, ShieldAlert } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+import { AdjustmentFormDialog } from '@/features/inventory/components/adjustment-form-dialog';
+import { InventoryToolbar } from '@/features/inventory/components/inventory-toolbar';
+import { LowStockPanel } from '@/features/inventory/components/low-stock-panel';
+import { MovementsTable } from '@/features/inventory/components/movements-table';
+import { useLowStock, useMovements } from '@/features/inventory/hooks';
+import { useProducts } from '@/features/products/hooks';
+import { usePermissions } from '@/lib/store';
+
+export default function InventoryPage() {
+  const permissions = usePermissions();
+  const canRead = permissions.includes('INVENTORY:READ');
+  const canReadProducts = permissions.includes('PRODUCTS:READ');
+
+  const [productId, setProductId] = useState<string | undefined>(undefined);
+  const productsQuery = useProducts({ enabled: canRead && canReadProducts });
+  const movementsQuery = useMovements(productId, { enabled: canRead });
+  const lowStockQuery = useLowStock({ enabled: canRead });
+
+  const [formOpen, setFormOpen] = useState(false);
+
+  const productNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    productsQuery.data?.forEach((product) => map.set(product.id, product.name));
+    return map;
+  }, [productsQuery.data]);
+
+  if (!canRead) {
+    return (
+      <div className="flex h-full min-h-[60vh] items-center justify-center">
+        <EmptyState
+          icon={<ShieldAlert />}
+          title="You don't have access to this section"
+          description="Ask a company owner or manager if you need this permission."
+        />
+      </div>
+    );
+  }
+
+  const movements = movementsQuery.data ?? [];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-semibold text-foreground">Inventory</h1>
+        <p className="text-sm text-muted-foreground">Track stock movements and post manual adjustments.</p>
+      </div>
+
+      {lowStockQuery.data && lowStockQuery.data.length > 0 ? <LowStockPanel products={lowStockQuery.data} /> : null}
+
+      <InventoryToolbar
+        products={productsQuery.data ?? []}
+        productId={productId}
+        onProductChange={setProductId}
+        onAdd={() => setFormOpen(true)}
+      />
+
+      {movementsQuery.isLoading ? (
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ) : movementsQuery.isError ? (
+        <EmptyState
+          title="Couldn't load inventory movements"
+          description={movementsQuery.error instanceof Error ? movementsQuery.error.message : 'Please try again.'}
+        />
+      ) : movements.length === 0 ? (
+        <EmptyState
+          icon={<Boxes />}
+          title={productId ? 'No movements for this product' : 'No inventory movements yet'}
+          description={
+            productId ? 'Try a different product filter.' : 'Movements appear here as stock is purchased, sold, or adjusted.'
+          }
+        />
+      ) : (
+        <MovementsTable movements={movements} productNameById={productNameById} />
+      )}
+
+      <AdjustmentFormDialog open={formOpen} onOpenChange={setFormOpen} products={productsQuery.data ?? []} />
+    </div>
+  );
+}

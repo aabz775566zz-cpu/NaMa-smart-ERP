@@ -1,10 +1,16 @@
 import type { Metadata } from 'next';
+import { brandConfig } from '@erp-smart/branding';
 import { getLocaleConfig } from '@erp-smart/i18n';
+import { Toaster } from '@erp-smart/ui';
 import '@erp-smart/ui/globals.css';
 
+import { SessionBootstrap } from '@/features/auth/session-bootstrap';
+
+import { Providers } from './providers';
+
 export const metadata: Metadata = {
-  title: 'ERP Smart',
-  description: 'AI-powered SaaS ERP platform for small and medium businesses',
+  title: brandConfig.productName,
+  description: brandConfig.tagline,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +18,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang={locale} dir={direction}>
-      <body>{children}</body>
+      <body>
+        <Providers>
+          <SessionBootstrap />
+          {children}
+          <Toaster />
+        </Providers>
+      </body>
     </html>
   );
 }

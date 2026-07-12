@@ -1,7 +1,10 @@
 // ERP Smart database schema
 // Phase 2: Identity and Access Management (User, Company, Membership, Role,
-// Permission, RefreshToken, ActivityLog). Business modules (Customer, Product,
-// Sale, Invoice, ...) arrive in Phase 3.
+// Permission, RefreshToken, ActivityLog).
+// Phase 3: business modules (Products + Categories, Customers, Inventory,
+// Sales, Invoices, Reports) — complete.
+// Phase 4 (in progress): AI Intelligence Layer, one migration per pass. Part 1
+// (AIConversation, AIMessage, AIUsageLog) below.
 
 generator client {
   provider = "prisma-client-js"
@@ -45,9 +48,13 @@ model User {
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt
 
-  memberships   Membership[]
-  refreshTokens RefreshToken[]
-  activityLogs  ActivityLog[]
+  memberships        Membership[]
+  refreshTokens      RefreshToken[]
+  activityLogs       ActivityLog[]
+  inventoryMovements InventoryMovement[]
+  sales              Sale[]
+  aiConversations    AIConversation[]
+  aiUsageLogs        AIUsageLog[]
 
   @@index([passwordResetToken])
   @@index([emailVerifyToken])
@@ -65,9 +72,19 @@ model Company {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  memberships  Membership[]
-  roles        Role[]
-  activityLogs ActivityLog[]
+  memberships        Membership[]
+  roles              Role[]
+  activityLogs       ActivityLog[]
+  categories         Category[]
+  products           Product[]
+  customers          Customer[]
+  inventoryMovements InventoryMovement[]
+  sales              Sale[]
+  invoices           Invoice[]
+  counters           CompanyCounter[]
+  aiConversations    AIConversation[]
+  aiMessages         AIMessage[]
+  aiUsageLogs        AIUsageLog[]
 }
 
 model Membership {
@@ -151,5 +168,256 @@ model ActivityLog {
   company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
   @@index([companyId])
+  @@index([userId])
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DISCONTINUED
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String
+  createdAt DateTime @default(now())
+
+  company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([companyId, name])
+}
+
+model Product {
+  id                String        @id @default(cuid())
+  companyId         String
+  categoryId        String?
+  name              String
+  description       String?
+  sku               String?
+  imageUrl          String?
+  purchasePrice     Decimal       @db.Decimal(14, 2)
+  sellingPrice      Decimal       @db.Decimal(14, 2)
+  quantityOnHand    Int           @default(0)
+  lowStockThreshold Int?
+  status            ProductStatus @default(ACTIVE)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  inventoryMovements InventoryMovement[]
+  saleItems          SaleItem[]
+
+  // Multiple products with sku = NULL are allowed (Postgres treats each NULL
+  // as distinct in a unique index); this only enforces uniqueness once a sku
+  // is actually set. Service-layer code additionally pre-checks availability
+  // for a friendlier error than a raw constraint violation.
+  @@unique([companyId, sku])
+  @@index([companyId, status])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sales   Sale[]
+
+  @@index([companyId])
+}
+
+enum InventoryMovementType {
+  PURCHASE
+  SALE
+  ADJUSTMENT
+  RETURN
+}
+
+model InventoryMovement {
+  id              String                @id @default(cuid())
+  companyId       String
+  productId       String
+  type            InventoryMovementType
+  quantityChange  Int // signed: positive = stock in, negative = stock out
+  referenceType   String? // e.g. "SALE" — loose pointer, not an FK; set by future modules
+  referenceId     String?
+  note            String?
+  createdByUserId String // every movement is created by an authenticated action; no anonymous case exists (unlike ActivityLog)
+  createdAt       DateTime              @default(now())
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  createdBy User    @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, productId, createdAt])
+}
+
+enum SaleStatus {
+  DRAFT
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  OTHER
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+}
+
+model Sale {
+  id              String        @id @default(cuid())
+  companyId       String
+  customerId      String?
+  createdByUserId String
+  status          SaleStatus    @default(DRAFT)
+  subtotal        Decimal       @db.Decimal(14, 2)
+  discountTotal   Decimal       @db.Decimal(14, 2) @default(0)
+  taxTotal        Decimal       @db.Decimal(14, 2) @default(0)
+  totalAmount     Decimal       @db.Decimal(14, 2)
+  paymentMethod   PaymentMethod @default(CASH)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer  Customer?  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  createdBy User       @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+  items     SaleItem[]
+  invoice   Invoice?
+
+  @@index([companyId, status, createdAt])
+}
+
+model SaleItem {
+  id        String  @id @default(cuid())
+  companyId String // denormalized, same reason as everywhere else — uniform tenant-guard
+  saleId    String
+  productId String
+  quantity  Int
+  unitPrice Decimal @db.Decimal(14, 2) // snapshot of Product.sellingPrice at creation — never re-read later
+  lineTotal Decimal @db.Decimal(14, 2)
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, saleId])
+}
+
+enum InvoiceStatus {
+  ISSUED
+  PAID
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  companyId     String
+  saleId        String        @unique
+  invoiceNumber String // formatted, e.g. "INV-0001"
+  status        InvoiceStatus @default(ISSUED)
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime?
+  totalAmount   Decimal       @db.Decimal(14, 2)
+  createdAt     DateTime      @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Restrict)
+
+  @@unique([companyId, invoiceNumber])
+}
+
+model CompanyCounter {
+  companyId  String
+  counterKey String // e.g. "INVOICE" — reusable for future document types
+  value      Int    @default(0)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, counterKey])
+}
+
+enum AIConversationVisibility {
+  PRIVATE
+  COMPANY
+}
+
+enum AIMessageRole {
+  USER
+  ASSISTANT
+  TOOL
+}
+
+model AIConversation {
+  id         String                   @id @default(cuid())
+  companyId  String
+  userId     String
+  visibility AIConversationVisibility @default(PRIVATE)
+  title      String?
+  createdAt  DateTime                 @default(now())
+  updatedAt  DateTime                 @updatedAt
+
+  company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  AIMessage[]
+  usageLogs AIUsageLog[]
+
+  @@index([companyId, userId])
+}
+
+model AIMessage {
+  id             String        @id @default(cuid())
+  conversationId String
+  companyId      String // denormalized, same reason as SaleItem.companyId
+  role           AIMessageRole
+  content        String
+  sequence       Int           @default(autoincrement()) // absolute ordering guarantee, independent of timestamp resolution
+  createdAt      DateTime      @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  company      Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, conversationId, sequence])
+}
+
+enum AIUsageStatus {
+  SUCCESS
+  FAILURE
+}
+
+model AIUsageLog {
+  id             String        @id @default(cuid())
+  companyId      String
+  userId         String
+  conversationId String? // nullable + SetNull below: deleting a conversation must never fail or destroy usage/cost audit history
+  model          String
+  inputTokens    Int
+  outputTokens   Int
+  toolCalls      Json?
+  status         AIUsageStatus @default(SUCCESS)
+  durationMs     Int           @default(0) // AiService always sets this explicitly; default exists only to satisfy pre-existing rows on migration
+  errorMessage   String?
+  createdAt      DateTime      @default(now())
+
+  company      Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  conversation AIConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, createdAt])
   @@index([userId])
 }
