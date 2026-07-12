@@ -16,18 +16,25 @@ interface ChecklistStep {
   done: boolean;
 }
 
+// Exported so the dashboard page can decide its grid layout (e.g. give the
+// "Explore" panel the full row) without duplicating this permission check.
+export function useOnboardingChecklistVisible() {
+  const permissions = usePermissions();
+  return (
+    permissions.includes('PRODUCTS:READ') &&
+    permissions.includes('CUSTOMERS:READ') &&
+    permissions.includes('SALES:READ') &&
+    permissions.includes('USERS:READ')
+  );
+}
+
 // Completion is derived entirely from data that already exists (products,
 // customers, sales, members) — no dedicated onboarding-progress backend
 // model. Only shown to roles that can read all four resources (OWNER/
 // MANAGER in practice), since it's meaningless to a restricted role who
 // can't see whether a step is actually done.
 export function OnboardingChecklist() {
-  const permissions = usePermissions();
-  const canSeeChecklist =
-    permissions.includes('PRODUCTS:READ') &&
-    permissions.includes('CUSTOMERS:READ') &&
-    permissions.includes('SALES:READ') &&
-    permissions.includes('USERS:READ');
+  const canSeeChecklist = useOnboardingChecklistVisible();
 
   const { data: products } = useProducts({ enabled: canSeeChecklist });
   const { data: customers } = useCustomers({ enabled: canSeeChecklist });

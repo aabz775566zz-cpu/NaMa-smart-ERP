@@ -5,7 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 import { DASHBOARD_NAV_ITEMS } from '@/features/dashboard/nav-items';
-import { OnboardingChecklist } from '@/features/dashboard/onboarding-checklist';
+import { OnboardingChecklist, useOnboardingChecklistVisible } from '@/features/dashboard/onboarding-checklist';
 import { DashboardReportView } from '@/features/reports/components/dashboard-report-view';
 import { useCompany } from '@/features/settings/hooks';
 import { useCurrentUser, usePermissions } from '@/lib/store';
@@ -15,6 +15,7 @@ export default function DashboardHomePage() {
   const permissions = usePermissions();
   const { data: company } = useCompany();
   const canViewReports = permissions.includes('REPORTS:READ');
+  const showChecklist = useOnboardingChecklistVisible();
 
   const quickLinks = DASHBOARD_NAV_ITEMS.filter(
     (item) => item.href !== '/dashboard' && (!item.requiredPermission || permissions.includes(item.requiredPermission)),
@@ -34,14 +35,16 @@ export default function DashboardHomePage() {
       {canViewReports ? <DashboardReportView /> : null}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-3">
-          <OnboardingChecklist />
-        </div>
-        <Card className="lg:col-span-2">
+        {showChecklist ? (
+          <div className="lg:col-span-3">
+            <OnboardingChecklist />
+          </div>
+        ) : null}
+        <Card className={showChecklist ? 'lg:col-span-2' : 'lg:col-span-5'}>
           <CardHeader>
             <CardTitle className="text-base">Explore</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-1">
+          <CardContent className={showChecklist ? 'space-y-1' : 'grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3'}>
             {quickLinks.map((item) => (
               <Link
                 key={item.href}
