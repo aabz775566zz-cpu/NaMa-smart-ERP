@@ -2,7 +2,7 @@
 
 import type { SaleStatus } from '@erp-smart/types';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp-smart/ui';
-import { Plus } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 
 import { useHasPermission } from '@/lib/store';
 
@@ -17,12 +17,15 @@ export function SalesToolbar({
   status,
   onStatusChange,
   onAdd,
+  onExport,
 }: {
   status: SaleStatus | undefined;
   onStatusChange: (status: SaleStatus | undefined) => void;
   onAdd: () => void;
+  onExport?: () => void;
 }) {
   const canCreate = useHasPermission('SALES:CREATE');
+  const canExport = useHasPermission('SALES:EXPORT');
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -42,12 +45,20 @@ export function SalesToolbar({
           ))}
         </SelectContent>
       </Select>
-      {canCreate ? (
-        <Button onClick={onAdd}>
-          <Plus />
-          New sale
-        </Button>
-      ) : null}
+      <div className="flex gap-2">
+        {canExport && onExport ? (
+          <Button variant="outline" onClick={onExport}>
+            <Download />
+            Export CSV
+          </Button>
+        ) : null}
+        {canCreate ? (
+          <Button onClick={onAdd}>
+            <Plus />
+            New sale
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { SaleFormDialog } from '@/features/sales/components/sale-form-dialog';
 import { SalesTable } from '@/features/sales/components/sales-table';
 import { SalesToolbar } from '@/features/sales/components/sales-toolbar';
 import { useCompleteSale, useSales } from '@/features/sales/hooks';
+import { exportToCsv } from '@/lib/csv-export';
 import { usePermissions } from '@/lib/store';
 
 export default function SalesPage() {
@@ -57,6 +58,17 @@ export default function SalesPage() {
 
   const sales = salesQuery.data ?? [];
 
+  function handleExport() {
+    exportToCsv('sales.csv', sales, [
+      { header: 'Date', value: (s) => new Date(s.createdAt).toISOString().slice(0, 10) },
+      { header: 'Customer', value: (s) => (s.customerId ? (customerNameById.get(s.customerId) ?? '') : 'Walk-in') },
+      { header: 'Status', value: (s) => s.status },
+      { header: 'Payment method', value: (s) => s.paymentMethod },
+      { header: 'Payment status', value: (s) => s.paymentStatus },
+      { header: 'Total', value: (s) => s.totalAmount },
+    ]);
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -64,7 +76,12 @@ export default function SalesPage() {
         <p className="text-sm text-muted-foreground">Create draft sales and complete them to generate invoices.</p>
       </div>
 
-      <SalesToolbar status={statusFilter} onStatusChange={setStatusFilter} onAdd={() => setFormOpen(true)} />
+      <SalesToolbar
+        status={statusFilter}
+        onStatusChange={setStatusFilter}
+        onAdd={() => setFormOpen(true)}
+        onExport={handleExport}
+      />
 
       {salesQuery.isLoading ? (
         <div className="space-y-2">

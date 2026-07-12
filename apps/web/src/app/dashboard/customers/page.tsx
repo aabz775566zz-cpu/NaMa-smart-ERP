@@ -10,6 +10,7 @@ import { CustomersTable } from '@/features/customers/components/customers-table'
 import { CustomersToolbar } from '@/features/customers/components/customers-toolbar';
 import { DeleteCustomerDialog } from '@/features/customers/components/delete-customer-dialog';
 import { useCustomers } from '@/features/customers/hooks';
+import { exportToCsv } from '@/lib/csv-export';
 import { usePermissions } from '@/lib/store';
 
 export default function CustomersPage() {
@@ -60,6 +61,15 @@ export default function CustomersPage() {
     setFormOpen(true);
   }
 
+  function handleExport() {
+    exportToCsv('customers.csv', filteredCustomers, [
+      { header: 'Name', value: (c) => c.name },
+      { header: 'Phone', value: (c) => c.phone ?? '' },
+      { header: 'Email', value: (c) => c.email ?? '' },
+      { header: 'Address', value: (c) => c.address ?? '' },
+    ]);
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -67,7 +77,7 @@ export default function CustomersPage() {
         <p className="text-sm text-muted-foreground">Manage your customer records.</p>
       </div>
 
-      <CustomersToolbar search={search} onSearchChange={setSearch} onAdd={openCreateDialog} />
+      <CustomersToolbar search={search} onSearchChange={setSearch} onAdd={openCreateDialog} onExport={handleExport} />
 
       {customersQuery.isLoading ? (
         <div className="space-y-2">

@@ -10,6 +10,7 @@ import { LowStockPanel } from '@/features/inventory/components/low-stock-panel';
 import { MovementsTable } from '@/features/inventory/components/movements-table';
 import { useLowStock, useMovements } from '@/features/inventory/hooks';
 import { useProducts } from '@/features/products/hooks';
+import { exportToCsv } from '@/lib/csv-export';
 import { usePermissions } from '@/lib/store';
 
 export default function InventoryPage() {
@@ -44,6 +45,16 @@ export default function InventoryPage() {
 
   const movements = movementsQuery.data ?? [];
 
+  function handleExport() {
+    exportToCsv('inventory-movements.csv', movements, [
+      { header: 'Date', value: (m) => new Date(m.createdAt).toISOString().slice(0, 10) },
+      { header: 'Product', value: (m) => productNameById.get(m.productId) ?? '' },
+      { header: 'Type', value: (m) => m.type },
+      { header: 'Quantity change', value: (m) => m.quantityChange },
+      { header: 'Note', value: (m) => m.note ?? '' },
+    ]);
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -58,6 +69,7 @@ export default function InventoryPage() {
         productId={productId}
         onProductChange={setProductId}
         onAdd={() => setFormOpen(true)}
+        onExport={handleExport}
       />
 
       {movementsQuery.isLoading ? (

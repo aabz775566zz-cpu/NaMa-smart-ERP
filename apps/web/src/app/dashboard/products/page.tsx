@@ -10,6 +10,7 @@ import { ProductFormDialog } from '@/features/products/components/product-form-d
 import { ProductsTable } from '@/features/products/components/products-table';
 import { ProductsToolbar } from '@/features/products/components/products-toolbar';
 import { useCategories, useProducts } from '@/features/products/hooks';
+import { exportToCsv } from '@/lib/csv-export';
 import { usePermissions } from '@/lib/store';
 
 export default function ProductsPage() {
@@ -64,6 +65,18 @@ export default function ProductsPage() {
     setFormOpen(true);
   }
 
+  function handleExport() {
+    exportToCsv('products.csv', filteredProducts, [
+      { header: 'Name', value: (p) => p.name },
+      { header: 'SKU', value: (p) => p.sku ?? '' },
+      { header: 'Category', value: (p) => (p.categoryId ? (categoryNameById.get(p.categoryId) ?? '') : '') },
+      { header: 'Purchase price', value: (p) => p.purchasePrice },
+      { header: 'Selling price', value: (p) => p.sellingPrice },
+      { header: 'Quantity on hand', value: (p) => p.quantityOnHand },
+      { header: 'Status', value: (p) => p.status },
+    ]);
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -71,7 +84,7 @@ export default function ProductsPage() {
         <p className="text-sm text-muted-foreground">Manage your product catalog.</p>
       </div>
 
-      <ProductsToolbar search={search} onSearchChange={setSearch} onAdd={openCreateDialog} />
+      <ProductsToolbar search={search} onSearchChange={setSearch} onAdd={openCreateDialog} onExport={handleExport} />
 
       {productsQuery.isLoading ? (
         <div className="space-y-2">

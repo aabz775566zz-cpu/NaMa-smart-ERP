@@ -10,6 +10,7 @@ import { InvoiceDetailDialog } from '@/features/invoices/components/invoice-deta
 import { InvoicesTable } from '@/features/invoices/components/invoices-table';
 import { InvoicesToolbar } from '@/features/invoices/components/invoices-toolbar';
 import { useInvoices, useMarkInvoicePaid } from '@/features/invoices/hooks';
+import { exportToCsv } from '@/lib/csv-export';
 import { usePermissions } from '@/lib/store';
 
 export default function InvoicesPage() {
@@ -45,6 +46,16 @@ export default function InvoicesPage() {
 
   const invoices = invoicesQuery.data ?? [];
 
+  function handleExport() {
+    exportToCsv('invoices.csv', invoices, [
+      { header: 'Invoice #', value: (i) => i.invoiceNumber },
+      { header: 'Issue date', value: (i) => new Date(i.issueDate).toISOString().slice(0, 10) },
+      { header: 'Due date', value: (i) => (i.dueDate ? new Date(i.dueDate).toISOString().slice(0, 10) : '') },
+      { header: 'Status', value: (i) => i.status },
+      { header: 'Total', value: (i) => i.totalAmount },
+    ]);
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -52,7 +63,7 @@ export default function InvoicesPage() {
         <p className="text-sm text-muted-foreground">Invoices are generated automatically when a sale is completed.</p>
       </div>
 
-      <InvoicesToolbar status={statusFilter} onStatusChange={setStatusFilter} />
+      <InvoicesToolbar status={statusFilter} onStatusChange={setStatusFilter} onExport={handleExport} />
 
       {invoicesQuery.isLoading ? (
         <div className="space-y-2">

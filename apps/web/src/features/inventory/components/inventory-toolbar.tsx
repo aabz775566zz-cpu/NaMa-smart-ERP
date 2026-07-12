@@ -2,7 +2,7 @@
 
 import type { Product } from '@erp-smart/types';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp-smart/ui';
-import { Plus } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 
 import { useHasPermission } from '@/lib/store';
 
@@ -14,13 +14,16 @@ export function InventoryToolbar({
   productId,
   onProductChange,
   onAdd,
+  onExport,
 }: {
   products: Product[];
   productId: string | undefined;
   onProductChange: (productId: string | undefined) => void;
   onAdd: () => void;
+  onExport?: () => void;
 }) {
   const canCreate = useHasPermission('INVENTORY:CREATE');
+  const canExport = useHasPermission('INVENTORY:EXPORT');
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -40,12 +43,20 @@ export function InventoryToolbar({
           ))}
         </SelectContent>
       </Select>
-      {canCreate ? (
-        <Button onClick={onAdd}>
-          <Plus />
-          New adjustment
-        </Button>
-      ) : null}
+      <div className="flex gap-2">
+        {canExport && onExport ? (
+          <Button variant="outline" onClick={onExport}>
+            <Download />
+            Export CSV
+          </Button>
+        ) : null}
+        {canCreate ? (
+          <Button onClick={onAdd}>
+            <Plus />
+            New adjustment
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }

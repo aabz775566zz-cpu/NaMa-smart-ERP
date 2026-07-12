@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Input } from '@erp-smart/ui';
-import { Plus, Search } from 'lucide-react';
+import { Download, Plus, Search } from 'lucide-react';
 
 import { useHasPermission } from '@/lib/store';
 
@@ -9,12 +9,15 @@ export function ProductsToolbar({
   search,
   onSearchChange,
   onAdd,
+  onExport,
 }: {
   search: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
+  onExport?: () => void;
 }) {
   const canCreate = useHasPermission('PRODUCTS:CREATE');
+  const canExport = useHasPermission('PRODUCTS:EXPORT');
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -27,12 +30,20 @@ export function ProductsToolbar({
           className="ps-9"
         />
       </div>
-      {canCreate ? (
-        <Button onClick={onAdd}>
-          <Plus />
-          Add product
-        </Button>
-      ) : null}
+      <div className="flex gap-2">
+        {canExport && onExport ? (
+          <Button variant="outline" onClick={onExport}>
+            <Download />
+            Export CSV
+          </Button>
+        ) : null}
+        {canCreate ? (
+          <Button onClick={onAdd}>
+            <Plus />
+            Add product
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }

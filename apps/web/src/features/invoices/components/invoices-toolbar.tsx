@@ -1,7 +1,10 @@
 'use client';
 
 import type { InvoiceStatus } from '@erp-smart/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp-smart/ui';
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp-smart/ui';
+import { Download } from 'lucide-react';
+
+import { useHasPermission } from '@/lib/store';
 
 const ALL_STATUSES = '__all__';
 const STATUS_OPTIONS: InvoiceStatus[] = ['ISSUED', 'PAID'];
@@ -11,26 +14,38 @@ const STATUS_OPTIONS: InvoiceStatus[] = ['ISSUED', 'PAID'];
 export function InvoicesToolbar({
   status,
   onStatusChange,
+  onExport,
 }: {
   status: InvoiceStatus | undefined;
   onStatusChange: (status: InvoiceStatus | undefined) => void;
+  onExport?: () => void;
 }) {
+  const canExport = useHasPermission('INVOICES:EXPORT');
+
   return (
-    <Select
-      value={status ?? ALL_STATUSES}
-      onValueChange={(value) => onStatusChange(value === ALL_STATUSES ? undefined : (value as InvoiceStatus))}
-    >
-      <SelectTrigger className="w-full sm:w-48">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value={ALL_STATUSES}>All statuses</SelectItem>
-        {STATUS_OPTIONS.map((option) => (
-          <SelectItem key={option} value={option}>
-            {option}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <Select
+        value={status ?? ALL_STATUSES}
+        onValueChange={(value) => onStatusChange(value === ALL_STATUSES ? undefined : (value as InvoiceStatus))}
+      >
+        <SelectTrigger className="w-full sm:w-48">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL_STATUSES}>All statuses</SelectItem>
+          {STATUS_OPTIONS.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {canExport && onExport ? (
+        <Button variant="outline" onClick={onExport}>
+          <Download />
+          Export CSV
+        </Button>
+      ) : null}
+    </div>
   );
 }
