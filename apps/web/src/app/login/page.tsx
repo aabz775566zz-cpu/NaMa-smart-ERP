@@ -59,6 +59,11 @@ export default function LoginPage() {
                 onChange={(event) => setPassword(event.target.value)}
               />
             </FormField>
+            <div className="text-end">
+              <Link href="/forgot-password" className="text-sm text-primary underline-offset-4 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
               {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
             </Button>

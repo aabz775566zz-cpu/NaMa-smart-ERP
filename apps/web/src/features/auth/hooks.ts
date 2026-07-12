@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/lib/store';
 
 import * as authApi from './api';
-import type { LoginInput, RegisterInput } from './api';
+import type { AcceptInviteInput, ForgotPasswordInput, LoginInput, RegisterInput, ResetPasswordInput } from './api';
 
 export function useLogin() {
   return useMutation({
@@ -38,6 +38,26 @@ export function useLogout() {
       queryClient.clear();
     },
   });
+}
+
+// One-shot action, not cacheable data — even though the backend route is a
+// GET, it has a side effect (consumes the token) and must only ever run
+// once per page load, driven explicitly by the page rather than react-query's
+// automatic query lifecycle (refetch-on-focus, etc.).
+export function useVerifyEmail() {
+  return useMutation({ mutationFn: (token: string) => authApi.verifyEmail(token) });
+}
+
+export function useForgotPassword() {
+  return useMutation({ mutationFn: (input: ForgotPasswordInput) => authApi.forgotPassword(input) });
+}
+
+export function useResetPassword() {
+  return useMutation({ mutationFn: (input: ResetPasswordInput) => authApi.resetPassword(input) });
+}
+
+export function useAcceptInvite() {
+  return useMutation({ mutationFn: (input: AcceptInviteInput) => authApi.acceptInvite(input) });
 }
 
 /** Attempts a silent refresh once on mount, using the httpOnly refresh
