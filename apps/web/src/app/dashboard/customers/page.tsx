@@ -1,7 +1,7 @@
 'use client';
 
 import type { Customer } from '@erp-smart/types';
-import { EmptyState, Skeleton } from '@erp-smart/ui';
+import { Button, EmptyState, Skeleton } from '@erp-smart/ui';
 import { ShieldAlert, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -83,11 +83,16 @@ export default function CustomersPage() {
       ) : filteredCustomers.length === 0 ? (
         <EmptyState
           icon={<Users />}
-          title={customersQuery.data?.length ? 'No customers match your search' : 'No customers yet'}
+          title={customersQuery.data?.length ? 'No customers match your search' : 'Add your first customer'}
           description={
             customersQuery.data?.length
               ? 'Try a different search term.'
-              : 'Add your first customer to start building your customer list.'
+              : 'Keep track of who you sell to — add a customer to get started.'
+          }
+          action={
+            !customersQuery.data?.length ? (
+              <Button onClick={openCreateDialog}>Add customer</Button>
+            ) : undefined
           }
         />
       ) : (

@@ -59,6 +59,13 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      // `--font-sans` is set by next/font/google (Inter) in each app's root
+      // layout — see apps/web & apps/marketing layout.tsx. Falls back to the
+      // system stack if that variable is ever absent (e.g. a consumer that
+      // doesn't load the font), so nothing breaks if it's missing.
+      fontFamily: {
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [animate],

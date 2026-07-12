@@ -1,7 +1,7 @@
 'use client';
 
 import type { Sale, SaleStatus } from '@erp-smart/types';
-import { EmptyState, Skeleton, toast } from '@erp-smart/ui';
+import { Button, EmptyState, Skeleton, toast } from '@erp-smart/ui';
 import { ShieldAlert, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -80,10 +80,13 @@ export default function SalesPage() {
       ) : sales.length === 0 ? (
         <EmptyState
           icon={<ShoppingCart />}
-          title={statusFilter ? `No ${statusFilter.toLowerCase()} sales` : 'No sales yet'}
+          title={statusFilter ? `No ${statusFilter.toLowerCase()} sales` : 'Record your first sale'}
           description={
-            statusFilter ? 'Try a different status filter.' : 'Create your first sale to start tracking revenue.'
+            statusFilter
+              ? 'Try a different status filter.'
+              : 'Sales you create here decrement stock and generate invoices once completed.'
           }
+          action={!statusFilter ? <Button onClick={() => setFormOpen(true)}>Create sale</Button> : undefined}
         />
       ) : (
         <SalesTable

@@ -1,9 +1,9 @@
 'use client';
 
-import { Skeleton } from '@erp-smart/ui';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { BrandedLoader } from '@/components/branded-loader';
 import { useAuthStore } from '@/lib/store';
 
 /**
@@ -25,10 +25,7 @@ export default function HomePage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="space-y-3">
-        <Skeleton className="h-4 w-48" />
-        <Skeleton className="h-4 w-32" />
-      </div>
+      <BrandedLoader />
     </main>
   );
 }

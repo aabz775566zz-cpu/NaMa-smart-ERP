@@ -1,17 +1,22 @@
+import { brandConfig } from '@erp-smart/branding';
 import { getMessages } from '@erp-smart/i18n';
+import { Button, Logo } from '@erp-smart/ui';
 
 export default function MarketingHomePage() {
   const messages = getMessages('en');
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">
-      <h1 className="text-4xl font-bold">{messages.marketing.heroTitle}</h1>
-      <p className="text-lg text-muted-foreground">{messages.marketing.heroSubtitle}</p>
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-4 text-center">
+      <Logo markSize={36} wordmark={brandConfig.productName} wordmarkClassName="text-xl" />
+      <div className="max-w-xl space-y-3">
+        <h1 className="text-4xl font-bold tracking-tight">{messages.marketing.heroTitle}</h1>
+        <p className="text-lg text-muted-foreground">{messages.marketing.heroSubtitle}</p>
+      </div>
       <div className="flex gap-4">
-        <button className="rounded-md bg-primary px-4 py-2 text-primary-foreground">
-          {messages.marketing.getStarted}
-        </button>
-        <button className="rounded-md border px-4 py-2">{messages.marketing.learnMore}</button>
+        <Button size="lg">{messages.marketing.getStarted}</Button>
+        <Button size="lg" variant="outline">
+          {messages.marketing.learnMore}
+        </Button>
       </div>
     </main>
   );

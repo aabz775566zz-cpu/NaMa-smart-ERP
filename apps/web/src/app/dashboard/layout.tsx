@@ -1,9 +1,9 @@
 'use client';
 
-import { Skeleton } from '@erp-smart/ui';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { BrandedLoader } from '@/components/branded-loader';
 import { DashboardShell } from '@/features/dashboard/dashboard-shell';
 import { useAuthStore } from '@/lib/store';
 
@@ -27,10 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (status === 'loading' || status === 'idle') {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="space-y-3">
-          <Skeleton className="h-4 w-48" />
-          <Skeleton className="h-4 w-32" />
-        </div>
+        <BrandedLoader />
       </div>
     );
   }

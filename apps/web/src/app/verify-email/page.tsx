@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef } from 'react';
 
 import { useVerifyEmail } from '@/features/auth';
+import { AuthShell } from '@/features/auth/components/auth-shell';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -68,10 +69,10 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
+    <AuthShell>
       <Suspense fallback={<Skeleton className="h-48 w-full max-w-sm" />}>
         <VerifyEmailContent />
       </Suspense>
-    </main>
+    </AuthShell>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState, Skeleton } from '@erp-smart/ui';
+import { Button, EmptyState, Skeleton } from '@erp-smart/ui';
 import { Boxes, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -74,10 +74,13 @@ export default function InventoryPage() {
       ) : movements.length === 0 ? (
         <EmptyState
           icon={<Boxes />}
-          title={productId ? 'No movements for this product' : 'No inventory movements yet'}
+          title={productId ? 'No movements for this product' : 'No stock movements yet'}
           description={
-            productId ? 'Try a different product filter.' : 'Movements appear here as stock is purchased, sold, or adjusted.'
+            productId
+              ? 'Try a different product filter.'
+              : 'Movements appear here as stock is purchased, sold, or adjusted — post a manual adjustment to get started.'
           }
+          action={!productId ? <Button onClick={() => setFormOpen(true)}>Record adjustment</Button> : undefined}
         />
       ) : (
         <MovementsTable movements={movements} productNameById={productNameById} />

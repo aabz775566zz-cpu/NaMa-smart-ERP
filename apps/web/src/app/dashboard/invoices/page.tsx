@@ -1,8 +1,9 @@
 'use client';
 
 import type { Invoice, InvoiceStatus } from '@erp-smart/types';
-import { EmptyState, Skeleton, toast } from '@erp-smart/ui';
+import { Button, EmptyState, Skeleton, toast } from '@erp-smart/ui';
 import { FileText, ShieldAlert } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { InvoiceDetailDialog } from '@/features/invoices/components/invoice-detail-dialog';
@@ -69,7 +70,16 @@ export default function InvoicesPage() {
           icon={<FileText />}
           title={statusFilter ? `No ${statusFilter.toLowerCase()} invoices` : 'No invoices yet'}
           description={
-            statusFilter ? 'Try a different status filter.' : 'Invoices appear here once a sale is completed.'
+            statusFilter
+              ? 'Try a different status filter.'
+              : "Invoices are generated automatically when a sale is completed — complete a sale to see one here."
+          }
+          action={
+            !statusFilter ? (
+              <Button asChild variant="outline">
+                <Link href="/dashboard/sales">Go to Sales</Link>
+              </Button>
+            ) : undefined
           }
         />
       ) : (

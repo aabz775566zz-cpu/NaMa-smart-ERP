@@ -1,7 +1,7 @@
 'use client';
 
 import type { Product } from '@erp-smart/types';
-import { EmptyState, Skeleton } from '@erp-smart/ui';
+import { Button, EmptyState, Skeleton } from '@erp-smart/ui';
 import { Package, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -87,11 +87,16 @@ export default function ProductsPage() {
       ) : filteredProducts.length === 0 ? (
         <EmptyState
           icon={<Package />}
-          title={productsQuery.data?.length ? 'No products match your search' : 'No products yet'}
+          title={productsQuery.data?.length ? 'No products match your search' : 'Add your first product'}
           description={
             productsQuery.data?.length
               ? 'Try a different search term.'
-              : 'Add your first product to start building your catalog.'
+              : "Your catalog is empty — add a product to start tracking stock and selling."
+          }
+          action={
+            !productsQuery.data?.length ? (
+              <Button onClick={openCreateDialog}>Add product</Button>
+            ) : undefined
           }
         />
       ) : (

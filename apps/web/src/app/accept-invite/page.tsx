@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 
 import { useAcceptInvite } from '@/features/auth';
+import { AuthShell } from '@/features/auth/components/auth-shell';
 
 type FormErrors = Partial<Record<'password' | 'confirmPassword', string>>;
 
@@ -106,10 +107,10 @@ function AcceptInviteContent() {
 
 export default function AcceptInvitePage() {
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
+    <AuthShell>
       <Suspense fallback={<Skeleton className="h-64 w-full max-w-sm" />}>
         <AcceptInviteContent />
       </Suspense>
-    </main>
+    </AuthShell>
   );
 }

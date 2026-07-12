@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { useLogin } from '@/features/auth';
+import { AuthShell } from '@/features/auth/components/auth-shell';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
+    <AuthShell>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
@@ -72,6 +73,6 @@ export default function LoginPage() {
           </p>
         </CardContent>
       </Card>
-    </main>
+    </AuthShell>
   );
 }

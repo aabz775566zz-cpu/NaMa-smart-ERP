@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 import { useForgotPassword } from '@/features/auth';
+import { AuthShell } from '@/features/auth/components/auth-shell';
 
 export default function ForgotPasswordPage() {
   const forgotPasswordMutation = useForgotPassword();
@@ -28,7 +29,7 @@ export default function ForgotPasswordPage() {
   // (it never reveals account existence), so the UI must not differentiate.
   if (forgotPasswordMutation.isSuccess) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-4">
+      <AuthShell>
         <Card className="w-full max-w-sm">
           <CardHeader className="items-center text-center">
             <Mail className="h-10 w-10 text-primary" />
@@ -43,12 +44,12 @@ export default function ForgotPasswordPage() {
             </Button>
           </CardContent>
         </Card>
-      </main>
+      </AuthShell>
     );
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
+    <AuthShell>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Forgot password</CardTitle>
@@ -77,6 +78,6 @@ export default function ForgotPasswordPage() {
           </p>
         </CardContent>
       </Card>
-    </main>
+    </AuthShell>
   );
 }

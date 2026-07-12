@@ -16,17 +16,21 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
     <div
       ref={ref}
       className={cn(
-        'flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border px-6 py-12 text-center',
+        'flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border px-6 py-14 text-center',
         className,
       )}
       {...props}
     >
-      {icon ? <div className="text-muted-foreground [&_svg]:size-10">{icon}</div> : null}
-      <div className="space-y-1">
-        <p className="text-sm font-medium text-foreground">{title}</p>
+      {icon ? (
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary [&_svg]:size-6">
+          {icon}
+        </div>
+      ) : null}
+      <div className="max-w-sm space-y-1.5">
+        <p className="text-base font-semibold text-foreground">{title}</p>
         {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       </div>
-      {action ? <div className="mt-2">{action}</div> : null}
+      {action ? <div className="mt-1">{action}</div> : null}
     </div>
   ),
 );
