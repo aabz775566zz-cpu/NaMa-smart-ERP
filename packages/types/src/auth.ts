@@ -10,7 +10,8 @@ export type PermissionModule =
   | 'INVOICES'
   | 'USERS'
   | 'SETTINGS'
-  | 'REPORTS';
+  | 'REPORTS'
+  | 'SUPPLIERS';
 
 export type PermissionAction = 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'EXPORT';
 

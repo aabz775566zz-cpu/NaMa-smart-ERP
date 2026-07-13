@@ -18,6 +18,7 @@ import { ProductsModule } from './products/products.module';
 import { ReportsModule } from './reports/reports.module';
 import { RolesModule } from './roles/roles.module';
 import { SalesModule } from './sales/sales.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { UsersModule } from './users/users.module';
     RolesModule,
     ProductsModule,
     CustomersModule,
+    SuppliersModule,
     InventoryModule,
     SalesModule,
     InvoicesModule,
