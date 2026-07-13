@@ -11,6 +11,8 @@ const MODULES = [
   'USERS',
   'SETTINGS',
   'REPORTS',
+  'SUPPLIERS',
+  'PURCHASES',
 ] as const;
 
 const ACTIONS = ['CREATE', 'READ', 'UPDATE', 'DELETE', 'EXPORT'] as const;
@@ -32,8 +34,8 @@ const SYSTEM_ROLES: Array<{ key: string; name: string; permissions: string[] }> 
     key: 'MANAGER',
     name: 'Manager',
     permissions: [
-      ...['PRODUCTS', 'CUSTOMERS', 'SALES', 'INVENTORY', 'INVOICES', 'REPORTS'].flatMap((m) =>
-        ACTIONS.map((a) => `${m}:${a}`),
+      ...['PRODUCTS', 'CUSTOMERS', 'SALES', 'INVENTORY', 'INVOICES', 'REPORTS', 'SUPPLIERS', 'PURCHASES'].flatMap(
+        (m) => ACTIONS.map((a) => `${m}:${a}`),
       ),
       'USERS:CREATE',
       'USERS:READ',
@@ -55,6 +57,17 @@ const SYSTEM_ROLES: Array<{ key: string; name: string; permissions: string[] }> 
       'INVOICES:EXPORT',
       'REPORTS:READ',
       'REPORTS:EXPORT',
+      // Payable-side mirror of the INVOICES grant above: accountants can see
+      // suppliers and purchase invoices and reconcile what's owed (mark-paid,
+      // record a supplier payment — both gated PURCHASES:UPDATE), but don't
+      // manage the supplier relationship itself (no SUPPLIERS:UPDATE, same
+      // reasoning as no CUSTOMERS:UPDATE above) or the receiving/procurement
+      // workflow (no PURCHASES:CREATE — entering a bill and posting the
+      // resulting stock movement is an operational task, not a financial one).
+      'SUPPLIERS:READ',
+      'PURCHASES:READ',
+      'PURCHASES:UPDATE',
+      'PURCHASES:EXPORT',
     ],
   },
   {
@@ -67,6 +80,11 @@ const SYSTEM_ROLES: Array<{ key: string; name: string; permissions: string[] }> 
       'INVENTORY:READ',
       'SALES:CREATE',
       'SALES:READ',
+      // No SUPPLIERS or PURCHASES grants — deliberate, not an oversight.
+      // Employee already has zero INVOICES:* access (docs/09_Security_Plan.md:
+      // "Employee: Limited access"); suppliers/purchases are the payable-side
+      // equivalent of that same financial/procurement boundary, so the same
+      // exclusion applies for the same reason.
     ],
   },
 ];
