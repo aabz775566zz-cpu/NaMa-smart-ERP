@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Input } from '@erp-smart/ui';
-import { Download, Plus, Search } from 'lucide-react';
+import { Download, Plus, Search, Upload } from 'lucide-react';
 
 import { useHasPermission } from '@/lib/store';
 
@@ -9,11 +9,13 @@ export function ProductsToolbar({
   search,
   onSearchChange,
   onAdd,
+  onImport,
   onExport,
 }: {
   search: string;
   onSearchChange: (value: string) => void;
   onAdd: () => void;
+  onImport?: () => void;
   onExport?: () => void;
 }) {
   const canCreate = useHasPermission('PRODUCTS:CREATE');
@@ -35,6 +37,12 @@ export function ProductsToolbar({
           <Button variant="outline" onClick={onExport}>
             <Download />
             Export CSV
+          </Button>
+        ) : null}
+        {canCreate && onImport ? (
+          <Button variant="outline" onClick={onImport}>
+            <Upload />
+            Import CSV
           </Button>
         ) : null}
         {canCreate ? (

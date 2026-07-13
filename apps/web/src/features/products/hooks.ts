@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import * as productsApi from './api';
-import type { CreateCategoryInput, CreateProductInput, UpdateProductInput } from './api';
+import type { CreateCategoryInput, CreateProductInput, ImportProductRow, UpdateProductInput } from './api';
 
 export const productsKeys = {
   all: ['products'] as const,
@@ -61,6 +61,17 @@ export function useUpdateProduct() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productsKeys.lists() });
     },
+  });
+}
+
+// Deliberately no onSuccess cache invalidation here — the import dialog
+// calls mutateAsync() many times in a chunk loop, and invalidating after
+// every single chunk would refire the products/categories queries 20+
+// times for a 5000-row file. The dialog invalidates both caches itself,
+// once, after the whole import finishes.
+export function useImportProducts() {
+  return useMutation({
+    mutationFn: (rows: ImportProductRow[]) => productsApi.importProducts(rows),
   });
 }
 

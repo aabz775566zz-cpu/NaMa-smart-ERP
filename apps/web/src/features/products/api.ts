@@ -50,3 +50,29 @@ export interface CreateCategoryInput {
 export function createCategory(input: CreateCategoryInput) {
   return apiClient.post<Category>('/categories', input);
 }
+
+// Mirrors ImportProductRowDto — `category` is a plain name, resolved (or
+// created) server-side, since a CSV never has internal category IDs.
+export interface ImportProductRow {
+  name: string;
+  description?: string;
+  sku?: string;
+  category?: string;
+  purchasePrice: number;
+  sellingPrice: number;
+  unit?: string;
+  openingQuantity?: number;
+  lowStockThreshold?: number;
+  status?: ProductStatus;
+}
+
+export interface ImportRowResult {
+  row: number;
+  success: boolean;
+  name: string;
+  error?: string;
+}
+
+export function importProducts(rows: ImportProductRow[]) {
+  return apiClient.post<ImportRowResult[]>('/products/import', { rows });
+}

@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 
 import { DeleteProductDialog } from '@/features/products/components/delete-product-dialog';
 import { ProductFormDialog } from '@/features/products/components/product-form-dialog';
+import { ProductImportDialog } from '@/features/products/components/product-import-dialog';
 import { ProductsTable } from '@/features/products/components/products-table';
 import { ProductsToolbar } from '@/features/products/components/products-toolbar';
 import { useCategories, useProducts } from '@/features/products/hooks';
@@ -22,6 +23,7 @@ export default function ProductsPage() {
 
   const [search, setSearch] = useState('');
   const [formOpen, setFormOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
@@ -84,7 +86,13 @@ export default function ProductsPage() {
         <p className="text-sm text-muted-foreground">Manage your product catalog.</p>
       </div>
 
-      <ProductsToolbar search={search} onSearchChange={setSearch} onAdd={openCreateDialog} onExport={handleExport} />
+      <ProductsToolbar
+        search={search}
+        onSearchChange={setSearch}
+        onAdd={openCreateDialog}
+        onImport={() => setImportOpen(true)}
+        onExport={handleExport}
+      />
 
       {productsQuery.isLoading ? (
         <div className="space-y-2">
@@ -122,6 +130,7 @@ export default function ProductsPage() {
       )}
 
       <ProductFormDialog open={formOpen} onOpenChange={setFormOpen} product={editingProduct} />
+      <ProductImportDialog open={importOpen} onOpenChange={setImportOpen} />
       <DeleteProductDialog
         product={deletingProduct}
         open={Boolean(deletingProduct)}
