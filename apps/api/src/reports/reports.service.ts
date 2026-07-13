@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { DailyCloseReportDto } from './dto/daily-close-report.dto';
 import { ReportDateRangeDto } from './dto/report-date-range.dto';
 
 @Injectable()
@@ -161,6 +162,71 @@ export class ReportsService {
         purchaseCount: g._count,
       };
     });
+  }
+
+  // End-of-day till reconciliation for a shop owner: how much was booked
+  // today, how much of that was actually collected today vs. left on
+  // credit, and how much old debt was paid down today.
+  //
+  // "Cash sales" here means paid-in-full-at-sale (Sale.paymentStatus ===
+  // 'PAID'), not literally Sale.paymentMethod === 'CASH' — a card or
+  // transfer sale paid in full at the counter is still money in hand today,
+  // while a CASH-method sale explicitly created as PARTIAL/UNPAID is money
+  // still owed. paymentStatus is the "did I actually get paid" signal;
+  // paymentMethod is only "how", which isn't what a close-of-day
+  // reconciliation needs.
+  //
+  // "Payments collected" sums the Payment ledger (Phase 4) for the day —
+  // debt collected against ANY sale, including ones from previous days.
+  // This is a different, non-overlapping population from "cash sales" in
+  // the common case: PaymentsService only ever writes a Payment row for a
+  // customer-linked sale that was originally left partial/unpaid (see
+  // PaymentsService.recordPayment/settleSaleInFull) — a same-day
+  // paid-in-full walk-in sale never creates one. The one case where the
+  // same transaction can appear in both figures is a customer-linked sale
+  // created AND fully settled on the same day; that's not double-counting,
+  // it's two different questions ("revenue booked" vs. "cash received")
+  // about the same event, so the two figures are deliberately shown
+  // separately rather than summed into one number.
+  async getDailyCloseReport(companyId: string, query: DailyCloseReportDto) {
+    const target = query.date ? new Date(query.date) : new Date();
+    const startOfDay = new Date(target);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(target);
+    endOfDay.setHours(23, 59, 59, 999);
+    const dayRange = { gte: startOfDay, lte: endOfDay };
+
+    const [sales, paymentsAgg] = await Promise.all([
+      this.db.sale.findMany({
+        where: { companyId, status: 'COMPLETED', createdAt: dayRange },
+        select: { totalAmount: true, paymentStatus: true },
+      }),
+      this.db.payment.aggregate({
+        where: { companyId, createdAt: dayRange },
+        _sum: { amount: true },
+      }),
+    ]);
+
+    let totalSales = new Prisma.Decimal(0);
+    let cashSales = new Prisma.Decimal(0);
+    let creditSales = new Prisma.Decimal(0);
+    for (const sale of sales) {
+      totalSales = totalSales.plus(sale.totalAmount);
+      if (sale.paymentStatus === 'PAID') {
+        cashSales = cashSales.plus(sale.totalAmount);
+      } else {
+        creditSales = creditSales.plus(sale.totalAmount);
+      }
+    }
+
+    return {
+      date: startOfDay.toISOString().slice(0, 10),
+      salesCount: sales.length,
+      totalSales: totalSales.toString(),
+      cashSales: cashSales.toString(),
+      creditSales: creditSales.toString(),
+      paymentsCollected: (paymentsAgg._sum.amount ?? new Prisma.Decimal(0)).toString(),
+    };
   }
 
   async getInventoryReport(companyId: string) {

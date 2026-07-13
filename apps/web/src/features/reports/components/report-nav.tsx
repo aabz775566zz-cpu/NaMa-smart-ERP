@@ -2,10 +2,11 @@
 
 import { Button } from '@erp-smart/ui';
 
-export type ReportSection = 'overview' | 'sales' | 'products' | 'customers' | 'inventory';
+export type ReportSection = 'overview' | 'daily-close' | 'sales' | 'products' | 'customers' | 'inventory';
 
 const SECTIONS: { key: ReportSection; label: string }[] = [
   { key: 'overview', label: 'Overview' },
+  { key: 'daily-close', label: 'Daily Close' },
   { key: 'sales', label: 'Sales' },
   { key: 'products', label: 'Products' },
   { key: 'customers', label: 'Customers' },

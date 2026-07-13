@@ -43,6 +43,8 @@ export type {
   InventoryReportLowStockProduct,
   InventoryReport,
   ReportDateRangeParams,
+  DailyCloseReport,
+  DailyCloseReportParams,
 } from './reports';
 export type {
   AIMessageRole,

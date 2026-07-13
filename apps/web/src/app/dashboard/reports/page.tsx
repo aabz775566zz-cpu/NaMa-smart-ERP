@@ -5,6 +5,7 @@ import { ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 
 import { CustomersReportView } from '@/features/reports/components/customers-report-view';
+import { DailyCloseReportView } from '@/features/reports/components/daily-close-report-view';
 import { DashboardReportView } from '@/features/reports/components/dashboard-report-view';
 import { InventoryReportView } from '@/features/reports/components/inventory-report-view';
 import { ProductsReportView } from '@/features/reports/components/products-report-view';
@@ -40,6 +41,7 @@ export default function ReportsPage() {
       <ReportNav active={section} onChange={setSection} />
 
       {section === 'overview' ? <DashboardReportView /> : null}
+      {section === 'daily-close' ? <DailyCloseReportView /> : null}
       {section === 'sales' ? <SalesReportView /> : null}
       {section === 'products' ? <ProductsReportView /> : null}
       {section === 'customers' ? <CustomersReportView /> : null}

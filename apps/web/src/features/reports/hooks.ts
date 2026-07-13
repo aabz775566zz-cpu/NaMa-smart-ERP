@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReportDateRangeParams } from '@erp-smart/types';
+import type { DailyCloseReportParams, ReportDateRangeParams } from '@erp-smart/types';
 import { useQuery } from '@tanstack/react-query';
 
 import * as reportsApi from './api';
@@ -12,6 +12,7 @@ export const reportsKeys = {
   products: (params?: ReportDateRangeParams) => [...reportsKeys.all, 'products', params ?? {}] as const,
   customers: (params?: ReportDateRangeParams) => [...reportsKeys.all, 'customers', params ?? {}] as const,
   inventory: () => [...reportsKeys.all, 'inventory'] as const,
+  dailyClose: (params?: DailyCloseReportParams) => [...reportsKeys.all, 'daily-close', params ?? {}] as const,
 };
 
 export function useDashboardReport() {
@@ -32,4 +33,11 @@ export function useCustomersReport(params?: ReportDateRangeParams) {
 
 export function useInventoryReport() {
   return useQuery({ queryKey: reportsKeys.inventory(), queryFn: reportsApi.getInventoryReport });
+}
+
+export function useDailyCloseReport(params?: DailyCloseReportParams) {
+  return useQuery({
+    queryKey: reportsKeys.dailyClose(params),
+    queryFn: () => reportsApi.getDailyCloseReport(params),
+  });
 }

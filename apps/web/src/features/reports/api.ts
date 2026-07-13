@@ -1,5 +1,7 @@
 import type {
   CustomersReport,
+  DailyCloseReport,
+  DailyCloseReportParams,
   DashboardReport,
   InventoryReport,
   ProductsReport,
@@ -40,4 +42,9 @@ export function getCustomersReport(params?: ReportDateRangeParams) {
 
 export function getInventoryReport() {
   return apiClient.get<InventoryReport>('/reports/inventory');
+}
+
+export function getDailyCloseReport(params?: DailyCloseReportParams) {
+  const query = params?.date ? `?date=${encodeURIComponent(params.date)}` : '';
+  return apiClient.get<DailyCloseReport>(`/reports/daily-close${query}`);
 }

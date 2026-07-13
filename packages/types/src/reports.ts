@@ -75,3 +75,24 @@ export interface ReportDateRangeParams {
   to?: string;
   limit?: number;
 }
+
+/** GET /reports/daily-close — end-of-day till reconciliation.
+ * cashSales = sales paid in full at time of sale (Sale.paymentStatus ===
+ * 'PAID'); creditSales = sales left partial/unpaid. paymentsCollected sums
+ * the Payment ledger (Phase 4) for the day — debt collected against any
+ * sale, including prior days' — a deliberately separate figure from
+ * cashSales, not netted against it. No "expenses" field: no Expense
+ * concept exists in this system. */
+export interface DailyCloseReport {
+  date: string;
+  salesCount: number;
+  totalSales: string;
+  cashSales: string;
+  creditSales: string;
+  paymentsCollected: string;
+}
+
+/** Query params accepted by /reports/daily-close (DailyCloseReportDto). */
+export interface DailyCloseReportParams {
+  date?: string;
+}

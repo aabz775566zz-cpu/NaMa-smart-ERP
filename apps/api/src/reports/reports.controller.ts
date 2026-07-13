@@ -3,6 +3,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { DailyCloseReportDto } from './dto/daily-close-report.dto';
 import { ReportDateRangeDto } from './dto/report-date-range.dto';
 import { ReportsService } from './reports.service';
 
@@ -37,5 +38,10 @@ export class ReportsController {
   @Get('inventory')
   getInventoryReport(@CurrentUser('companyId') companyId: string) {
     return this.reportsService.getInventoryReport(companyId);
+  }
+
+  @Get('daily-close')
+  getDailyCloseReport(@CurrentUser('companyId') companyId: string, @Query() query: DailyCloseReportDto) {
+    return this.reportsService.getDailyCloseReport(companyId, query);
   }
 }
