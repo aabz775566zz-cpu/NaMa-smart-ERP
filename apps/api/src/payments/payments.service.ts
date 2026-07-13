@@ -9,6 +9,8 @@ type SaleAllocationStatus = 'PAID' | 'PARTIAL' | 'UNPAID';
 interface SaleAllocation {
   saleId: string;
   invoiceId: string | null;
+  invoiceNumber: string | null;
+  createdAt: Date;
   totalAmount: Prisma.Decimal;
   allocated: Prisma.Decimal;
   remaining: Prisma.Decimal;
@@ -93,6 +95,8 @@ export class PaymentsService {
       return {
         saleId: sale.id as string,
         invoiceId: (sale.invoice?.id as string | undefined) ?? null,
+        invoiceNumber: (sale.invoice?.invoiceNumber as string | undefined) ?? null,
+        createdAt: sale.createdAt as Date,
         totalAmount: total,
         allocated,
         remaining,
@@ -119,6 +123,8 @@ export class PaymentsService {
       sales: ledger.sales.map((s) => ({
         saleId: s.saleId,
         invoiceId: s.invoiceId,
+        invoiceNumber: s.invoiceNumber,
+        createdAt: s.createdAt,
         totalAmount: s.totalAmount.toFixed(2),
         allocated: s.allocated.toFixed(2),
         remaining: s.remaining.toFixed(2),

@@ -31,6 +31,7 @@ export type {
   InvoiceSale,
   InvoiceDetail,
 } from './invoice';
+export type { SaleAllocation, LedgerPayment, CustomerLedger } from './payment';
 export type {
   DashboardReport,
   SalesReportDailyEntry,

@@ -1,4 +1,4 @@
-import type { Customer } from '@erp-smart/types';
+import type { Customer, CustomerLedger, PaymentMethod } from '@erp-smart/types';
 
 import { apiClient } from '@/lib/api';
 
@@ -14,8 +14,19 @@ export interface CreateCustomerInput {
 
 export type UpdateCustomerInput = Partial<CreateCustomerInput>;
 
+// Mirrors CreatePaymentDto on the backend.
+export interface RecordPaymentInput {
+  amount: number;
+  method?: PaymentMethod;
+  note?: string;
+}
+
 export function listCustomers() {
   return apiClient.get<Customer[]>('/customers');
+}
+
+export function getCustomer(id: string) {
+  return apiClient.get<Customer>(`/customers/${id}`);
 }
 
 export function createCustomer(input: CreateCustomerInput) {
@@ -28,4 +39,12 @@ export function updateCustomer(id: string, input: UpdateCustomerInput) {
 
 export function deleteCustomer(id: string) {
   return apiClient.delete<void>(`/customers/${id}`);
+}
+
+export function getCustomerLedger(customerId: string) {
+  return apiClient.get<CustomerLedger>(`/customers/${customerId}/ledger`);
+}
+
+export function recordPayment(customerId: string, input: RecordPaymentInput) {
+  return apiClient.post<CustomerLedger>(`/customers/${customerId}/payments`, input);
 }

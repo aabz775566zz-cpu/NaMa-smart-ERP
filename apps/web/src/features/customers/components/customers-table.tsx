@@ -14,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from '@erp-smart/ui';
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Wallet } from 'lucide-react';
+import Link from 'next/link';
 
 import { useHasPermission } from '@/lib/store';
 
@@ -47,7 +48,11 @@ export function CustomersTable({
         <TableBody>
           {customers.map((customer) => (
             <TableRow key={customer.id}>
-              <TableCell className="font-medium text-foreground">{customer.name}</TableCell>
+              <TableCell className="font-medium text-foreground">
+                <Link href={`/dashboard/customers/${customer.id}`} className="hover:underline">
+                  {customer.name}
+                </Link>
+              </TableCell>
               <TableCell className="text-muted-foreground">{customer.phone ?? '—'}</TableCell>
               <TableCell className="text-muted-foreground">{customer.email ?? '—'}</TableCell>
               <TableCell className="max-w-xs truncate text-muted-foreground">{customer.address ?? '—'}</TableCell>
@@ -64,6 +69,12 @@ export function CustomersTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/customers/${customer.id}`}>
+                          <Wallet />
+                          Debt &amp; payments
+                        </Link>
+                      </DropdownMenuItem>
                       {canUpdate ? (
                         <DropdownMenuItem onClick={() => onEdit(customer)}>
                           <Pencil />
