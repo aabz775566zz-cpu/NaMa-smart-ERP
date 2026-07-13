@@ -129,8 +129,6 @@
     "recordPaymentSuccess": "Payment recorded",
     "recordPaymentError": "Failed to record payment",
     "amountRequired": "Enter an amount greater than zero.",
-    "amountExceedsRemaining": "Amount can't exceed the remaining balance.",
-    "statementTitle": "Customer statement",
-    "statementFor": "Statement for"
+    "amountExceedsRemaining": "Amount can't exceed the remaining balance."
   }
 }

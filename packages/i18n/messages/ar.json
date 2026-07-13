@@ -81,7 +81,7 @@
     "product": "المنتج",
     "quantity": "الكمية",
     "unitPrice": "سعر الوحدة",
-    "lineTotal": "المجموع",
+    "lineTotal": "الإجمالي",
     "subtotal": "المجموع الفرعي",
     "discount": "الخصم",
     "tax": "الضريبة",
@@ -129,8 +129,6 @@
     "recordPaymentSuccess": "تم تسجيل الدفعة",
     "recordPaymentError": "تعذر تسجيل الدفعة",
     "amountRequired": "أدخل مبلغاً أكبر من صفر.",
-    "amountExceedsRemaining": "لا يمكن أن يتجاوز المبلغ الرصيد المتبقي.",
-    "statementTitle": "كشف حساب العميل",
-    "statementFor": "كشف حساب"
+    "amountExceedsRemaining": "لا يمكن أن يتجاوز المبلغ الرصيد المتبقي."
   }
 }
