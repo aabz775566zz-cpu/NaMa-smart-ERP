@@ -89,7 +89,7 @@ export function ProductPicker({
                   </p>
                 </div>
                 <Badge variant={outOfStock ? 'destructive' : 'outline'} className="shrink-0">
-                  {outOfStock ? 'Out of stock' : `${product.quantityOnHand} in stock`}
+                  {outOfStock ? 'Out of stock' : `${product.quantityOnHand} ${product.unit} in stock`}
                 </Badge>
               </button>
             );

@@ -202,6 +202,12 @@ model Product {
   purchasePrice     Decimal       @db.Decimal(14, 2)
   sellingPrice      Decimal       @db.Decimal(14, 2)
   quantityOnHand    Int           @default(0)
+  // Free-text unit label (e.g. "kg", "box", "pcs"), not a Unit model with
+  // conversions — a small-business catalog doesn't need multi-unit
+  // conversion math today. Kept as a plain column specifically so a future
+  // Unit table + unitId FK can be introduced additively later without a
+  // breaking rework of this field.
+  unit              String        @default("pcs")
   lowStockThreshold Int?
   status            ProductStatus @default(ACTIVE)
   createdAt         DateTime      @default(now())

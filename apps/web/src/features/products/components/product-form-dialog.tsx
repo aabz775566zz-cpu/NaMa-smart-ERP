@@ -38,6 +38,8 @@ interface ProductFormValues {
   categoryId: string;
   purchasePrice: string;
   sellingPrice: string;
+  unit: string;
+  openingQuantity: string;
   lowStockThreshold: string;
   status: ProductStatus;
 }
@@ -50,6 +52,8 @@ function emptyValues(): ProductFormValues {
     categoryId: NO_CATEGORY,
     purchasePrice: '',
     sellingPrice: '',
+    unit: 'pcs',
+    openingQuantity: '',
     lowStockThreshold: '',
     status: 'ACTIVE',
   };
@@ -63,12 +67,18 @@ function valuesFromProduct(product: Product): ProductFormValues {
     categoryId: product.categoryId ?? NO_CATEGORY,
     purchasePrice: product.purchasePrice,
     sellingPrice: product.sellingPrice,
+    unit: product.unit,
+    // Opening quantity is create-only — an existing product's stock is
+    // never edited through this form, only via Inventory movements.
+    openingQuantity: '',
     lowStockThreshold: product.lowStockThreshold !== null ? String(product.lowStockThreshold) : '',
     status: product.status,
   };
 }
 
-type FormErrors = Partial<Record<'name' | 'purchasePrice' | 'sellingPrice' | 'lowStockThreshold', string>>;
+type FormErrors = Partial<
+  Record<'name' | 'purchasePrice' | 'sellingPrice' | 'openingQuantity' | 'lowStockThreshold', string>
+>;
 
 export function ProductFormDialog({
   open,
@@ -107,6 +117,12 @@ export function ProductFormDialog({
     if (values.lowStockThreshold !== '' && Number(values.lowStockThreshold) < 0) {
       nextErrors.lowStockThreshold = 'Must be zero or greater.';
     }
+    if (
+      values.openingQuantity !== '' &&
+      (!Number.isInteger(Number(values.openingQuantity)) || Number(values.openingQuantity) < 0)
+    ) {
+      nextErrors.openingQuantity = 'Must be a whole number, zero or greater.';
+    }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
@@ -122,6 +138,9 @@ export function ProductFormDialog({
       categoryId: values.categoryId === NO_CATEGORY ? undefined : values.categoryId,
       purchasePrice: Number(values.purchasePrice),
       sellingPrice: Number(values.sellingPrice),
+      unit: values.unit.trim() || undefined,
+      openingQuantity:
+        !isEdit && values.openingQuantity !== '' ? Number(values.openingQuantity) : undefined,
       lowStockThreshold: values.lowStockThreshold === '' ? undefined : Number(values.lowStockThreshold),
       status: values.status,
     };
@@ -232,6 +251,34 @@ export function ProductFormDialog({
                 onChange={(event) => setValues((v) => ({ ...v, sellingPrice: event.target.value }))}
               />
             </FormField>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="Unit" htmlFor="product-unit" description="e.g. pcs, kg, box">
+              <Input
+                id="product-unit"
+                value={values.unit}
+                onChange={(event) => setValues((v) => ({ ...v, unit: event.target.value }))}
+              />
+            </FormField>
+            {!isEdit ? (
+              <FormField
+                label="Opening quantity"
+                htmlFor="product-opening-quantity"
+                error={errors.openingQuantity}
+                description="Stock to start with — recorded as a purchase movement."
+              >
+                <Input
+                  id="product-opening-quantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="0"
+                  value={values.openingQuantity}
+                  onChange={(event) => setValues((v) => ({ ...v, openingQuantity: event.target.value }))}
+                />
+              </FormField>
+            ) : null}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

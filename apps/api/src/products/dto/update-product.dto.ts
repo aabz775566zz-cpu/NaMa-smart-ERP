@@ -38,6 +38,11 @@ export class UpdateProductDto {
   sellingPrice?: number;
 
   @IsOptional()
+  @IsString()
+  @MinLength(1)
+  unit?: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(0)

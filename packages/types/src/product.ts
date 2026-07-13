@@ -20,6 +20,9 @@ export interface Product {
   purchasePrice: string;
   sellingPrice: string;
   quantityOnHand: number;
+  // Free-text unit label (e.g. "kg", "box", "pcs") — not a Unit model with
+  // conversions, just a display suffix. Defaults to "pcs" server-side.
+  unit: string;
   lowStockThreshold: number | null;
   status: ProductStatus;
   createdAt: string;

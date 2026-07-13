@@ -26,8 +26,12 @@ export class ProductsController {
 
   @RequirePermission('PRODUCTS:CREATE')
   @Post()
-  create(@CurrentUser('companyId') companyId: string, @Body() dto: CreateProductDto) {
-    return this.productsService.create(companyId, dto);
+  create(
+    @CurrentUser('companyId') companyId: string,
+    @CurrentUser('sub') userId: string,
+    @Body() dto: CreateProductDto,
+  ) {
+    return this.productsService.create(companyId, userId, dto);
   }
 
   @RequirePermission('PRODUCTS:UPDATE')

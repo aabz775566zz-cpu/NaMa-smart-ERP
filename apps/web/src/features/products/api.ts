@@ -13,11 +13,15 @@ export interface CreateProductInput {
   categoryId?: string;
   purchasePrice: number;
   sellingPrice: number;
+  unit?: string;
+  // Opt-in opening balance, create-only — stock is never directly editable
+  // afterward, only through Inventory movements (see products.service.ts).
+  openingQuantity?: number;
   lowStockThreshold?: number;
   status?: ProductStatus;
 }
 
-export type UpdateProductInput = Partial<CreateProductInput>;
+export type UpdateProductInput = Partial<Omit<CreateProductInput, 'openingQuantity'>>;
 
 export function listProducts() {
   return apiClient.get<Product[]>('/products');

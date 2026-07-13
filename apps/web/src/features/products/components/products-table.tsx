@@ -66,7 +66,7 @@ export function ProductsTable({
                 <TableCell>{formatMoney(product.sellingPrice)}</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center gap-2">
-                    {product.quantityOnHand}
+                    {product.quantityOnHand} {product.unit}
                     {isLowStock ? <Badge variant="warning">Low stock</Badge> : null}
                   </span>
                 </TableCell>

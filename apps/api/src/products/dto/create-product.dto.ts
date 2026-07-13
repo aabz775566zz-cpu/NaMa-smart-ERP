@@ -36,9 +36,22 @@ export class CreateProductDto {
   @Min(0)
   sellingPrice!: number;
 
-  // quantityOnHand is intentionally NOT settable here — stock always starts
-  // at 0 and is only ever changed through audited Inventory movements
-  // (Phase 3's Inventory module, not yet built).
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  unit?: string;
+
+  // quantityOnHand itself is still never settable directly — this is an
+  // opt-in opening balance, written through the same audited Inventory
+  // movement mechanism as every other stock change (ProductsService.create()
+  // posts a PURCHASE movement in the same transaction when this is > 0),
+  // never a raw column write.
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  openingQuantity?: number;
+
   @IsOptional()
   @Type(() => Number)
   @IsInt()
