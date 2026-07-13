@@ -33,6 +33,23 @@ export type {
 } from './invoice';
 export type { SaleAllocation, LedgerPayment, CustomerLedger } from './payment';
 export type {
+  Supplier,
+  CreateSupplierInput,
+  UpdateSupplierInput,
+  PurchaseInvoiceAllocation,
+  SupplierLedger,
+} from './supplier';
+export type {
+  PurchaseInvoiceStatus,
+  PurchaseInvoiceItem,
+  PurchaseInvoice,
+  PurchaseInvoiceItemWithProduct,
+  PurchaseInvoiceDetail,
+  CreatePurchaseInvoiceItemInput,
+  CreatePurchaseInvoiceInput,
+} from './purchase-invoice';
+export type { SupplierPayment, CreateSupplierPaymentInput } from './supplier-payment';
+export type {
   DashboardReport,
   SalesReportDailyEntry,
   SalesReport,
