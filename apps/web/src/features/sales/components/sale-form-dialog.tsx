@@ -1,6 +1,6 @@
 'use client';
 
-import type { Customer, PaymentMethod, PaymentStatus } from '@erp-smart/types';
+import type { PaymentMethod, PaymentStatus, Product } from '@erp-smart/types';
 import {
   Button,
   Dialog,
@@ -20,17 +20,18 @@ import {
   SelectValue,
   toast,
 } from '@erp-smart/ui';
-import { Package, Plus, Trash2 } from 'lucide-react';
+import { Package, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-import { CustomerFormDialog } from '@/features/customers/components/customer-form-dialog';
-import { useCustomers } from '@/features/customers/hooks';
+import { useCreateCustomer, useCustomers } from '@/features/customers/hooks';
 import { useProducts } from '@/features/products/hooks';
 import { useFormatMoney } from '@/lib/format/money';
 
 import type { CreateSaleInput } from '../api';
-import { useCreateSale } from '../hooks';
+import { useCompleteSale, useCreateSale } from '../hooks';
+import { CartLineItem } from './cart-line-item';
+import { ProductPicker } from './product-picker';
 
 const NO_CUSTOMER = '__none__';
 const CREATE_CUSTOMER = '__create__';
@@ -39,19 +40,27 @@ const PAYMENT_STATUSES: PaymentStatus[] = ['UNPAID', 'PARTIAL', 'PAID'];
 
 interface LineItemDraft {
   productId: string;
-  quantity: string;
-}
-
-function emptyLineItem(): LineItemDraft {
-  return { productId: '', quantity: '1' };
+  quantity: number;
 }
 
 // Creation only — there is no PATCH /sales/:id, so an existing sale can
 // never be edited, only completed or cancelled (see sales.controller.ts).
+//
+// Phase 5 rework: the old flow was a non-searchable <Select> per product
+// line (open dropdown, scroll, pick, repeat "Add line") plus a second
+// nested dialog just to add a walk-in customer's name. This version adds
+// a search-as-you-type ProductPicker (clicking an already-in-cart product
+// just bumps its quantity instead of adding a duplicate line), quantity
+// steppers instead of raw number-only inputs, an inline customer quick-add
+// (no second dialog), and a one-click "Complete sale" path so a shop
+// employee doesn't have to close this dialog and hunt for the row's kebab
+// menu just to finish a walk-in sale.
 export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { data: customers } = useCustomers();
   const { data: products } = useProducts();
   const createMutation = useCreateSale();
+  const completeMutation = useCompleteSale();
+  const createCustomerMutation = useCreateCustomer();
   const formatMoney = useFormatMoney();
 
   const [customerId, setCustomerId] = useState(NO_CUSTOMER);
@@ -59,9 +68,11 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('UNPAID');
   const [discountTotal, setDiscountTotal] = useState('');
   const [taxTotal, setTaxTotal] = useState('');
-  const [items, setItems] = useState<LineItemDraft[]>([emptyLineItem()]);
+  const [items, setItems] = useState<LineItemDraft[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [quickAddName, setQuickAddName] = useState('');
+  const [quickAddPhone, setQuickAddPhone] = useState('');
 
   useEffect(() => {
     if (open) {
@@ -70,8 +81,11 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
       setPaymentStatus('UNPAID');
       setDiscountTotal('');
       setTaxTotal('');
-      setItems([emptyLineItem()]);
+      setItems([]);
       setError(null);
+      setQuickAddOpen(false);
+      setQuickAddName('');
+      setQuickAddPhone('');
     }
   }, [open]);
 
@@ -83,46 +97,66 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
   // submit time (SalesService.create()); none of this is ever sent to the API.
   const previewSubtotal = items.reduce((sum, item) => {
     const product = productById.get(item.productId);
-    const quantity = Number(item.quantity);
-    if (!product || !Number.isFinite(quantity)) return sum;
-    return sum + Number(product.sellingPrice) * quantity;
+    if (!product) return sum;
+    return sum + Number(product.sellingPrice) * item.quantity;
   }, 0);
   const previewTotal = Math.max(0, previewSubtotal - Number(discountTotal || 0) + Number(taxTotal || 0));
 
-  function updateItem(index: number, patch: Partial<LineItemDraft>) {
-    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, ...patch } : item)));
-  }
-
-  function addItem() {
-    setItems((prev) => [...prev, emptyLineItem()]);
-  }
-
-  function removeItem(index: number) {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function handleCustomerCreated(customer: Customer) {
-    setCustomerId(customer.id);
-  }
-
-  function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  function handleProductSelect(product: Product) {
     setError(null);
+    setItems((prev) => {
+      const existing = prev.find((item) => item.productId === product.id);
+      if (existing) {
+        return prev.map((item) =>
+          item.productId === product.id ? { ...item, quantity: item.quantity + 1 } : item,
+        );
+      }
+      return [...prev, { productId: product.id, quantity: 1 }];
+    });
+  }
 
-    const validItems = items.filter((item) => item.productId && Number(item.quantity) > 0);
-    if (validItems.length === 0) {
-      setError('Add at least one product line with a quantity of 1 or more.');
-      return;
+  function updateQuantity(productId: string, quantity: number) {
+    setItems((prev) => prev.map((item) => (item.productId === productId ? { ...item, quantity } : item)));
+  }
+
+  function removeItem(productId: string) {
+    setItems((prev) => prev.filter((item) => item.productId !== productId));
+  }
+
+  function handleQuickAddCustomer() {
+    if (!quickAddName.trim()) return;
+    createCustomerMutation
+      .mutateAsync({ name: quickAddName.trim(), phone: quickAddPhone.trim() || undefined })
+      .then((customer) => {
+        setCustomerId(customer.id);
+        setQuickAddOpen(false);
+        setQuickAddName('');
+        setQuickAddPhone('');
+      })
+      .catch((err: Error) => {
+        toast({ variant: 'destructive', title: 'Failed to add customer', description: err.message });
+      });
+  }
+
+  function buildInput(): CreateSaleInput | null {
+    if (items.length === 0) {
+      setError('Add at least one product.');
+      return null;
     }
-
-    const input: CreateSaleInput = {
+    setError(null);
+    return {
       customerId: customerId === NO_CUSTOMER ? undefined : customerId,
       paymentMethod,
       paymentStatus,
       discountTotal: discountTotal ? Number(discountTotal) : undefined,
       taxTotal: taxTotal ? Number(taxTotal) : undefined,
-      items: validItems.map((item) => ({ productId: item.productId, quantity: Number(item.quantity) })),
+      items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
     };
+  }
+
+  function handleSaveDraft() {
+    const input = buildInput();
+    if (!input) return;
 
     createMutation
       .mutateAsync(input)
@@ -135,23 +169,53 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
       });
   }
 
+  function handleCompleteNow() {
+    const input = buildInput();
+    if (!input) return;
+
+    createMutation
+      .mutateAsync(input)
+      .then((sale) =>
+        completeMutation
+          .mutateAsync(sale.id)
+          .then((result) => {
+            toast({ title: 'Sale completed', description: `Invoice ${result.invoice.invoiceNumber} generated.` });
+            onOpenChange(false);
+          })
+          .catch((err: Error) => {
+            // The sale itself was already created successfully — only
+            // completion (which decrements stock and generates the
+            // invoice) failed, e.g. insufficient stock. Leave it as a
+            // draft rather than losing the cart the user just built.
+            toast({
+              variant: 'destructive',
+              title: 'Sale saved as draft — completion failed',
+              description: err.message,
+            });
+            onOpenChange(false);
+          }),
+      )
+      .catch((err: Error) => {
+        toast({ variant: 'destructive', title: 'Failed to create sale', description: err.message });
+      });
+  }
+
+  const isSubmitting = createMutation.isPending || completeMutation.isPending;
+
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>New sale</DialogTitle>
-          <DialogDescription>
-            Creates a draft sale. Complete it afterwards to decrement stock and generate an invoice.
-          </DialogDescription>
+          <DialogDescription>Search or scan a product to add it, then complete the sale.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pe-1">
           <FormField label="Customer" htmlFor="sale-customer">
             <Select
               value={customerId}
               onValueChange={(value) => {
                 if (value === CREATE_CUSTOMER) {
-                  setCustomerDialogOpen(true);
+                  setQuickAddOpen(true);
                   return;
                 }
                 setCustomerId(value);
@@ -177,6 +241,37 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
               </SelectContent>
             </Select>
           </FormField>
+
+          {quickAddOpen ? (
+            <div className="flex items-end gap-2 rounded-md border border-dashed border-border p-3">
+              <FormField label="Name" htmlFor="quick-customer-name" required className="flex-1">
+                <Input
+                  id="quick-customer-name"
+                  value={quickAddName}
+                  onChange={(event) => setQuickAddName(event.target.value)}
+                  autoFocus
+                />
+              </FormField>
+              <FormField label="Phone" htmlFor="quick-customer-phone" className="flex-1">
+                <Input
+                  id="quick-customer-phone"
+                  value={quickAddPhone}
+                  onChange={(event) => setQuickAddPhone(event.target.value)}
+                />
+              </FormField>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleQuickAddCustomer}
+                disabled={!quickAddName.trim() || createCustomerMutation.isPending}
+              >
+                Add
+              </Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => setQuickAddOpen(false)}>
+                Cancel
+              </Button>
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Payment method" htmlFor="sale-payment-method">
@@ -209,68 +304,45 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
             </FormField>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">Items</span>
-              {products && products.length > 0 ? (
-                <Button type="button" variant="outline" size="sm" onClick={addItem}>
-                  <Plus />
-                  Add line
+          {products && products.length === 0 ? (
+            <EmptyState
+              icon={<Package />}
+              title="No products yet"
+              description="Add a product before creating a sale."
+              action={
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/dashboard/products">Go to Products</Link>
                 </Button>
-              ) : null}
-            </div>
-            {products && products.length === 0 ? (
-              <EmptyState
-                icon={<Package />}
-                title="No products yet"
-                description="Add a product before creating a sale."
-                action={
-                  <Button asChild size="sm" variant="outline">
-                    <Link href="/dashboard/products">Go to Products</Link>
-                  </Button>
-                }
-              />
-            ) : (
+              }
+            />
+          ) : (
+            <>
+              <ProductPicker products={products ?? []} onSelect={handleProductSelect} autoFocus />
+
               <div className="space-y-2">
-                {items.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Select value={item.productId} onValueChange={(value) => updateItem(index, { productId: value })}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Select a product" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {products?.map((product) => (
-                          <SelectItem key={product.id} value={product.id}>
-                            {product.name}
-                            {product.sku ? ` (${product.sku})` : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      type="number"
-                      min="1"
-                      step="1"
-                      className="w-24"
-                      value={item.quantity}
-                      onChange={(event) => updateItem(index, { quantity: event.target.value })}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeItem(index)}
-                      disabled={items.length === 1}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remove line</span>
-                    </Button>
-                  </div>
-                ))}
+                {items.length === 0 ? (
+                  <p className="rounded-md border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
+                    Cart is empty — search above to add products.
+                  </p>
+                ) : (
+                  items.map((item) => {
+                    const product = productById.get(item.productId);
+                    if (!product) return null;
+                    return (
+                      <CartLineItem
+                        key={item.productId}
+                        product={product}
+                        quantity={item.quantity}
+                        onQuantityChange={(quantity) => updateQuantity(item.productId, quantity)}
+                        onRemove={() => removeItem(item.productId)}
+                      />
+                    );
+                  })
+                )}
               </div>
-            )}
-            {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
-          </div>
+              {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
+            </>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Discount total" htmlFor="sale-discount">
@@ -296,27 +368,23 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           </div>
 
           <div className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
-            Estimated total: {formatMoney(previewTotal)}{' '}
+            Estimated total: <span className="font-medium text-foreground">{formatMoney(previewTotal)}</span>{' '}
             <span className="text-xs">(the server computes the authoritative total from live prices)</span>
           </div>
+        </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? 'Creating…' : 'Create sale'}
-            </Button>
-          </DialogFooter>
-        </form>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={isSubmitting}>
+            {createMutation.isPending ? 'Saving…' : 'Save as draft'}
+          </Button>
+          <Button type="button" onClick={handleCompleteNow} disabled={isSubmitting}>
+            {isSubmitting ? 'Completing…' : 'Complete sale'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      </Dialog>
-
-      <CustomerFormDialog
-        open={customerDialogOpen}
-        onOpenChange={setCustomerDialogOpen}
-        onCreated={handleCustomerCreated}
-      />
-    </>
+    </Dialog>
   );
 }
