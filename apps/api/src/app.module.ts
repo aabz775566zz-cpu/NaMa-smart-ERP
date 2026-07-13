@@ -15,6 +15,7 @@ import { InvoicesModule } from './invoices/invoices.module';
 import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
+import { PurchaseInvoicesModule } from './purchase-invoices/purchase-invoices.module';
 import { ReportsModule } from './reports/reports.module';
 import { RolesModule } from './roles/roles.module';
 import { SalesModule } from './sales/sales.module';
@@ -36,6 +37,7 @@ import { UsersModule } from './users/users.module';
     InventoryModule,
     SalesModule,
     InvoicesModule,
+    PurchaseInvoicesModule,
     PaymentsModule,
     ReportsModule,
     AiModule,

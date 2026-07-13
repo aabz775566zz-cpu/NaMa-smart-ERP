@@ -11,7 +11,8 @@ export type PermissionModule =
   | 'USERS'
   | 'SETTINGS'
   | 'REPORTS'
-  | 'SUPPLIERS';
+  | 'SUPPLIERS'
+  | 'PURCHASES';
 
 export type PermissionAction = 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'EXPORT';
 

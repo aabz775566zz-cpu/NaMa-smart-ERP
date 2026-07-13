@@ -1,4 +1,5 @@
 import type { Product } from './product';
+import type { PaymentStatus } from './sale';
 import type { Supplier } from './supplier';
 
 export type PurchaseInvoiceStatus = 'DRAFT' | 'RECEIVED' | 'CANCELLED';
@@ -17,15 +18,22 @@ export interface PurchaseInvoiceItem {
   lineTotal: string;
 }
 
-/** Matches GET /purchase-invoices (list, endpoint not yet built) — no items,
- * mirroring how GET /sales and GET /invoices both omit line detail from
- * their list responses. */
+/** Matches GET /purchase-invoices (list) — no items, mirroring how GET
+ * /sales and GET /invoices both omit line detail from their list
+ * responses. invoiceNumber is our own system-generated reference (e.g.
+ * "PINV-0001"), assigned only on receive() — null on a DRAFT, exactly
+ * mirroring how a Sale has no Invoice until it completes. paymentStatus is
+ * a simple flip for now (see PurchaseInvoicesService.markPaid()); it
+ * becomes a write-through cache of a real ledger once
+ * SupplierPaymentsService exists, the same evolution Sale.paymentStatus
+ * already went through. */
 export interface PurchaseInvoice {
   id: string;
   companyId: string;
   supplierId: string;
-  invoiceNumber: string;
+  invoiceNumber: string | null;
   status: PurchaseInvoiceStatus;
+  paymentStatus: PaymentStatus;
   subtotal: string;
   discountTotal: string;
   taxTotal: string;
@@ -43,9 +51,9 @@ export interface PurchaseInvoiceItemWithProduct extends PurchaseInvoiceItem {
   product: Product;
 }
 
-/** Matches a future GET /purchase-invoices/:id — the richer, itemized shape;
- * the list endpoint above returns plain PurchaseInvoice[]. Mirrors
- * InvoiceDetail exactly (base type doubles as the list shape, no separate
+/** Matches GET /purchase-invoices/:id — the richer, itemized shape; the list
+ * endpoint above returns plain PurchaseInvoice[]. Mirrors InvoiceDetail
+ * exactly (base type doubles as the list shape, no separate
  * "ListItem"-suffixed type — this codebase doesn't use that naming anywhere
  * else, so PurchaseInvoiceDetail follows the existing split instead). */
 export interface PurchaseInvoiceDetail extends PurchaseInvoice {
@@ -67,12 +75,12 @@ export interface CreatePurchaseInvoiceItemInput {
 }
 
 // Mirrors CreateSaleInput's shape (supplierId replacing customerId).
-// invoiceNumber/dueDate are additional — a purchase invoice is a real
-// document entered from the supplier's bill, not system-generated the way
-// a customer Invoice is, so its own reference number is client-supplied.
+// Deliberately no invoiceNumber field — it's system-generated (PINV-0001
+// style) only when the invoice is received, never accepted from the
+// client, matching CreateSaleDto's rule that system-generated fields are
+// never client input.
 export interface CreatePurchaseInvoiceInput {
   supplierId: string;
-  invoiceNumber: string;
   dueDate?: string;
   discountTotal?: number;
   taxTotal?: number;
