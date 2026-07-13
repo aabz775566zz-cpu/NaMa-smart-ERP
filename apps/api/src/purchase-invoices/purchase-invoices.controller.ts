@@ -60,7 +60,11 @@ export class PurchaseInvoicesController {
   @RequirePermission('PURCHASES:UPDATE')
   @HttpCode(HttpStatus.OK)
   @Post(':id/mark-paid')
-  markPaid(@CurrentUser('companyId') companyId: string, @Param('id') id: string) {
-    return this.purchaseInvoicesService.markPaid(companyId, id);
+  markPaid(
+    @CurrentUser('companyId') companyId: string,
+    @CurrentUser('sub') userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.purchaseInvoicesService.markPaid(companyId, userId, id);
   }
 }

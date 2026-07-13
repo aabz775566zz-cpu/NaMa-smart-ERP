@@ -19,6 +19,7 @@ import { PurchaseInvoicesModule } from './purchase-invoices/purchase-invoices.mo
 import { ReportsModule } from './reports/reports.module';
 import { RolesModule } from './roles/roles.module';
 import { SalesModule } from './sales/sales.module';
+import { SupplierPaymentsModule } from './supplier-payments/supplier-payments.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { UsersModule } from './users/users.module';
 
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
     InvoicesModule,
     PurchaseInvoicesModule,
     PaymentsModule,
+    SupplierPaymentsModule,
     ReportsModule,
     AiModule,
   ],

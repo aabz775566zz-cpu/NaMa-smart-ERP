@@ -4,6 +4,7 @@ import type { PurchaseInvoiceStatus } from '@prisma/client';
 
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { SupplierPaymentsService } from '../supplier-payments/supplier-payments.service';
 import { CreatePurchaseInvoiceDto } from './dto/create-purchase-invoice.dto';
 
 const PURCHASE_INVOICE_STATUSES = ['DRAFT', 'RECEIVED', 'CANCELLED'] as const;
@@ -28,6 +29,7 @@ export class PurchaseInvoicesService {
   constructor(
     private readonly tenantPrisma: TenantGuardedPrismaService,
     private readonly inventoryService: InventoryService,
+    private readonly supplierPaymentsService: SupplierPaymentsService,
   ) {}
 
   private get db() {
@@ -178,13 +180,12 @@ export class PurchaseInvoicesService {
     return this.db.purchaseInvoice.update({ where: { id, companyId }, data: { status: 'CANCELLED' } });
   }
 
-  // Simple status flip for now — mirrors the walk-in branch of
-  // InvoicesService.markPaid() (no ledger involved). Once
-  // SupplierPaymentsService exists, this should evolve the same way
-  // InvoicesService.markPaid() did: record the remaining balance as an
-  // implicit SupplierPayment, then let the ledger reconcile this field,
-  // rather than toggling it directly.
-  async markPaid(companyId: string, id: string) {
+  // Records the invoice's remaining balance as an implicit SupplierPayment
+  // and lets the ledger reconcile paymentStatus — mirrors
+  // InvoicesService.markPaid()'s customer-ledger branch exactly. No
+  // walk-in-style direct-flip branch is needed here (unlike Invoices),
+  // since every PurchaseInvoice always has a required supplierId.
+  async markPaid(companyId: string, userId: string, id: string) {
     const purchaseInvoice = await this.db.purchaseInvoice.findFirst({ where: { id, companyId } });
     if (!purchaseInvoice) {
       throw new NotFoundException('Purchase invoice not found.');
@@ -196,6 +197,15 @@ export class PurchaseInvoicesService {
       throw new ConflictException('Purchase invoice is already marked as paid.');
     }
 
-    return this.db.purchaseInvoice.update({ where: { id, companyId }, data: { paymentStatus: 'PAID' } });
+    await this.db.$transaction(async (tx) => {
+      await this.supplierPaymentsService.settlePurchaseInvoiceInFull(
+        tx,
+        companyId,
+        { id: purchaseInvoice.id, supplierId: purchaseInvoice.supplierId },
+        userId,
+      );
+    });
+
+    return this.db.purchaseInvoice.findFirst({ where: { id, companyId } });
   }
 }

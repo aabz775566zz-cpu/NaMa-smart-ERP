@@ -20,6 +20,7 @@ const TENANT_SCOPED_MODELS = new Set<string>([
   'Supplier',
   'PurchaseInvoice',
   'PurchaseInvoiceItem',
+  'SupplierPayment',
   'CompanyCounter',
   'AIConversation',
   'AIMessage',
