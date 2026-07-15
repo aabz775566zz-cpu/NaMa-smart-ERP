@@ -63,9 +63,9 @@ export function ProductsTable({
                 <TableCell className="text-muted-foreground">
                   {product.categoryId ? (categoryNameById.get(product.categoryId) ?? '—') : '—'}
                 </TableCell>
-                <TableCell>{formatMoney(product.sellingPrice)}</TableCell>
+                <TableCell className="tabular-nums">{formatMoney(product.sellingPrice)}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center gap-2">
+                  <span className="inline-flex items-center gap-2 tabular-nums">
                     {product.quantityOnHand} {product.unit}
                     {isLowStock ? <Badge variant="warning">Low stock</Badge> : null}
                   </span>

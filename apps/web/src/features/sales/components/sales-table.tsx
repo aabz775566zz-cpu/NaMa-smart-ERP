@@ -65,7 +65,7 @@ export function SalesTable({
                 <TableCell className="text-foreground">
                   {sale.customerId ? (customerNameById.get(sale.customerId) ?? '—') : 'Walk-in customer'}
                 </TableCell>
-                <TableCell className="font-medium text-foreground">{formatMoney(sale.totalAmount)}</TableCell>
+                <TableCell className="font-medium tabular-nums text-foreground">{formatMoney(sale.totalAmount)}</TableCell>
                 <TableCell className="text-muted-foreground">
                   <span className="inline-flex items-center gap-2">
                     {sale.paymentMethod}

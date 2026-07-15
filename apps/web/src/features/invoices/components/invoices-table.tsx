@@ -44,7 +44,7 @@ export function InvoicesTable({
               <TableCell className="text-muted-foreground">
                 {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : '—'}
               </TableCell>
-              <TableCell className="font-medium text-foreground">{formatMoney(invoice.totalAmount)}</TableCell>
+              <TableCell className="font-medium tabular-nums text-foreground">{formatMoney(invoice.totalAmount)}</TableCell>
               <TableCell>
                 <InvoiceStatusBadge status={invoice.status} />
               </TableCell>

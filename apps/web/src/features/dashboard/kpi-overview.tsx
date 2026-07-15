@@ -59,7 +59,7 @@ export function KpiOverview() {
   ];
 
   return (
-    <Card className="animate-in fade-in slide-in-from-bottom-2 overflow-hidden p-0 duration-500 hover:shadow-sm">
+    <Card className="animate-in fade-in slide-in-from-bottom-2 overflow-hidden p-0 duration-500">
       <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-5 sm:divide-x sm:divide-y-0">
         {tiles.map((tile) => (
           <Link

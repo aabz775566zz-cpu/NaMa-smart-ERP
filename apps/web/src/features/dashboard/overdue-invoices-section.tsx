@@ -58,7 +58,7 @@ export function OverdueInvoicesSection({
               <Badge variant="destructive">
                 {invoice.dueDate ? dateFormatter.format(new Date(invoice.dueDate)) : ''}
               </Badge>
-              <span className="text-muted-foreground">{formatMoney(invoice.totalAmount)}</span>
+              <span className="tabular-nums text-muted-foreground">{formatMoney(invoice.totalAmount)}</span>
             </span>
           </li>
         ))}

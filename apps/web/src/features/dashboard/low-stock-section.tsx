@@ -47,7 +47,7 @@ export function LowStockSection({
             <Link href="/dashboard/inventory" className="truncate text-foreground hover:underline">
               {product.name}
             </Link>
-            <Badge variant="warning" className="shrink-0">
+            <Badge variant="warning" className="shrink-0 tabular-nums">
               {product.quantityOnHand} {product.unit}
             </Badge>
           </li>
