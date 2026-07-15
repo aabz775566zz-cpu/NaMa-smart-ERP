@@ -53,11 +53,27 @@ export default {
           DEFAULT: 'hsl(var(--info))',
           foreground: 'hsl(var(--info-foreground))',
         },
+        // A 5th brand color (violet), distinct from `accent` above — that
+        // one is a neutral hover-surface tint consumed by Button/Select/
+        // DropdownMenu/Sidebar, not a brand color. Keeping them separate
+        // means this doesn't recolor every hover state in the app.
+        'accent-brand': {
+          DEFAULT: 'hsl(var(--accent-brand))',
+          foreground: 'hsl(var(--accent-brand-foreground))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      // Tailwind 3.x's default `boxShadow` scale has no `xs` key (that alias
+      // only exists in Tailwind v4's renamed scale) — confirmed by
+      // inspecting `tailwindcss/defaultTheme` at the installed 3.4.19.
+      // Added here so `shadow-xs` (Card's subtle resting elevation) actually
+      // resolves instead of silently producing no CSS.
+      boxShadow: {
+        xs: '0 1px 2px 0 rgb(0 0 0 / 0.03)',
       },
       // `--font-sans` is set by next/font/google (Inter) in each app's root
       // layout — see apps/web & apps/marketing layout.tsx. Falls back to the

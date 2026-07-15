@@ -2,9 +2,23 @@ import * as React from 'react';
 
 import { cn } from '../../lib/utils';
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('rounded-xl border border-border bg-card text-card-foreground shadow-sm', className)} {...props} />
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Set when the whole card is a single click/link target (e.g. a
+   * dashboard tile) — only then does it get the hover-elevate affordance. */
+  interactive?: boolean;
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, interactive = false, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        'rounded-xl border border-border bg-card text-card-foreground shadow-xs transition-shadow duration-200',
+        interactive && 'hover:shadow-md',
+        className,
+      )}
+      {...props}
+    />
   ),
 );
 Card.displayName = 'Card';

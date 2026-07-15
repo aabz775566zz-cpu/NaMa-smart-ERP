@@ -9,10 +9,14 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
   action?: React.ReactNode;
+  /** 'success' reads the empty state as a genuinely good outcome (e.g.
+   * "nothing needs attention") rather than a neutral/error one. Defaults
+   * to 'default', which is byte-for-byte identical to today's rendering. */
+  tone?: 'default' | 'success';
 }
 
 const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
-  ({ className, icon, title, description, action, ...props }, ref) => (
+  ({ className, icon, title, description, action, tone = 'default', ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
@@ -22,7 +26,12 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       {...props}
     >
       {icon ? (
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary [&_svg]:size-6">
+        <div
+          className={cn(
+            'flex h-14 w-14 items-center justify-center rounded-full [&_svg]:size-6',
+            tone === 'success' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary',
+          )}
+        >
           {icon}
         </div>
       ) : null}
