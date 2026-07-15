@@ -1,4 +1,5 @@
 import { Slot } from '@radix-ui/react-slot';
+import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '../../lib/utils';
@@ -27,7 +28,7 @@ const SidebarHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 SidebarHeader.displayName = 'SidebarHeader';
 
 const SidebarContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn('flex-1 overflow-y-auto p-2', className)} {...props} />,
+  ({ className, ...props }, ref) => <div ref={ref} className={cn('flex-1 overflow-y-auto p-3', className)} {...props} />,
 );
 SidebarContent.displayName = 'SidebarContent';
 
@@ -37,7 +38,7 @@ const SidebarFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 SidebarFooter.displayName = 'SidebarFooter';
 
 const SidebarNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
-  ({ className, ...props }, ref) => <nav ref={ref} className={cn('flex flex-col gap-1', className)} {...props} />,
+  ({ className, ...props }, ref) => <nav ref={ref} className={cn('flex flex-col gap-1.5', className)} {...props} />,
 );
 SidebarNav.displayName = 'SidebarNav';
 
@@ -87,6 +88,62 @@ const SidebarNavItem = React.forwardRef<HTMLButtonElement, SidebarNavItemProps>(
 );
 SidebarNavItem.displayName = 'SidebarNavItem';
 
+export interface SidebarNavSubmenuProps {
+  /** Rendered inside the trigger button, before the label — typically an icon. */
+  icon?: React.ReactNode;
+  label: React.ReactNode;
+  /** Whether any child route is currently active — expands the submenu and
+   * tints the trigger the same way a plain SidebarNavItem would. */
+  active?: boolean;
+  /** Controls the open state from outside (e.g. to force-open the section
+   * containing the active route). Falls back to internal state otherwise. */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+}
+
+// A collapsible group of SidebarNavItems (no Radix Collapsible dependency —
+// the grid-template-rows 0fr/1fr trick animates height without needing a
+// measured pixel value, and collapses cleanly in both LTR and RTL since it
+// never touches left/right, only block size).
+const SidebarNavSubmenu = React.forwardRef<HTMLDivElement, SidebarNavSubmenuProps>(
+  ({ icon, label, active = false, open, onOpenChange, children }, ref) => {
+    return (
+      <div ref={ref}>
+        <button
+          type="button"
+          onClick={() => onOpenChange(!open)}
+          aria-expanded={open}
+          data-active={active || undefined}
+          className={cn(
+            'flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-foreground/70 transition-colors [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:opacity-70',
+            'hover:bg-accent/70 hover:text-foreground',
+            'data-[active]:text-primary data-[active]:[&_svg]:opacity-100',
+          )}
+        >
+          {icon}
+          <span className="flex-1 truncate text-start">{label}</span>
+          <ChevronDown
+            className={cn(
+              'h-3.5 w-3.5 shrink-0 text-muted-foreground/60 transition-transform duration-200',
+              open && 'rotate-180',
+            )}
+          />
+        </button>
+        <div
+          className="grid transition-[grid-template-rows] duration-200 ease-in-out"
+          style={{ gridTemplateRows: open ? '1fr' : '0fr' }}
+        >
+          <div className="overflow-hidden">
+            <div className="ms-4 mt-0.5 flex flex-col gap-0.5 border-s border-border/60 ps-3">{children}</div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+);
+SidebarNavSubmenu.displayName = 'SidebarNavSubmenu';
+
 export {
   Sidebar,
   SidebarHeader,
@@ -96,4 +153,5 @@ export {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarNavItem,
+  SidebarNavSubmenu,
 };

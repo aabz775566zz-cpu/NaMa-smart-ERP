@@ -4,18 +4,20 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Smart ERP brand palette (Phase 2 design-system foundation) — every
+     * value below is the HSL conversion of an exact hex spec: background
+     * #F8FAFC, card #FFFFFF, border #E2E8F0, text #0F172A, secondary text
+     * #64748B, primary #3B82F6. Structural tokens (secondary/muted/accent —
+     * the hover-surface family, and input/ring) intentionally keep riding
+     * the same slate scale rather than introducing new ones, since the
+     * light background/border math above already lands on that scale. */
+    --background: 210 40% 98%;
+    --foreground: 222.2 47.4% 11.2%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222.2 47.4% 11.2%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    /* Brand primary — indigo, deliberately chosen over shadcn's default
-     * neutral-black primary to give ERP Smart a distinct, trustworthy-but-
-     * modern identity (same family Linear/Stripe lean on). Every other
-     * token below is unchanged from the original shadcn "slate" scaffold —
-     * only primary/ring/radius shifted, so the change stays low-risk. */
-    --primary: 243 75% 59%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -24,51 +26,62 @@
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 243 75% 59%;
+    --ring: 217.2 91.2% 59.8%;
     --radius: 0.625rem;
 
     /* Semantic status tones — extend the token system rather than hardcoding
      * colors per-component. Used by Badge/status-pill variants; feature-level
      * code maps its own domain enums (SaleStatus, InvoiceStatus, ...) onto
      * these generic tones, never the other way around. */
-    --success: 142 71% 45%;
+    --success: 160.1 84.1% 39.4%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 37.7 92.1% 50.2%;
     --warning-foreground: 20 14% 12%;
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
+
+    /* Brand accent (violet) — a distinct 5th brand color, separate from
+     * --accent above (which is a neutral hover-surface tint used by
+     * Button/DropdownMenu/Select/Sidebar, not a brand color). Keeping these
+     * as two different tokens means adding this doesn't recolor every
+     * hover state in the app. */
+    --accent-brand: 258.3 89.5% 66.3%;
+    --accent-brand-foreground: 0 0% 100%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 243 85% 70%;
-    --primary-foreground: 240 50% 12%;
+    --background: 222.9 48.8% 8.4%;
+    --foreground: 210 40% 96.1%;
+    --card: 221.4 40.8% 13.9%;
+    --card-foreground: 210 40% 96.1%;
+    --popover: 221.4 40.8% 13.9%;
+    --popover-foreground: 210 40% 96.1%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 210 40% 96.1%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent-foreground: 210 40% 96.1%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 243 85% 70%;
+    --destructive-foreground: 210 40% 96.1%;
+    --border: 223.3 33.9% 24.9%;
+    --input: 223.3 33.9% 24.9%;
+    --ring: 217.2 91.2% 59.8%;
 
-    --success: 142 71% 45%;
+    --success: 160.1 84.1% 39.4%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 37.7 92.1% 50.2%;
     --warning-foreground: 20 14% 12%;
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
+
+    --accent-brand: 258.3 89.5% 66.3%;
+    --accent-brand-foreground: 0 0% 100%;
   }
 }
 
@@ -78,5 +91,21 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Locale-driven typeface — Inter for English (LTR), Tajawal for Arabic
+   * (RTL) — apps/web loads both. html[lang] is already set server-side from
+   * the active locale (see apps/web & apps/marketing layout.tsx), so this
+   * needs no JS: every element inherits --font-sans through Tailwind's
+   * preflight, which reads theme('fontFamily.sans') → var(--font-sans)
+   * globally on <html>. Fallbacks are nested inside each var() (rather than
+   * left as later items in the same comma list) so a consumer that never
+   * defines --font-tajawal — apps/marketing, which only loads Inter —
+   * degrades to Inter instead of invalidating the whole property. */
+  :root {
+    --font-sans: var(--font-inter, ui-sans-serif), ui-sans-serif, system-ui, sans-serif;
+  }
+  html[lang='ar'] {
+    --font-sans: var(--font-tajawal, var(--font-inter, ui-sans-serif)), ui-sans-serif, system-ui, sans-serif;
   }
 }
