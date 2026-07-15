@@ -1,5 +1,9 @@
+'use client';
+
 import type { ProductStatus } from '@erp-smart/types';
 import { Badge } from '@erp-smart/ui';
+
+import { useLocale } from '@/lib/locale/locale-context';
 
 const STATUS_VARIANT: Record<ProductStatus, 'success' | 'secondary' | 'destructive'> = {
   ACTIVE: 'success',
@@ -8,5 +12,11 @@ const STATUS_VARIANT: Record<ProductStatus, 'success' | 'secondary' | 'destructi
 };
 
 export function ProductStatusBadge({ status }: { status: ProductStatus }) {
-  return <Badge variant={STATUS_VARIANT[status]}>{status}</Badge>;
+  const { messages } = useLocale();
+  const labels: Record<ProductStatus, string> = {
+    ACTIVE: messages.products.statusActive,
+    INACTIVE: messages.products.statusInactive,
+    DISCONTINUED: messages.products.statusDiscontinued,
+  };
+  return <Badge variant={STATUS_VARIANT[status]}>{labels[status]}</Badge>;
 }

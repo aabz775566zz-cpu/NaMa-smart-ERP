@@ -21,6 +21,8 @@ import {
 import { MailPlus, MoreHorizontal, ShieldCheck, UserMinus } from 'lucide-react';
 
 import { useResendInvite } from '@/features/settings/hooks';
+import { useLocale } from '@/lib/locale/locale-context';
+import { useRoleLabels } from '@/lib/locale/role-labels';
 import { useHasPermission } from '@/lib/store';
 
 const STATUS_VARIANT: Record<MembershipStatus, 'success' | 'secondary' | 'destructive'> = {
@@ -43,14 +45,22 @@ export function MembersTable({
   const canInvite = useHasPermission('USERS:CREATE');
   const canAct = canUpdateRole || canRemove || canInvite;
   const resendInviteMutation = useResendInvite();
+  const { messages } = useLocale();
+  const t = messages.settings;
+  const roleLabels = useRoleLabels();
+  const STATUS_LABELS: Record<MembershipStatus, string> = {
+    ACTIVE: t.statusActive,
+    INVITED: t.statusInvited,
+    SUSPENDED: t.statusSuspended,
+  };
 
   function handleResendInvite(member: Member) {
     resendInviteMutation.mutate(member.id, {
       onSuccess: () => {
-        toast({ title: 'Invitation resent', description: `A new invite link was sent to ${member.user.email}.` });
+        toast({ title: t.invitationResent, description: t.invitationResentDescription.replace('{{email}}', member.user.email) });
       },
       onError: (error: Error) => {
-        toast({ variant: 'destructive', title: 'Failed to resend invitation', description: error.message });
+        toast({ variant: 'destructive', title: t.resendInviteFailed, description: error.message });
       },
     });
   }
@@ -60,11 +70,11 @@ export function MembersTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Member</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            {canAct ? <TableHead className="text-end">Actions</TableHead> : null}
+            <TableHead>{t.memberHeader}</TableHead>
+            <TableHead>{messages.common.email}</TableHead>
+            <TableHead>{t.roleHeader}</TableHead>
+            <TableHead>{messages.common.status}</TableHead>
+            {canAct ? <TableHead className="text-end">{messages.common.actions}</TableHead> : null}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -87,10 +97,10 @@ export function MembersTable({
                 </TableCell>
                 <TableCell className="text-muted-foreground">{member.user.email}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">{member.role.name}</Badge>
+                  <Badge variant="outline">{roleLabels[member.role.key]}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={STATUS_VARIANT[member.status]}>{member.status}</Badge>
+                  <Badge variant={STATUS_VARIANT[member.status]}>{STATUS_LABELS[member.status]}</Badge>
                 </TableCell>
                 {canAct ? (
                   <TableCell className="text-end">
@@ -99,7 +109,7 @@ export function MembersTable({
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
                             <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Open actions</span>
+                            <span className="sr-only">{messages.common.openActions}</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -109,13 +119,13 @@ export function MembersTable({
                               disabled={resendInviteMutation.isPending}
                             >
                               <MailPlus />
-                              Resend invitation
+                              {t.resendInvitation}
                             </DropdownMenuItem>
                           ) : null}
                           {canUpdateRole ? (
                             <DropdownMenuItem onClick={() => onChangeRole(member)}>
                               <ShieldCheck />
-                              Change role
+                              {t.changeRole}
                             </DropdownMenuItem>
                           ) : null}
                           {canRemove ? (
@@ -124,7 +134,7 @@ export function MembersTable({
                               className="text-destructive focus:text-destructive"
                             >
                               <UserMinus />
-                              Remove
+                              {t.remove}
                             </DropdownMenuItem>
                           ) : null}
                         </DropdownMenuContent>

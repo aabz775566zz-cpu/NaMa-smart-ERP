@@ -6,6 +6,7 @@ import { Package, Search } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 const MAX_RESULTS = 8;
 
@@ -28,6 +29,8 @@ export function ProductPicker({
   autoFocus?: boolean;
 }) {
   const [query, setQuery] = useState('');
+  const { messages } = useLocale();
+  const t = messages.sales;
   const formatMoney = useFormatMoney();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -63,7 +66,7 @@ export function ProductPicker({
         <Input
           ref={inputRef}
           autoFocus={autoFocus}
-          placeholder="Search by name or SKU — or scan a barcode"
+          placeholder={t.searchPlaceholder}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={handleKeyDown}
@@ -89,7 +92,9 @@ export function ProductPicker({
                   </p>
                 </div>
                 <Badge variant={outOfStock ? 'destructive' : 'outline'} className="shrink-0">
-                  {outOfStock ? 'Out of stock' : `${product.quantityOnHand} ${product.unit} in stock`}
+                  {outOfStock
+                    ? t.outOfStock
+                    : t.inStock.replace('{{quantity}}', String(product.quantityOnHand)).replace('{{unit}}', product.unit)}
                 </Badge>
               </button>
             );
@@ -98,7 +103,7 @@ export function ProductPicker({
       ) : query.trim() ? (
         <p className="flex items-center gap-1.5 px-1 text-xs text-muted-foreground">
           <Package className="h-3.5 w-3.5" />
-          No matching products.
+          {t.noMatchingProducts}
         </p>
       ) : null}
     </div>

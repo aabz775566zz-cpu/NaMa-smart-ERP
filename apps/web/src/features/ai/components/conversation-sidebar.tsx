@@ -4,6 +4,8 @@ import type { AIConversation } from '@erp-smart/types';
 import { Button, Skeleton } from '@erp-smart/ui';
 import { MessageSquarePlus, Trash2 } from 'lucide-react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useDeleteConversation } from '../hooks';
 
 // Hidden below md, matching the same breakpoint the main dashboard sidebar
@@ -24,6 +26,8 @@ export function ConversationSidebar({
   onNewChat: () => void;
 }) {
   const deleteMutation = useDeleteConversation();
+  const { messages } = useLocale();
+  const t = messages.ai;
 
   function handleDelete(id: string) {
     deleteMutation.mutate(id, {
@@ -38,7 +42,7 @@ export function ConversationSidebar({
       <div className="border-b border-border p-2">
         <Button variant="outline" size="sm" className="w-full" onClick={onNewChat}>
           <MessageSquarePlus />
-          New chat
+          {t.newChat}
         </Button>
       </div>
       <div className="flex-1 space-y-1 overflow-y-auto p-2">
@@ -48,7 +52,7 @@ export function ConversationSidebar({
             <Skeleton className="h-9 w-full" />
           </>
         ) : conversations.length === 0 ? (
-          <p className="p-2 text-center text-xs text-muted-foreground">No conversations yet.</p>
+          <p className="p-2 text-center text-xs text-muted-foreground">{t.noConversationsYet}</p>
         ) : (
           conversations.map((conversation) => {
             const isActive = conversation.id === activeConversationId;
@@ -64,7 +68,7 @@ export function ConversationSidebar({
                     isActive ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
-                  {conversation.title ?? 'New conversation'}
+                  {conversation.title ?? t.newConversation}
                 </button>
                 <Button
                   type="button"
@@ -74,7 +78,7 @@ export function ConversationSidebar({
                   onClick={() => handleDelete(conversation.id)}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  <span className="sr-only">Delete conversation</span>
+                  <span className="sr-only">{t.deleteConversation}</span>
                 </Button>
               </div>
             );

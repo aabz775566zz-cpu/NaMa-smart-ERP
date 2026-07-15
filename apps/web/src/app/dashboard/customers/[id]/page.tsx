@@ -1,6 +1,7 @@
 'use client';
 
 import { getDirection } from '@erp-smart/i18n';
+import type { PaymentMethod } from '@erp-smart/types';
 import {
   Badge,
   Button,
@@ -33,6 +34,12 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
   const direction = getDirection(locale);
   const t = messages.customers;
   const formatMoney = useFormatMoney();
+  const METHOD_LABELS: Record<PaymentMethod, string> = {
+    CASH: messages.common.methodCash,
+    CARD: messages.common.methodCard,
+    TRANSFER: messages.common.methodTransfer,
+    OTHER: messages.common.methodOther,
+  };
 
   const permissions = usePermissions();
   const canRead = permissions.includes('CUSTOMERS:READ');
@@ -49,8 +56,8 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       <div className="flex h-full min-h-[60vh] items-center justify-center">
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       </div>
     );
@@ -176,7 +183,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                         </TableCell>
                         <TableCell className="font-medium text-foreground">{formatMoney(payment.amount)}</TableCell>
                         <TableCell>
-                          <Badge variant="outline">{payment.method}</Badge>
+                          <Badge variant="outline">{METHOD_LABELS[payment.method]}</Badge>
                         </TableCell>
                         <TableCell className="max-w-xs truncate text-muted-foreground">
                           {payment.note ?? '—'}

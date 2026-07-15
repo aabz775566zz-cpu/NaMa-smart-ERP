@@ -42,14 +42,15 @@ export function InvoiceDetailDialog({
   const markPaidMutation = useMarkInvoicePaid();
   const formatMoney = useFormatMoney();
   const { messages } = useLocale();
+  const t = messages.invoices;
   const { data: company } = useCompany();
 
   function handleMarkPaid() {
     if (!invoice) return;
     markPaidMutation.mutate(invoice.id, {
-      onSuccess: () => toast({ title: 'Invoice marked as paid' }),
+      onSuccess: () => toast({ title: t.markedPaid }),
       onError: (error) => {
-        toast({ variant: 'destructive', title: 'Failed to mark invoice as paid', description: error.message });
+        toast({ variant: 'destructive', title: t.markPaidFailed, description: error.message });
       },
     });
   }
@@ -58,9 +59,11 @@ export function InvoiceDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{invoice ? invoice.invoiceNumber : 'Invoice'}</DialogTitle>
+          <DialogTitle>{invoice ? invoice.invoiceNumber : messages.invoice.title}</DialogTitle>
           <DialogDescription>
-            {invoice ? `Issued ${new Date(invoice.issueDate).toLocaleDateString()}` : 'Loading invoice details…'}
+            {invoice
+              ? t.issuedOn.replace('{{date}}', new Date(invoice.issueDate).toLocaleDateString())
+              : t.loadingDetails}
           </DialogDescription>
         </DialogHeader>
 
@@ -74,7 +77,7 @@ export function InvoiceDetailDialog({
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
-                {invoice.sale.customer ? invoice.sale.customer.name : 'Walk-in customer'}
+                {invoice.sale.customer ? invoice.sale.customer.name : messages.invoice.walkInCustomer}
               </span>
               <InvoiceStatusBadge status={invoice.status} />
             </div>
@@ -83,10 +86,10 @@ export function InvoiceDetailDialog({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Qty</TableHead>
-                    <TableHead>Unit price</TableHead>
-                    <TableHead>Line total</TableHead>
+                    <TableHead>{messages.invoice.product}</TableHead>
+                    <TableHead>{messages.invoice.quantity}</TableHead>
+                    <TableHead>{messages.invoice.unitPrice}</TableHead>
+                    <TableHead>{messages.invoice.lineTotal}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -104,19 +107,19 @@ export function InvoiceDetailDialog({
 
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">{messages.invoice.subtotal}</span>
                 <span>{formatMoney(invoice.sale.subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Discount</span>
+                <span className="text-muted-foreground">{messages.invoice.discount}</span>
                 <span>-{formatMoney(invoice.sale.discountTotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Tax</span>
+                <span className="text-muted-foreground">{messages.invoice.tax}</span>
                 <span>{formatMoney(invoice.sale.taxTotal)}</span>
               </div>
               <div className="flex justify-between font-medium text-foreground">
-                <span>Total</span>
+                <span>{t.total}</span>
                 <span>{formatMoney(invoice.totalAmount)}</span>
               </div>
             </div>
@@ -143,7 +146,7 @@ export function InvoiceDetailDialog({
             </Button>
             {canUpdate && invoice.status === 'ISSUED' ? (
               <Button onClick={handleMarkPaid} disabled={markPaidMutation.isPending}>
-                {markPaidMutation.isPending ? 'Marking…' : 'Mark as paid'}
+                {markPaidMutation.isPending ? t.marking : t.markPaid}
               </Button>
             ) : null}
           </DialogFooter>

@@ -17,12 +17,14 @@ import Link from 'next/link';
 
 import { useLogout } from '@/features/auth';
 import { useLocale } from '@/lib/locale/locale-context';
+import { useRoleLabels } from '@/lib/locale/role-labels';
 import { useCurrentUser } from '@/lib/store';
 
 export function UserMenu() {
   const user = useCurrentUser();
   const logoutMutation = useLogout();
   const { messages } = useLocale();
+  const roleLabels = useRoleLabels();
 
   if (!user) return null;
 
@@ -43,7 +45,7 @@ export function UserMenu() {
           <div className="flex flex-col gap-1">
             <span className="truncate text-sm font-medium">{user.email}</span>
             <Badge variant="secondary" className="w-fit">
-              {user.roleKey}
+              {roleLabels[user.roleKey]}
             </Badge>
           </div>
         </DropdownMenuLabel>

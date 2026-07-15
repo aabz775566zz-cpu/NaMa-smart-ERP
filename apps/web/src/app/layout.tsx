@@ -3,7 +3,7 @@ import { brandConfig } from '@erp-smart/branding';
 import { getLocaleConfig, resolveLocale } from '@erp-smart/i18n';
 import { Toaster } from '@erp-smart/ui';
 import '@erp-smart/ui/globals.css';
-import { Inter } from 'next/font/google';
+import { Inter, Tajawal } from 'next/font/google';
 import { cookies } from 'next/headers';
 
 import { SessionBootstrap } from '@/features/auth/session-bootstrap';
@@ -13,7 +13,14 @@ import { LocaleProvider } from '@/lib/locale/locale-context';
 import { Providers } from './providers';
 import { ThemeProvider } from './theme-provider';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+// Both fonts load unconditionally — the active locale is only known at
+// request time (from a cookie), not at build time, so next/font can't be
+// called conditionally. Each only exposes a CSS variable; which one
+// actually renders is decided by html[lang] in globals.css, not by which
+// of these run. Tajawal has no variable-font axis on Google Fonts, hence
+// the explicit weight list (Inter is variable and doesn't need one).
+const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '700'], variable: '--font-inter' });
+const tajawal = Tajawal({ subsets: ['arabic'], weight: ['400', '500', '700'], variable: '--font-tajawal' });
 
 export const metadata: Metadata = {
   title: brandConfig.productName,
@@ -26,7 +33,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { direction, messages } = getLocaleConfig(locale);
 
   return (
-    <html lang={locale} dir={direction} className={inter.variable} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={direction}
+      className={`${inter.variable} ${tajawal.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <ThemeProvider>
           <LocaleProvider locale={locale} messages={messages}>

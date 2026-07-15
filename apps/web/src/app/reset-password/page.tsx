@@ -8,6 +8,7 @@ import { Suspense, useState } from 'react';
 
 import { useResetPassword } from '@/features/auth';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { useLocale } from '@/lib/locale/locale-context';
 
 type FormErrors = Partial<Record<'password' | 'confirmPassword', string>>;
 
@@ -16,6 +17,8 @@ function ResetPasswordContent() {
   const router = useRouter();
   const token = searchParams.get('token');
   const resetMutation = useResetPassword();
+  const { messages } = useLocale();
+  const t = messages.auth;
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,12 +29,12 @@ function ResetPasswordContent() {
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
           <XCircle className="h-10 w-10 text-destructive" />
-          <CardTitle>Invalid reset link</CardTitle>
-          <CardDescription>This link is missing its reset token.</CardDescription>
+          <CardTitle>{t.invalidResetTitle}</CardTitle>
+          <CardDescription>{t.invalidResetDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline" className="w-full">
-            <Link href="/forgot-password">Request a new link</Link>
+            <Link href="/forgot-password">{t.requestNewLink}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -40,8 +43,8 @@ function ResetPasswordContent() {
 
   function validate(): boolean {
     const nextErrors: FormErrors = {};
-    if (password.length < 8) nextErrors.password = 'At least 8 characters.';
-    if (password !== confirmPassword) nextErrors.confirmPassword = 'Passwords do not match.';
+    if (password.length < 8) nextErrors.password = t.passwordHint;
+    if (password !== confirmPassword) nextErrors.confirmPassword = t.passwordsDoNotMatch;
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
@@ -54,11 +57,11 @@ function ResetPasswordContent() {
       { token: token as string, password },
       {
         onSuccess: () => {
-          toast({ title: 'Password reset', description: 'Sign in with your new password.' });
+          toast({ title: t.passwordReset, description: t.signInWithNewPassword });
           router.push('/login');
         },
         onError: (error) => {
-          toast({ variant: 'destructive', title: 'Failed to reset password', description: error.message });
+          toast({ variant: 'destructive', title: t.resetPasswordFailed, description: error.message });
         },
       },
     );
@@ -67,17 +70,17 @@ function ResetPasswordContent() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Reset password</CardTitle>
-        <CardDescription>Choose a new password for your account.</CardDescription>
+        <CardTitle>{t.resetPasswordTitle}</CardTitle>
+        <CardDescription>{t.resetPasswordDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormField
-            label="New password"
+            label={t.newPasswordLabel}
             htmlFor="reset-password"
             required
             error={errors.password}
-            description="At least 8 characters."
+            description={t.passwordHint}
           >
             <Input
               id="reset-password"
@@ -87,7 +90,7 @@ function ResetPasswordContent() {
               onChange={(event) => setPassword(event.target.value)}
             />
           </FormField>
-          <FormField label="Confirm new password" htmlFor="reset-confirm-password" required error={errors.confirmPassword}>
+          <FormField label={t.confirmNewPasswordLabel} htmlFor="reset-confirm-password" required error={errors.confirmPassword}>
             <Input
               id="reset-confirm-password"
               type="password"
@@ -97,7 +100,7 @@ function ResetPasswordContent() {
             />
           </FormField>
           <Button type="submit" className="w-full" disabled={resetMutation.isPending}>
-            {resetMutation.isPending ? 'Resetting…' : 'Reset password'}
+            {resetMutation.isPending ? t.resetting : t.resetPasswordTitle}
           </Button>
         </form>
       </CardContent>

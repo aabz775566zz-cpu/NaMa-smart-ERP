@@ -20,7 +20,10 @@ import {
 } from '@erp-smart/ui';
 import { useEffect, useState } from 'react';
 
-import { useInviteMember, useRoles } from '../hooks';
+import { useLocale } from '@/lib/locale/locale-context';
+import { useRoleLabels } from '@/lib/locale/role-labels';
+
+import { useInviteMember } from '../hooks';
 
 // Matches the backend's InvitableRoleKey exactly (invite-member.dto.ts) —
 // OWNER is deliberately not invitable.
@@ -28,8 +31,10 @@ const ASSIGNABLE_ROLES: AssignableRoleKey[] = ['MANAGER', 'ACCOUNTANT', 'EMPLOYE
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function InviteMemberDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { data: roles } = useRoles();
   const inviteMutation = useInviteMember();
+  const { messages } = useLocale();
+  const t = messages.settings;
+  const roleLabels = useRoleLabels();
 
   const [email, setEmail] = useState('');
   const [roleKey, setRoleKey] = useState<AssignableRoleKey>('EMPLOYEE');
@@ -43,13 +48,11 @@ export function InviteMemberDialog({ open, onOpenChange }: { open: boolean; onOp
     }
   }, [open]);
 
-  const roleNameByKey = new Map((roles ?? []).map((role) => [role.key, role.name]));
-
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !EMAIL_PATTERN.test(trimmedEmail)) {
-      setError('Enter a valid email address.');
+      setError(t.invalidEmail);
       return;
     }
     setError(null);
@@ -58,11 +61,11 @@ export function InviteMemberDialog({ open, onOpenChange }: { open: boolean; onOp
       { email: trimmedEmail, roleKey },
       {
         onSuccess: () => {
-          toast({ title: 'Invitation sent' });
+          toast({ title: t.invitationSent });
           onOpenChange(false);
         },
         onError: (err) => {
-          toast({ variant: 'destructive', title: 'Failed to invite member', description: err.message });
+          toast({ variant: 'destructive', title: t.inviteFailed, description: err.message });
         },
       },
     );
@@ -72,14 +75,14 @@ export function InviteMemberDialog({ open, onOpenChange }: { open: boolean; onOp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Invite a member</DialogTitle>
-          <DialogDescription>They&apos;ll receive an email with a link to join your company.</DialogDescription>
+          <DialogTitle>{t.inviteMemberTitle}</DialogTitle>
+          <DialogDescription>{t.inviteMemberDescription}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Email" htmlFor="invite-email" required error={error ?? undefined}>
+          <FormField label={messages.common.email} htmlFor="invite-email" required error={error ?? undefined}>
             <Input id="invite-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
           </FormField>
-          <FormField label="Role" htmlFor="invite-role">
+          <FormField label={t.roleHeader} htmlFor="invite-role">
             <Select value={roleKey} onValueChange={(value) => setRoleKey(value as AssignableRoleKey)}>
               <SelectTrigger id="invite-role">
                 <SelectValue />
@@ -87,7 +90,7 @@ export function InviteMemberDialog({ open, onOpenChange }: { open: boolean; onOp
               <SelectContent>
                 {ASSIGNABLE_ROLES.map((key) => (
                   <SelectItem key={key} value={key}>
-                    {roleNameByKey.get(key) ?? key}
+                    {roleLabels[key]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -95,10 +98,10 @@ export function InviteMemberDialog({ open, onOpenChange }: { open: boolean; onOp
           </FormField>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
             <Button type="submit" disabled={inviteMutation.isPending}>
-              {inviteMutation.isPending ? 'Sending…' : 'Send invite'}
+              {inviteMutation.isPending ? t.sending : t.sendInvite}
             </Button>
           </DialogFooter>
         </form>

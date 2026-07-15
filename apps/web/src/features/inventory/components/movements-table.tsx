@@ -3,6 +3,8 @@
 import type { InventoryMovement } from '@erp-smart/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@erp-smart/ui';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { MovementTypeBadge } from './movement-type-badge';
 
 export function MovementsTable({
@@ -12,17 +14,19 @@ export function MovementsTable({
   movements: InventoryMovement[];
   productNameById: Map<string, string>;
 }) {
+  const { messages } = useLocale();
+  const t = messages.inventory;
   return (
     <div className="rounded-lg border border-border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Product</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Reference</TableHead>
-            <TableHead>Note</TableHead>
+            <TableHead>{messages.common.date}</TableHead>
+            <TableHead>{messages.common.product}</TableHead>
+            <TableHead>{t.type}</TableHead>
+            <TableHead>{t.quantity}</TableHead>
+            <TableHead>{t.reference}</TableHead>
+            <TableHead>{messages.common.note}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

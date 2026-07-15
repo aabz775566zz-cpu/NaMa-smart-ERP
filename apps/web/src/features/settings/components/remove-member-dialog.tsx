@@ -12,6 +12,8 @@ import {
   toast,
 } from '@erp-smart/ui';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useRemoveMember } from '../hooks';
 
 export function RemoveMemberDialog({
@@ -24,16 +26,18 @@ export function RemoveMemberDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const removeMutation = useRemoveMember();
+  const { messages } = useLocale();
+  const t = messages.settings;
 
   function handleConfirm() {
     if (!member) return;
     removeMutation.mutate(member.id, {
       onSuccess: () => {
-        toast({ title: 'Member removed' });
+        toast({ title: t.memberRemoved });
         onOpenChange(false);
       },
       onError: (err) => {
-        toast({ variant: 'destructive', title: 'Failed to remove member', description: err.message });
+        toast({ variant: 'destructive', title: t.removeMemberFailed, description: err.message });
       },
     });
   }
@@ -42,19 +46,17 @@ export function RemoveMemberDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Remove member</DialogTitle>
+          <DialogTitle>{t.removeMemberTitle}</DialogTitle>
           <DialogDescription>
-            {member
-              ? `This will remove ${member.user.fullName} from your company. They will lose access immediately.`
-              : null}
+            {member ? t.removeMemberDescription.replace('{{name}}', member.user.fullName) : null}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {messages.common.cancel}
           </Button>
           <Button type="button" variant="destructive" onClick={handleConfirm} disabled={removeMutation.isPending}>
-            {removeMutation.isPending ? 'Removing…' : 'Remove'}
+            {removeMutation.isPending ? t.removing : t.remove}
           </Button>
         </DialogFooter>
       </DialogContent>

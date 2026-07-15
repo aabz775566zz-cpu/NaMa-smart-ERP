@@ -7,10 +7,13 @@ import { useState } from 'react';
 
 import { useForgotPassword } from '@/features/auth';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { useLocale } from '@/lib/locale/locale-context';
 
 export default function ForgotPasswordPage() {
   const forgotPasswordMutation = useForgotPassword();
   const [email, setEmail] = useState('');
+  const { messages } = useLocale();
+  const t = messages.auth;
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -18,7 +21,7 @@ export default function ForgotPasswordPage() {
       { email },
       {
         onError: (error) => {
-          toast({ variant: 'destructive', title: 'Something went wrong', description: error.message });
+          toast({ variant: 'destructive', title: messages.common.error, description: error.message });
         },
       },
     );
@@ -33,14 +36,12 @@ export default function ForgotPasswordPage() {
         <Card className="w-full max-w-sm">
           <CardHeader className="items-center text-center">
             <Mail className="h-10 w-10 text-primary" />
-            <CardTitle>Check your email</CardTitle>
-            <CardDescription>
-              If an account exists for {email}, we&apos;ve sent a password reset link.
-            </CardDescription>
+            <CardTitle>{t.checkYourEmail}</CardTitle>
+            <CardDescription>{t.checkYourEmailDescription.replace('{{email}}', email)}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/login">Back to sign in</Link>
+              <Link href="/login">{t.backToSignIn}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -52,12 +53,12 @@ export default function ForgotPasswordPage() {
     <AuthShell>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Forgot password</CardTitle>
-          <CardDescription>Enter your email and we&apos;ll send you a reset link.</CardDescription>
+          <CardTitle>{t.forgotPasswordTitle}</CardTitle>
+          <CardDescription>{t.forgotPasswordDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField label="Email" htmlFor="forgot-email" required>
+            <FormField label={t.emailLabel} htmlFor="forgot-email" required>
               <Input
                 id="forgot-email"
                 type="email"
@@ -68,12 +69,12 @@ export default function ForgotPasswordPage() {
               />
             </FormField>
             <Button type="submit" className="w-full" disabled={forgotPasswordMutation.isPending}>
-              {forgotPasswordMutation.isPending ? 'Sending…' : 'Send reset link'}
+              {forgotPasswordMutation.isPending ? t.sending : t.sendResetLink}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
             <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
-              Back to sign in
+              {t.backToSignIn}
             </Link>
           </p>
         </CardContent>

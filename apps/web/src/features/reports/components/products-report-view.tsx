@@ -4,6 +4,7 @@ import { EmptyState, Skeleton, Table, TableBody, TableCell, TableHead, TableHead
 import { useState } from 'react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import { useProductsReport } from '../hooks';
 import { DateRangeFilter } from './date-range-filter';
@@ -13,6 +14,8 @@ export function ProductsReportView() {
   const [to, setTo] = useState('');
   const [limit, setLimit] = useState('');
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
+  const t = messages.reports;
   const { data, isLoading, isError, error } = useProductsReport({
     from: from || undefined,
     to: to || undefined,
@@ -43,20 +46,20 @@ export function ProductsReportView() {
         </div>
       ) : isError || !data ? (
         <EmptyState
-          title="Couldn't load the products report"
-          description={error instanceof Error ? error.message : 'Please try again.'}
+          title={t.couldNotLoadProducts}
+          description={error instanceof Error ? error.message : messages.common.pleaseTryAgain}
         />
       ) : data.length === 0 ? (
-        <EmptyState title="No completed sales in this range" description="Try widening the date range." />
+        <EmptyState title={t.noSalesInRange} description={t.tryWideningRange} />
       ) : (
         <div className="rounded-lg border border-border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Quantity sold</TableHead>
-                <TableHead>Revenue</TableHead>
-                <TableHead>Estimated profit</TableHead>
+                <TableHead>{messages.common.product}</TableHead>
+                <TableHead>{t.quantitySold}</TableHead>
+                <TableHead>{t.revenue}</TableHead>
+                <TableHead>{t.estimatedProfit}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

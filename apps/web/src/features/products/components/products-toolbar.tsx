@@ -3,6 +3,7 @@
 import { Button, Input } from '@erp-smart/ui';
 import { Download, Plus, Search, Upload } from 'lucide-react';
 
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 export function ProductsToolbar({
@@ -18,6 +19,8 @@ export function ProductsToolbar({
   onImport?: () => void;
   onExport?: () => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.products;
   const canCreate = useHasPermission('PRODUCTS:CREATE');
   const canExport = useHasPermission('PRODUCTS:EXPORT');
 
@@ -28,7 +31,7 @@ export function ProductsToolbar({
         <Input
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search by name or SKU…"
+          placeholder={t.searchPlaceholder}
           className="ps-9"
         />
       </div>
@@ -36,19 +39,19 @@ export function ProductsToolbar({
         {canExport && onExport ? (
           <Button variant="outline" onClick={onExport}>
             <Download />
-            Export CSV
+            {messages.common.exportCsv}
           </Button>
         ) : null}
         {canCreate && onImport ? (
           <Button variant="outline" onClick={onImport}>
             <Upload />
-            Import CSV
+            {messages.common.importCsv}
           </Button>
         ) : null}
         {canCreate ? (
           <Button onClick={onAdd}>
             <Plus />
-            Add product
+            {t.addProduct}
           </Button>
         ) : null}
       </div>

@@ -4,6 +4,7 @@ import { EmptyState, Skeleton, Table, TableBody, TableCell, TableHead, TableHead
 import { useState } from 'react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import { useCustomersReport } from '../hooks';
 import { DateRangeFilter } from './date-range-filter';
@@ -13,6 +14,8 @@ export function CustomersReportView() {
   const [to, setTo] = useState('');
   const [limit, setLimit] = useState('');
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
+  const t = messages.reports;
   const { data, isLoading, isError, error } = useCustomersReport({
     from: from || undefined,
     to: to || undefined,
@@ -43,24 +46,21 @@ export function CustomersReportView() {
         </div>
       ) : isError || !data ? (
         <EmptyState
-          title="Couldn't load the customers report"
-          description={error instanceof Error ? error.message : 'Please try again.'}
+          title={t.couldNotLoadCustomers}
+          description={error instanceof Error ? error.message : messages.common.pleaseTryAgain}
         />
       ) : data.length === 0 ? (
         // Walk-in sales (no customerId) are excluded from attribution — see
         // ReportsService.getCustomersReport()'s customerId: { not: null } filter.
-        <EmptyState
-          title="No attributed sales in this range"
-          description="Walk-in sales without a customer aren't counted here."
-        />
+        <EmptyState title={t.noAttributedSales} description={t.walkInExcluded} />
       ) : (
         <div className="rounded-lg border border-border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Total spent</TableHead>
-                <TableHead>Purchases</TableHead>
+                <TableHead>{t.customer}</TableHead>
+                <TableHead>{t.totalSpent}</TableHead>
+                <TableHead>{t.purchases}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

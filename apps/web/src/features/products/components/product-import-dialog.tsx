@@ -22,6 +22,9 @@ import { useMemo, useRef, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 
+import type { Messages } from '@erp-smart/i18n';
+import { useLocale } from '@/lib/locale/locale-context';
+
 import type { ImportProductRow, ImportRowResult } from '../api';
 import { categoriesKeys, productsKeys, useImportProducts } from '../hooks';
 
@@ -54,33 +57,38 @@ function parseNumber(value: string | undefined): number | undefined {
   return Number.isFinite(n) ? n : NaN;
 }
 
-function validateRow(raw: Record<string, string>, index: number, seenSkus: Set<string>): ParsedRow {
+function validateRow(
+  raw: Record<string, string>,
+  index: number,
+  seenSkus: Set<string>,
+  t: Messages['products'],
+): ParsedRow {
   const errors: string[] = [];
   const name = (raw.name ?? '').trim();
-  if (!name) errors.push('Name is required.');
+  if (!name) errors.push(t.rowNameRequired);
 
   const purchasePrice = parseNumber(raw.purchasePrice);
   if (purchasePrice === undefined || Number.isNaN(purchasePrice) || purchasePrice < 0) {
-    errors.push('Purchase price must be a number ≥ 0.');
+    errors.push(t.rowPurchasePriceInvalid);
   }
   const sellingPrice = parseNumber(raw.sellingPrice);
   if (sellingPrice === undefined || Number.isNaN(sellingPrice) || sellingPrice < 0) {
-    errors.push('Selling price must be a number ≥ 0.');
+    errors.push(t.rowSellingPriceInvalid);
   }
 
   const openingQuantityRaw = parseNumber(raw.openingQuantity);
   if (openingQuantityRaw !== undefined && (Number.isNaN(openingQuantityRaw) || !Number.isInteger(openingQuantityRaw) || openingQuantityRaw < 0)) {
-    errors.push('Opening quantity must be a whole number ≥ 0.');
+    errors.push(t.rowOpeningQuantityInvalid);
   }
   const lowStockRaw = parseNumber(raw.lowStockThreshold);
   if (lowStockRaw !== undefined && (Number.isNaN(lowStockRaw) || !Number.isInteger(lowStockRaw) || lowStockRaw < 0)) {
-    errors.push('Low stock threshold must be a whole number ≥ 0.');
+    errors.push(t.rowLowStockInvalid);
   }
 
   const sku = raw.sku?.trim() || undefined;
   if (sku) {
     if (seenSkus.has(sku)) {
-      errors.push(`Duplicate SKU "${sku}" elsewhere in this file.`);
+      errors.push(t.duplicateSku.replace('{{sku}}', sku));
     }
     seenSkus.add(sku);
   }
@@ -103,6 +111,8 @@ function validateRow(raw: Record<string, string>, index: number, seenSkus: Set<s
 }
 
 export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const { messages } = useLocale();
+  const t = messages.products;
   const [step, setStep] = useState<Step>('select');
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<ParsedRow[]>([]);
@@ -145,7 +155,7 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
           return;
         }
         const seenSkus = new Set<string>();
-        const parsed = result.data.map((raw, i) => validateRow(raw, i, seenSkus));
+        const parsed = result.data.map((raw, i) => validateRow(raw, i, seenSkus, t));
         setRows(parsed);
         setStep('preview');
       },
@@ -174,7 +184,7 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
     const allResults: ImportRowResult[] = invalidRows.map((r) => ({
       row: r.index,
       success: false,
-      name: r.data.name || `Row ${r.index + 1}`,
+      name: r.data.name || `${t.row} ${r.index + 1}`,
       error: r.errors.join(' '),
     }));
 
@@ -189,7 +199,7 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
             row: -1,
             success: false,
             name: row.name,
-            error: error instanceof Error ? error.message : 'Import request failed.',
+            error: error instanceof Error ? error.message : t.importRequestFailed,
           }),
         );
       }
@@ -209,9 +219,9 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Import products from CSV</DialogTitle>
+          <DialogTitle>{t.importTitle}</DialogTitle>
           <DialogDescription>
-            Bulk-add products from a spreadsheet — supports large catalogs, validates before importing.
+            {t.importDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -220,17 +230,18 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
             <div className="space-y-4">
               <Button variant="outline" onClick={handleDownloadTemplate}>
                 <Download />
-                Download CSV template
+                {t.downloadTemplate}
               </Button>
               <div className="rounded-md border border-dashed border-border p-8 text-center">
                 <FileUp className="mx-auto h-8 w-8 text-muted-foreground" />
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Required columns: <span className="font-medium text-foreground">name, purchasePrice, sellingPrice</span>.
-                  Optional: sku, category, unit, openingQuantity, lowStockThreshold, description.
+                  {t.requiredColumns}
+                  {' '}
+                  {t.optionalColumns}
                 </p>
                 <Button className="mt-4" onClick={() => fileInputRef.current?.click()}>
                   <Upload />
-                  Choose CSV file
+                  {t.chooseFile}
                 </Button>
                 <input
                   ref={fileInputRef}
@@ -247,21 +258,21 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
           {step === 'preview' ? (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{fileName}</span> — {rows.length} rows found.
+                <span className="font-medium text-foreground">{fileName}</span> — {t.rowsFound.replace('{{count}}', String(rows.length))}
               </p>
               <div className="flex gap-2">
-                <Badge variant="success">{validRows.length} ready to import</Badge>
-                {invalidRows.length > 0 ? <Badge variant="destructive">{invalidRows.length} have errors</Badge> : null}
+                <Badge variant="success">{validRows.length} {t.readyToImport}</Badge>
+                {invalidRows.length > 0 ? <Badge variant="destructive">{invalidRows.length} {t.haveErrors}</Badge> : null}
               </div>
 
               <div className="max-h-80 overflow-y-auto rounded-md border border-border">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Row</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>{t.row}</TableHead>
+                      <TableHead>{messages.common.name}</TableHead>
+                      <TableHead>{t.price}</TableHead>
+                      <TableHead>{messages.common.status}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -272,7 +283,7 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
                         <TableCell className="text-muted-foreground">{row.data.sellingPrice}</TableCell>
                         <TableCell>
                           {row.errors.length === 0 ? (
-                            <Badge variant="success">Valid</Badge>
+                            <Badge variant="success">{t.validRow}</Badge>
                           ) : (
                             <span className="text-xs text-destructive">{row.errors.join(' ')}</span>
                           )}
@@ -284,8 +295,9 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
               </div>
               {rows.length > MAX_PREVIEW_ROWS ? (
                 <p className="text-xs text-muted-foreground">
-                  Showing the first {MAX_PREVIEW_ROWS} of {rows.length} rows — all {rows.length} will be validated and
-                  imported.
+                  {t.showingFirst
+                    .replaceAll('{{total}}', String(rows.length))
+                    .replace('{{shown}}', String(MAX_PREVIEW_ROWS))}
                 </p>
               ) : null}
             </div>
@@ -294,7 +306,7 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
           {step === 'importing' ? (
             <div className="space-y-3 py-8 text-center">
               <p className="text-sm text-muted-foreground">
-                Importing {progress.done} of {progress.total}…
+                {t.importingProgress.replace('{{done}}', String(progress.done)).replace('{{total}}', String(progress.total))}
               </p>
               <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
@@ -310,7 +322,7 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
               <div className="flex items-center gap-2 text-sm">
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <span>
-                  <span className="font-medium text-foreground">{successCount}</span> products created.
+                  <span className="font-medium text-foreground">{successCount}</span> {t.productsCreatedCount}
                 </span>
               </div>
               {failureResults.length > 0 ? (
@@ -318,16 +330,16 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
                   <div className="flex items-center gap-2 text-sm">
                     <AlertTriangle className="h-4 w-4 text-destructive" />
                     <span>
-                      <span className="font-medium text-foreground">{failureResults.length}</span> rows failed.
+                      <span className="font-medium text-foreground">{failureResults.length}</span> {t.rowsFailedCount}
                     </span>
                   </div>
                   <div className="max-h-56 overflow-y-auto rounded-md border border-border">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Row</TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Error</TableHead>
+                          <TableHead>{t.row}</TableHead>
+                          <TableHead>{messages.common.name}</TableHead>
+                          <TableHead>{t.error}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -353,17 +365,17 @@ export function ProductImportDialog({ open, onOpenChange }: { open: boolean; onO
           {step === 'preview' ? (
             <>
               <Button variant="outline" onClick={reset}>
-                Choose a different file
+                {t.chooseDifferentFile}
               </Button>
               <Button onClick={handleImport} disabled={validRows.length === 0}>
-                Import {validRows.length} products
+                {t.importCount.replace('{{count}}', String(validRows.length))}
               </Button>
             </>
           ) : step === 'done' ? (
-            <Button onClick={() => handleClose(false)}>Done</Button>
+            <Button onClick={() => handleClose(false)}>{t.done}</Button>
           ) : (
             <Button variant="outline" onClick={() => handleClose(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
           )}
         </DialogFooter>

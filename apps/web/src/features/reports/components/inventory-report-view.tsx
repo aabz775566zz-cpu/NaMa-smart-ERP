@@ -4,12 +4,15 @@ import { EmptyState, Skeleton, StatCard, Table, TableBody, TableCell, TableHead,
 import { AlertTriangle, Boxes, Package, Wallet } from 'lucide-react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import { useInventoryReport } from '../hooks';
 
 export function InventoryReportView() {
   const { data, isLoading, isError, error } = useInventoryReport();
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
+  const t = messages.reports;
 
   if (isLoading) {
     return (
@@ -24,8 +27,8 @@ export function InventoryReportView() {
   if (isError || !data) {
     return (
       <EmptyState
-        title="Couldn't load the inventory report"
-        description={error instanceof Error ? error.message : 'Please try again.'}
+        title={t.couldNotLoadInventory}
+        description={error instanceof Error ? error.message : messages.common.pleaseTryAgain}
       />
     );
   }
@@ -33,22 +36,22 @@ export function InventoryReportView() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total products" value={data.totalProducts} icon={<Package />} />
-        <StatCard label="Units in stock" value={data.totalUnitsInStock} icon={<Boxes />} />
-        <StatCard label="Stock value" value={formatMoney(data.stockValue)} icon={<Wallet />} />
-        <StatCard label="Low stock items" value={data.lowStockCount} icon={<AlertTriangle />} />
+        <StatCard label={t.totalProducts} value={data.totalProducts} icon={<Package />} />
+        <StatCard label={t.unitsInStock} value={data.totalUnitsInStock} icon={<Boxes />} />
+        <StatCard label={t.stockValue} value={formatMoney(data.stockValue)} icon={<Wallet />} />
+        <StatCard label={t.lowStockItems} value={data.lowStockCount} icon={<AlertTriangle />} />
       </div>
 
       {data.lowStockProducts.length === 0 ? (
-        <EmptyState icon={<Boxes />} title="Nothing low on stock" description="All products are above their threshold." />
+        <EmptyState icon={<Boxes />} title={t.nothingLowOnStock} description={t.allAboveThreshold} />
       ) : (
         <div className="rounded-lg border border-border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>On hand</TableHead>
-                <TableHead>Threshold</TableHead>
+                <TableHead>{messages.common.product}</TableHead>
+                <TableHead>{t.onHand}</TableHead>
+                <TableHead>{t.threshold}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

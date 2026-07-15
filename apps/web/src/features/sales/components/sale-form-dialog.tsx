@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react';
 import { useCreateCustomer, useCustomers } from '@/features/customers/hooks';
 import { useProducts } from '@/features/products/hooks';
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import type { CreateSaleInput } from '../api';
 import { useCompleteSale, useCreateSale } from '../hooks';
@@ -62,6 +63,19 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
   const completeMutation = useCompleteSale();
   const createCustomerMutation = useCreateCustomer();
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
+  const t = messages.sales;
+  const METHOD_LABELS: Record<PaymentMethod, string> = {
+    CASH: messages.common.methodCash,
+    CARD: messages.common.methodCard,
+    TRANSFER: messages.common.methodTransfer,
+    OTHER: messages.common.methodOther,
+  };
+  const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+    PAID: messages.common.paymentStatusPaid,
+    PARTIAL: messages.common.paymentStatusPartial,
+    UNPAID: messages.common.paymentStatusUnpaid,
+  };
 
   const [customerId, setCustomerId] = useState(NO_CUSTOMER);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
@@ -134,13 +148,13 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         setQuickAddPhone('');
       })
       .catch((err: Error) => {
-        toast({ variant: 'destructive', title: 'Failed to add customer', description: err.message });
+        toast({ variant: 'destructive', title: t.addCustomerFailed, description: err.message });
       });
   }
 
   function buildInput(): CreateSaleInput | null {
     if (items.length === 0) {
-      setError('Add at least one product.');
+      setError(t.addAtLeastOneProduct);
       return null;
     }
     setError(null);
@@ -161,11 +175,11 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
     createMutation
       .mutateAsync(input)
       .then(() => {
-        toast({ title: 'Sale created as draft' });
+        toast({ title: t.saleCreatedDraft });
         onOpenChange(false);
       })
       .catch((err: Error) => {
-        toast({ variant: 'destructive', title: 'Failed to create sale', description: err.message });
+        toast({ variant: 'destructive', title: t.createFailed, description: err.message });
       });
   }
 
@@ -179,7 +193,10 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         completeMutation
           .mutateAsync(sale.id)
           .then((result) => {
-            toast({ title: 'Sale completed', description: `Invoice ${result.invoice.invoiceNumber} generated.` });
+            toast({
+              title: t.saleCompleted,
+              description: t.invoiceGenerated.replace('{{number}}', result.invoice.invoiceNumber),
+            });
             onOpenChange(false);
           })
           .catch((err: Error) => {
@@ -189,14 +206,14 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
             // draft rather than losing the cart the user just built.
             toast({
               variant: 'destructive',
-              title: 'Sale saved as draft — completion failed',
+              title: t.savedAsDraftTitle,
               description: err.message,
             });
             onOpenChange(false);
           }),
       )
       .catch((err: Error) => {
-        toast({ variant: 'destructive', title: 'Failed to create sale', description: err.message });
+        toast({ variant: 'destructive', title: t.createFailed, description: err.message });
       });
   }
 
@@ -206,11 +223,11 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>New sale</DialogTitle>
-          <DialogDescription>Search or scan a product to add it, then complete the sale.</DialogDescription>
+          <DialogTitle>{t.newSale}</DialogTitle>
+          <DialogDescription>{t.newSaleDescription}</DialogDescription>
         </DialogHeader>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pe-1">
-          <FormField label="Customer" htmlFor="sale-customer">
+          <FormField label={t.customer} htmlFor="sale-customer">
             <Select
               value={customerId}
               onValueChange={(value) => {
@@ -222,10 +239,10 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
               }}
             >
               <SelectTrigger id="sale-customer">
-                <SelectValue placeholder="Walk-in customer" />
+                <SelectValue placeholder={t.walkInCustomer} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NO_CUSTOMER}>Walk-in customer</SelectItem>
+                <SelectItem value={NO_CUSTOMER}>{t.walkInCustomer}</SelectItem>
                 {customers?.map((customer) => (
                   <SelectItem key={customer.id} value={customer.id}>
                     {customer.name}
@@ -235,7 +252,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                 <SelectItem value={CREATE_CUSTOMER}>
                   <span className="flex items-center gap-1.5 text-primary">
                     <Plus className="h-3.5 w-3.5" />
-                    New customer
+                    {t.newCustomer}
                   </span>
                 </SelectItem>
               </SelectContent>
@@ -244,7 +261,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
 
           {quickAddOpen ? (
             <div className="flex items-end gap-2 rounded-md border border-dashed border-border p-3">
-              <FormField label="Name" htmlFor="quick-customer-name" required className="flex-1">
+              <FormField label={messages.common.name} htmlFor="quick-customer-name" required className="flex-1">
                 <Input
                   id="quick-customer-name"
                   value={quickAddName}
@@ -252,7 +269,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                   autoFocus
                 />
               </FormField>
-              <FormField label="Phone" htmlFor="quick-customer-phone" className="flex-1">
+              <FormField label={messages.common.phone} htmlFor="quick-customer-phone" className="flex-1">
                 <Input
                   id="quick-customer-phone"
                   value={quickAddPhone}
@@ -265,16 +282,16 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                 onClick={handleQuickAddCustomer}
                 disabled={!quickAddName.trim() || createCustomerMutation.isPending}
               >
-                Add
+                {t.add}
               </Button>
               <Button type="button" size="sm" variant="ghost" onClick={() => setQuickAddOpen(false)}>
-                Cancel
+                {messages.common.cancel}
               </Button>
             </div>
           ) : null}
 
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Payment method" htmlFor="sale-payment-method">
+            <FormField label={t.paymentMethod} htmlFor="sale-payment-method">
               <Select value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}>
                 <SelectTrigger id="sale-payment-method">
                   <SelectValue />
@@ -282,13 +299,13 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                 <SelectContent>
                   {PAYMENT_METHODS.map((method) => (
                     <SelectItem key={method} value={method}>
-                      {method}
+                      {METHOD_LABELS[method]}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </FormField>
-            <FormField label="Payment status" htmlFor="sale-payment-status">
+            <FormField label={t.paymentStatus} htmlFor="sale-payment-status">
               <Select value={paymentStatus} onValueChange={(value) => setPaymentStatus(value as PaymentStatus)}>
                 <SelectTrigger id="sale-payment-status">
                   <SelectValue />
@@ -296,7 +313,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                 <SelectContent>
                   {PAYMENT_STATUSES.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {status}
+                      {PAYMENT_STATUS_LABELS[status]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -307,11 +324,11 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           {products && products.length === 0 ? (
             <EmptyState
               icon={<Package />}
-              title="No products yet"
-              description="Add a product before creating a sale."
+              title={t.noProductsYet}
+              description={t.addProductBeforeSale}
               action={
                 <Button asChild size="sm" variant="outline">
-                  <Link href="/dashboard/products">Go to Products</Link>
+                  <Link href="/dashboard/products">{t.goToProducts}</Link>
                 </Button>
               }
             />
@@ -322,7 +339,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
               <div className="space-y-2">
                 {items.length === 0 ? (
                   <p className="rounded-md border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
-                    Cart is empty — search above to add products.
+                    {t.cartEmpty}
                   </p>
                 ) : (
                   items.map((item) => {
@@ -345,7 +362,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Discount total" htmlFor="sale-discount">
+            <FormField label={t.discountTotal} htmlFor="sale-discount">
               <Input
                 id="sale-discount"
                 type="number"
@@ -355,7 +372,7 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                 onChange={(event) => setDiscountTotal(event.target.value)}
               />
             </FormField>
-            <FormField label="Tax total" htmlFor="sale-tax">
+            <FormField label={t.taxTotal} htmlFor="sale-tax">
               <Input
                 id="sale-tax"
                 type="number"
@@ -368,20 +385,20 @@ export function SaleFormDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           </div>
 
           <div className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
-            Estimated total: <span className="font-medium text-foreground">{formatMoney(previewTotal)}</span>{' '}
-            <span className="text-xs">(the server computes the authoritative total from live prices)</span>
+            {t.estimatedTotal} <span className="font-medium text-foreground">{formatMoney(previewTotal)}</span>{' '}
+            <span className="text-xs">{t.estimatedTotalHint}</span>
           </div>
         </div>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {messages.common.cancel}
           </Button>
           <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={isSubmitting}>
-            {createMutation.isPending ? 'Saving…' : 'Save as draft'}
+            {createMutation.isPending ? messages.common.saving : t.saveAsDraft}
           </Button>
           <Button type="button" onClick={handleCompleteNow} disabled={isSubmitting}>
-            {isSubmitting ? 'Completing…' : 'Complete sale'}
+            {isSubmitting ? t.completing : t.completeSale}
           </Button>
         </DialogFooter>
       </DialogContent>

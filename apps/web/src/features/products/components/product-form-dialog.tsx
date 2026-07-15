@@ -23,6 +23,8 @@ import {
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useCategories, useCreateProduct, useUpdateProduct } from '../hooks';
 import type { CreateProductInput } from '../api';
 import { CategoryQuickCreateDialog } from './category-quick-create-dialog';
@@ -89,6 +91,13 @@ export function ProductFormDialog({
   onOpenChange: (open: boolean) => void;
   product?: Product | null;
 }) {
+  const { messages } = useLocale();
+  const t = messages.products;
+  const STATUS_LABELS: Record<ProductStatus, string> = {
+    ACTIVE: t.statusActive,
+    INACTIVE: t.statusInactive,
+    DISCONTINUED: t.statusDiscontinued,
+  };
   const isEdit = Boolean(product);
   const { data: categories } = useCategories();
   const createMutation = useCreateProduct();
@@ -107,21 +116,21 @@ export function ProductFormDialog({
 
   function validate(): boolean {
     const nextErrors: FormErrors = {};
-    if (!values.name.trim()) nextErrors.name = 'Name is required.';
+    if (!values.name.trim()) nextErrors.name = t.nameRequired;
     if (values.purchasePrice === '' || Number(values.purchasePrice) < 0) {
-      nextErrors.purchasePrice = 'Enter a valid purchase price.';
+      nextErrors.purchasePrice = t.purchasePriceInvalid;
     }
     if (values.sellingPrice === '' || Number(values.sellingPrice) < 0) {
-      nextErrors.sellingPrice = 'Enter a valid selling price.';
+      nextErrors.sellingPrice = t.sellingPriceInvalid;
     }
     if (values.lowStockThreshold !== '' && Number(values.lowStockThreshold) < 0) {
-      nextErrors.lowStockThreshold = 'Must be zero or greater.';
+      nextErrors.lowStockThreshold = t.lowStockInvalid;
     }
     if (
       values.openingQuantity !== '' &&
       (!Number.isInteger(Number(values.openingQuantity)) || Number(values.openingQuantity) < 0)
     ) {
-      nextErrors.openingQuantity = 'Must be a whole number, zero or greater.';
+      nextErrors.openingQuantity = t.openingQuantityInvalid;
     }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -152,13 +161,13 @@ export function ProductFormDialog({
 
     submit
       .then(() => {
-        toast({ title: isEdit ? 'Product updated' : 'Product created' });
+        toast({ title: isEdit ? t.productUpdated : t.productCreated });
         onOpenChange(false);
       })
       .catch((error: Error) => {
         toast({
           variant: 'destructive',
-          title: isEdit ? 'Failed to update product' : 'Failed to create product',
+          title: isEdit ? t.updateFailed : t.createFailed,
           description: error.message,
         });
       });
@@ -173,158 +182,176 @@ export function ProductFormDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit product' : 'Add product'}</DialogTitle>
+          <DialogTitle>{isEdit ? t.editProduct : t.addProduct}</DialogTitle>
           <DialogDescription>
-            {isEdit ? "Update this product's details." : 'Create a new product in your catalog.'}
+            {isEdit ? t.updateDescription : t.createDescription}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Name" htmlFor="product-name" required error={errors.name}>
-            <Input
-              id="product-name"
-              value={values.name}
-              onChange={(event) => setValues((v) => ({ ...v, name: event.target.value }))}
-            />
-          </FormField>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="SKU" htmlFor="product-sku">
-              <Input
-                id="product-sku"
-                value={values.sku}
-                onChange={(event) => setValues((v) => ({ ...v, sku: event.target.value }))}
-              />
-            </FormField>
-            <FormField label="Category" htmlFor="product-category">
-              <Select
-                value={values.categoryId}
-                onValueChange={(value) => {
-                  if (value === CREATE_CATEGORY) {
-                    setCategoryDialogOpen(true);
-                    return;
-                  }
-                  setValues((v) => ({ ...v, categoryId: value }));
-                }}
-              >
-                <SelectTrigger id="product-category">
-                  <SelectValue placeholder="No category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_CATEGORY}>No category</SelectItem>
-                  {categories?.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                  <SelectSeparator />
-                  <SelectItem value={CREATE_CATEGORY}>
-                    <span className="flex items-center gap-1.5 text-primary">
-                      <Plus className="h-3.5 w-3.5" />
-                      New category
-                    </span>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FormField>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Purchase price" htmlFor="product-purchase-price" required error={errors.purchasePrice}>
-              <Input
-                id="product-purchase-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={values.purchasePrice}
-                onChange={(event) => setValues((v) => ({ ...v, purchasePrice: event.target.value }))}
-              />
-            </FormField>
-            <FormField label="Selling price" htmlFor="product-selling-price" required error={errors.sellingPrice}>
-              <Input
-                id="product-selling-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={values.sellingPrice}
-                onChange={(event) => setValues((v) => ({ ...v, sellingPrice: event.target.value }))}
-              />
-            </FormField>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Unit" htmlFor="product-unit" description="e.g. pcs, kg, box">
-              <Input
-                id="product-unit"
-                value={values.unit}
-                onChange={(event) => setValues((v) => ({ ...v, unit: event.target.value }))}
-              />
-            </FormField>
-            {!isEdit ? (
-              <FormField
-                label="Opening quantity"
-                htmlFor="product-opening-quantity"
-                error={errors.openingQuantity}
-                description="Stock to start with — recorded as a purchase movement."
-              >
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          {/* The only scrolling region — DialogHeader above and
+              DialogFooter below both stay fixed regardless of viewport
+              height, so Save is never pushed out of reach on a short
+              screen. [&_label]:leading-snug (instead of the shared Label's
+              default leading-none) is scoped to just this dialog: a long
+              wrapped Arabic label should look like a deliberate two-line
+              label, not cramped overlapping text. */}
+          <div className="min-h-0 flex-1 space-y-6 overflow-y-auto pe-1 [&_label]:leading-snug">
+            <section className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.basicInfoSection}</p>
+              <FormField label={messages.common.name} htmlFor="product-name" required error={errors.name}>
                 <Input
-                  id="product-opening-quantity"
-                  type="number"
-                  min="0"
-                  step="1"
-                  placeholder="0"
-                  value={values.openingQuantity}
-                  onChange={(event) => setValues((v) => ({ ...v, openingQuantity: event.target.value }))}
+                  id="product-name"
+                  value={values.name}
+                  onChange={(event) => setValues((v) => ({ ...v, name: event.target.value }))}
                 />
               </FormField>
-            ) : null}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <FormField label={t.sku} htmlFor="product-sku">
+                  <Input
+                    id="product-sku"
+                    value={values.sku}
+                    onChange={(event) => setValues((v) => ({ ...v, sku: event.target.value }))}
+                  />
+                </FormField>
+                <FormField label={t.category} htmlFor="product-category">
+                  <Select
+                    value={values.categoryId}
+                    onValueChange={(value) => {
+                      if (value === CREATE_CATEGORY) {
+                        setCategoryDialogOpen(true);
+                        return;
+                      }
+                      setValues((v) => ({ ...v, categoryId: value }));
+                    }}
+                  >
+                    <SelectTrigger id="product-category">
+                      <SelectValue placeholder={t.noCategory} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_CATEGORY}>{t.noCategory}</SelectItem>
+                      {categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                      <SelectSeparator />
+                      <SelectItem value={CREATE_CATEGORY}>
+                        <span className="flex items-center gap-1.5 text-primary">
+                          <Plus className="h-3.5 w-3.5" />
+                          {t.newCategory}
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField label={messages.common.status} htmlFor="product-status">
+                  <Select
+                    value={values.status}
+                    onValueChange={(value) => setValues((v) => ({ ...v, status: value as ProductStatus }))}
+                  >
+                    <SelectTrigger id="product-status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {STATUS_LABELS[status]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              </div>
+              <FormField label={t.description} htmlFor="product-description">
+                <Textarea
+                  id="product-description"
+                  rows={2}
+                  value={values.description}
+                  onChange={(event) => setValues((v) => ({ ...v, description: event.target.value }))}
+                />
+              </FormField>
+            </section>
+
+            <section className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.pricingSection}</p>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField label={t.purchasePrice} htmlFor="product-purchase-price" required error={errors.purchasePrice}>
+                  <Input
+                    id="product-purchase-price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={values.purchasePrice}
+                    onChange={(event) => setValues((v) => ({ ...v, purchasePrice: event.target.value }))}
+                  />
+                </FormField>
+                <FormField label={t.sellingPrice} htmlFor="product-selling-price" required error={errors.sellingPrice}>
+                  <Input
+                    id="product-selling-price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={values.sellingPrice}
+                    onChange={(event) => setValues((v) => ({ ...v, sellingPrice: event.target.value }))}
+                  />
+                </FormField>
+              </div>
+            </section>
+
+            {/* Deliberately emphasized — unit and opening quantity are the
+                fields most often overlooked when quickly adding a product, so
+                this section gets a tinted, bordered box instead of blending
+                into the same flat rhythm as the sections above. */}
+            <section className="space-y-3 rounded-lg border border-border bg-muted/30 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.inventorySection}</p>
+              <div className={isEdit ? 'grid grid-cols-1 gap-4 sm:grid-cols-2' : 'grid grid-cols-1 gap-4 sm:grid-cols-3'}>
+                <FormField label={t.unit} htmlFor="product-unit" description={t.unitHint}>
+                  <Input
+                    id="product-unit"
+                    value={values.unit}
+                    onChange={(event) => setValues((v) => ({ ...v, unit: event.target.value }))}
+                  />
+                </FormField>
+                {!isEdit ? (
+                  <FormField
+                    label={t.openingQuantity}
+                    htmlFor="product-opening-quantity"
+                    error={errors.openingQuantity}
+                    description={t.openingQuantityHint}
+                  >
+                    <Input
+                      id="product-opening-quantity"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="0"
+                      value={values.openingQuantity}
+                      onChange={(event) => setValues((v) => ({ ...v, openingQuantity: event.target.value }))}
+                    />
+                  </FormField>
+                ) : null}
+                <FormField label={t.lowStockThreshold} htmlFor="product-low-stock" error={errors.lowStockThreshold}>
+                  <Input
+                    id="product-low-stock"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={values.lowStockThreshold}
+                    onChange={(event) => setValues((v) => ({ ...v, lowStockThreshold: event.target.value }))}
+                  />
+                </FormField>
+              </div>
+            </section>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Low stock threshold" htmlFor="product-low-stock" error={errors.lowStockThreshold}>
-              <Input
-                id="product-low-stock"
-                type="number"
-                min="0"
-                step="1"
-                value={values.lowStockThreshold}
-                onChange={(event) => setValues((v) => ({ ...v, lowStockThreshold: event.target.value }))}
-              />
-            </FormField>
-            <FormField label="Status" htmlFor="product-status">
-              <Select
-                value={values.status}
-                onValueChange={(value) => setValues((v) => ({ ...v, status: value as ProductStatus }))}
-              >
-                <SelectTrigger id="product-status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-          </div>
-
-          <FormField label="Description" htmlFor="product-description">
-            <Textarea
-              id="product-description"
-              value={values.description}
-              onChange={(event) => setValues((v) => ({ ...v, description: event.target.value }))}
-            />
-          </FormField>
-
-          <DialogFooter>
+          <DialogFooter className="mt-4 border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create product'}
+              {isPending ? messages.common.saving : isEdit ? messages.common.saveChanges : t.createProductButton}
             </Button>
           </DialogFooter>
         </form>

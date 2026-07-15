@@ -8,6 +8,7 @@ import { Suspense, useState } from 'react';
 
 import { useAcceptInvite } from '@/features/auth';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { useLocale } from '@/lib/locale/locale-context';
 
 type FormErrors = Partial<Record<'password' | 'confirmPassword', string>>;
 
@@ -16,6 +17,8 @@ function AcceptInviteContent() {
   const router = useRouter();
   const token = searchParams.get('token');
   const acceptMutation = useAcceptInvite();
+  const { messages } = useLocale();
+  const t = messages.auth;
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,12 +29,12 @@ function AcceptInviteContent() {
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
           <XCircle className="h-10 w-10 text-destructive" />
-          <CardTitle>Invalid invitation link</CardTitle>
-          <CardDescription>This link is missing its invitation token.</CardDescription>
+          <CardTitle>{t.invalidInviteTitle}</CardTitle>
+          <CardDescription>{t.invalidInviteDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline" className="w-full">
-            <Link href="/login">Go to sign in</Link>
+            <Link href="/login">{t.goToSignIn}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -40,8 +43,8 @@ function AcceptInviteContent() {
 
   function validate(): boolean {
     const nextErrors: FormErrors = {};
-    if (password.length < 8) nextErrors.password = 'At least 8 characters.';
-    if (password !== confirmPassword) nextErrors.confirmPassword = 'Passwords do not match.';
+    if (password.length < 8) nextErrors.password = t.passwordHint;
+    if (password !== confirmPassword) nextErrors.confirmPassword = t.passwordsDoNotMatch;
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
@@ -54,11 +57,11 @@ function AcceptInviteContent() {
       { token: token as string, password },
       {
         onSuccess: () => {
-          toast({ title: 'Invitation accepted', description: 'Sign in to get started.' });
+          toast({ title: t.invitationAccepted, description: t.signInToGetStarted });
           router.push('/login');
         },
         onError: (error) => {
-          toast({ variant: 'destructive', title: 'Failed to accept invitation', description: error.message });
+          toast({ variant: 'destructive', title: t.acceptInviteFailed, description: error.message });
         },
       },
     );
@@ -67,17 +70,17 @@ function AcceptInviteContent() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Accept invitation</CardTitle>
-        <CardDescription>Set a password to join your company.</CardDescription>
+        <CardTitle>{t.acceptInvitationTitle}</CardTitle>
+        <CardDescription>{t.acceptInvitationDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormField
-            label="Password"
+            label={t.passwordLabel}
             htmlFor="invite-password"
             required
             error={errors.password}
-            description="At least 8 characters."
+            description={t.passwordHint}
           >
             <Input
               id="invite-password"
@@ -87,7 +90,7 @@ function AcceptInviteContent() {
               onChange={(event) => setPassword(event.target.value)}
             />
           </FormField>
-          <FormField label="Confirm password" htmlFor="invite-confirm-password" required error={errors.confirmPassword}>
+          <FormField label={t.confirmPassword} htmlFor="invite-confirm-password" required error={errors.confirmPassword}>
             <Input
               id="invite-confirm-password"
               type="password"
@@ -97,7 +100,7 @@ function AcceptInviteContent() {
             />
           </FormField>
           <Button type="submit" className="w-full" disabled={acceptMutation.isPending}>
-            {acceptMutation.isPending ? 'Joining…' : 'Accept invitation'}
+            {acceptMutation.isPending ? t.joining : t.acceptInvitationTitle}
           </Button>
         </form>
       </CardContent>

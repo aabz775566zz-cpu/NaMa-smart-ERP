@@ -5,6 +5,8 @@ import { EmptyState, Skeleton } from '@erp-smart/ui';
 import { Sparkles } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { MessageBubble } from './message-bubble';
 
 export function MessageList({
@@ -19,6 +21,8 @@ export function MessageList({
   isSending: boolean;
 }) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { messages: localeMessages } = useLocale();
+  const t = localeMessages.ai;
   // TOOL-role messages carry raw JSON meant for the model's own context
   // (see AIToolCallResult), not for direct display — only USER/ASSISTANT
   // turns render as bubbles.
@@ -41,7 +45,7 @@ export function MessageList({
   if (isError) {
     return (
       <div className="flex flex-1 items-center justify-center p-4">
-        <EmptyState title="Couldn't load this conversation" description="Please try again." />
+        <EmptyState title={t.couldNotLoadConversation} description={localeMessages.common.pleaseTryAgain} />
       </div>
     );
   }
@@ -49,11 +53,7 @@ export function MessageList({
   if (visibleMessages.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center p-4">
-        <EmptyState
-          icon={<Sparkles />}
-          title="Ask the AI assistant"
-          description="Ask about your sales, inventory, products, or customers — it can only see what you have permission to see."
-        />
+        <EmptyState icon={<Sparkles />} title={t.askAiAssistant} description={t.askAiAssistantDescription} />
       </div>
     );
   }

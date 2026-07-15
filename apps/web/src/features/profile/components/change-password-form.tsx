@@ -14,6 +14,8 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useChangePassword } from '../hooks';
 
 type FormErrors = Partial<Record<'currentPassword' | 'newPassword' | 'confirmPassword', string>>;
@@ -21,6 +23,8 @@ type FormErrors = Partial<Record<'currentPassword' | 'newPassword' | 'confirmPas
 export function ChangePasswordForm() {
   const router = useRouter();
   const changePasswordMutation = useChangePassword();
+  const { messages } = useLocale();
+  const t = messages.profile;
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -29,9 +33,9 @@ export function ChangePasswordForm() {
 
   function validate(): boolean {
     const nextErrors: FormErrors = {};
-    if (!currentPassword) nextErrors.currentPassword = 'Enter your current password.';
-    if (newPassword.length < 8) nextErrors.newPassword = 'At least 8 characters.';
-    if (newPassword !== confirmPassword) nextErrors.confirmPassword = 'Passwords do not match.';
+    if (!currentPassword) nextErrors.currentPassword = t.currentPasswordRequired;
+    if (newPassword.length < 8) nextErrors.newPassword = t.newPasswordHint;
+    if (newPassword !== confirmPassword) nextErrors.confirmPassword = t.passwordsDoNotMatch;
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
@@ -45,13 +49,13 @@ export function ChangePasswordForm() {
       {
         onSuccess: () => {
           toast({
-            title: 'Password changed',
-            description: 'You have been signed out of every session. Please sign in again.',
+            title: t.passwordChanged,
+            description: t.passwordChangedDescription,
           });
           router.push('/login');
         },
         onError: (err) => {
-          toast({ variant: 'destructive', title: 'Failed to change password', description: err.message });
+          toast({ variant: 'destructive', title: t.changePasswordFailed, description: err.message });
         },
       },
     );
@@ -60,12 +64,12 @@ export function ChangePasswordForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Change password</CardTitle>
-        <CardDescription>You&apos;ll be signed out of every session after changing your password.</CardDescription>
+        <CardTitle className="text-base">{t.changePasswordTitle}</CardTitle>
+        <CardDescription>{t.changePasswordDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Current password" htmlFor="current-password" required error={errors.currentPassword}>
+          <FormField label={t.currentPassword} htmlFor="current-password" required error={errors.currentPassword}>
             <Input
               id="current-password"
               type="password"
@@ -75,11 +79,11 @@ export function ChangePasswordForm() {
             />
           </FormField>
           <FormField
-            label="New password"
+            label={t.newPassword}
             htmlFor="new-password"
             required
             error={errors.newPassword}
-            description="At least 8 characters."
+            description={t.newPasswordHint}
           >
             <Input
               id="new-password"
@@ -89,7 +93,7 @@ export function ChangePasswordForm() {
               onChange={(event) => setNewPassword(event.target.value)}
             />
           </FormField>
-          <FormField label="Confirm new password" htmlFor="confirm-password" required error={errors.confirmPassword}>
+          <FormField label={t.confirmNewPassword} htmlFor="confirm-password" required error={errors.confirmPassword}>
             <Input
               id="confirm-password"
               type="password"
@@ -99,7 +103,7 @@ export function ChangePasswordForm() {
             />
           </FormField>
           <Button type="submit" disabled={changePasswordMutation.isPending}>
-            {changePasswordMutation.isPending ? 'Changing…' : 'Change password'}
+            {changePasswordMutation.isPending ? t.changing : t.changePasswordButton}
           </Button>
         </form>
       </CardContent>

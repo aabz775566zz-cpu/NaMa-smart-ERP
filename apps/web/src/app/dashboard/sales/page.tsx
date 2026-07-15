@@ -1,6 +1,6 @@
 'use client';
 
-import type { Sale, SaleStatus } from '@erp-smart/types';
+import type { PaymentMethod, PaymentStatus, Sale, SaleStatus } from '@erp-smart/types';
 import { Button, EmptyState, Skeleton, ToastAction, toast } from '@erp-smart/ui';
 import { ShieldAlert, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -29,7 +29,24 @@ export default function SalesPage() {
   const completeMutation = useCompleteSale();
   const { data: company } = useCompany();
   const { messages } = useLocale();
+  const t = messages.sales;
   const formatMoney = useFormatMoney();
+  const STATUS_LABELS: Record<SaleStatus, string> = {
+    DRAFT: t.statusDraft,
+    COMPLETED: t.statusCompleted,
+    CANCELLED: t.statusCancelled,
+  };
+  const METHOD_LABELS: Record<PaymentMethod, string> = {
+    CASH: messages.common.methodCash,
+    CARD: messages.common.methodCard,
+    TRANSFER: messages.common.methodTransfer,
+    OTHER: messages.common.methodOther,
+  };
+  const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+    PAID: messages.common.paymentStatusPaid,
+    PARTIAL: messages.common.paymentStatusPartial,
+    UNPAID: messages.common.paymentStatusUnpaid,
+  };
 
   const [formOpen, setFormOpen] = useState(false);
   const [cancellingSale, setCancellingSale] = useState<Sale | null>(null);
@@ -51,8 +68,8 @@ export default function SalesPage() {
       <div className="flex h-full min-h-[60vh] items-center justify-center">
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       </div>
     );
@@ -71,8 +88,8 @@ export default function SalesPage() {
           : null;
 
         toast({
-          title: 'Sale completed',
-          description: `Invoice ${result.invoice.invoiceNumber} generated.`,
+          title: t.saleCompleted,
+          description: t.invoiceGenerated.replace('{{number}}', result.invoice.invoiceNumber),
           action: message ? (
             <ToastAction
               altText={messages.invoice.sendWhatsApp}
@@ -84,7 +101,7 @@ export default function SalesPage() {
         });
       },
       onError: (error) => {
-        toast({ variant: 'destructive', title: 'Failed to complete sale', description: error.message });
+        toast({ variant: 'destructive', title: t.completeFailed, description: error.message });
       },
     });
   }
@@ -93,20 +110,20 @@ export default function SalesPage() {
 
   function handleExport() {
     exportToCsv('sales.csv', sales, [
-      { header: 'Date', value: (s) => new Date(s.createdAt).toISOString().slice(0, 10) },
-      { header: 'Customer', value: (s) => (s.customerId ? (customerNameById.get(s.customerId) ?? '') : 'Walk-in') },
-      { header: 'Status', value: (s) => s.status },
-      { header: 'Payment method', value: (s) => s.paymentMethod },
-      { header: 'Payment status', value: (s) => s.paymentStatus },
-      { header: 'Total', value: (s) => s.totalAmount },
+      { header: messages.common.date, value: (s) => new Date(s.createdAt).toISOString().slice(0, 10) },
+      { header: messages.common.name, value: (s) => (s.customerId ? (customerNameById.get(s.customerId) ?? '') : t.walkIn) },
+      { header: messages.common.status, value: (s) => STATUS_LABELS[s.status] },
+      { header: t.paymentMethod, value: (s) => METHOD_LABELS[s.paymentMethod] },
+      { header: t.paymentStatus, value: (s) => PAYMENT_STATUS_LABELS[s.paymentStatus] },
+      { header: t.total, value: (s) => s.totalAmount },
     ]);
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Sales</h1>
-        <p className="text-sm text-muted-foreground">Create draft sales and complete them to generate invoices.</p>
+        <h1 className="text-xl font-semibold text-foreground">{t.title}</h1>
+        <p className="text-sm text-muted-foreground">{t.subtitle}</p>
       </div>
 
       <SalesToolbar
@@ -124,19 +141,27 @@ export default function SalesPage() {
         </div>
       ) : salesQuery.isError ? (
         <EmptyState
-          title="Couldn't load sales"
-          description={salesQuery.error instanceof Error ? salesQuery.error.message : 'Please try again.'}
+          title={t.couldNotLoad}
+          description={salesQuery.error instanceof Error ? salesQuery.error.message : messages.common.pleaseTryAgain}
         />
       ) : sales.length === 0 ? (
         <EmptyState
           icon={<ShoppingCart />}
-          title={statusFilter ? `No ${statusFilter.toLowerCase()} sales` : 'Record your first sale'}
+          title={
+            statusFilter === 'DRAFT'
+              ? t.noStatusSalesDraft
+              : statusFilter === 'COMPLETED'
+                ? t.noStatusSalesCompleted
+                : statusFilter === 'CANCELLED'
+                  ? t.noStatusSalesCancelled
+                  : t.recordFirstSale
+          }
           description={
             statusFilter
-              ? 'Try a different status filter.'
-              : 'Sales you create here decrement stock and generate invoices once completed.'
+              ? t.tryDifferentStatusFilter
+              : t.emptyDescription
           }
-          action={!statusFilter ? <Button onClick={() => setFormOpen(true)}>Create sale</Button> : undefined}
+          action={!statusFilter ? <Button onClick={() => setFormOpen(true)}>{t.createSale}</Button> : undefined}
         />
       ) : (
         <SalesTable

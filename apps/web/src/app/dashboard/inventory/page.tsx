@@ -1,5 +1,6 @@
 'use client';
 
+import type { InventoryMovementType } from '@erp-smart/types';
 import { Button, EmptyState, Skeleton } from '@erp-smart/ui';
 import { Boxes, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -11,9 +12,18 @@ import { MovementsTable } from '@/features/inventory/components/movements-table'
 import { useLowStock, useMovements } from '@/features/inventory/hooks';
 import { useProducts } from '@/features/products/hooks';
 import { exportToCsv } from '@/lib/csv-export';
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
 export default function InventoryPage() {
+  const { messages } = useLocale();
+  const t = messages.inventory;
+  const TYPE_LABELS: Record<InventoryMovementType, string> = {
+    PURCHASE: t.typePurchase,
+    SALE: t.typeSale,
+    ADJUSTMENT: t.typeAdjustment,
+    RETURN: t.typeReturn,
+  };
   const permissions = usePermissions();
   const canRead = permissions.includes('INVENTORY:READ');
   const canReadProducts = permissions.includes('PRODUCTS:READ');
@@ -36,8 +46,8 @@ export default function InventoryPage() {
       <div className="flex h-full min-h-[60vh] items-center justify-center">
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       </div>
     );
@@ -47,19 +57,19 @@ export default function InventoryPage() {
 
   function handleExport() {
     exportToCsv('inventory-movements.csv', movements, [
-      { header: 'Date', value: (m) => new Date(m.createdAt).toISOString().slice(0, 10) },
-      { header: 'Product', value: (m) => productNameById.get(m.productId) ?? '' },
-      { header: 'Type', value: (m) => m.type },
-      { header: 'Quantity change', value: (m) => m.quantityChange },
-      { header: 'Note', value: (m) => m.note ?? '' },
+      { header: messages.common.date, value: (m) => new Date(m.createdAt).toISOString().slice(0, 10) },
+      { header: messages.common.product, value: (m) => productNameById.get(m.productId) ?? '' },
+      { header: t.type, value: (m) => TYPE_LABELS[m.type] },
+      { header: t.quantity, value: (m) => m.quantityChange },
+      { header: messages.common.note, value: (m) => m.note ?? '' },
     ]);
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Inventory</h1>
-        <p className="text-sm text-muted-foreground">Track stock movements and post manual adjustments.</p>
+        <h1 className="text-xl font-semibold text-foreground">{t.title}</h1>
+        <p className="text-sm text-muted-foreground">{t.subtitle}</p>
       </div>
 
       {lowStockQuery.data && lowStockQuery.data.length > 0 ? <LowStockPanel products={lowStockQuery.data} /> : null}
@@ -80,19 +90,19 @@ export default function InventoryPage() {
         </div>
       ) : movementsQuery.isError ? (
         <EmptyState
-          title="Couldn't load inventory movements"
-          description={movementsQuery.error instanceof Error ? movementsQuery.error.message : 'Please try again.'}
+          title={t.couldNotLoad}
+          description={movementsQuery.error instanceof Error ? movementsQuery.error.message : messages.common.pleaseTryAgain}
         />
       ) : movements.length === 0 ? (
         <EmptyState
           icon={<Boxes />}
-          title={productId ? 'No movements for this product' : 'No stock movements yet'}
+          title={productId ? t.noMovementsForProduct : t.noMovementsYet}
           description={
             productId
-              ? 'Try a different product filter.'
-              : 'Movements appear here as stock is purchased, sold, or adjusted — post a manual adjustment to get started.'
+              ? t.tryDifferentFilter
+              : t.emptyDescription
           }
-          action={!productId ? <Button onClick={() => setFormOpen(true)}>Record adjustment</Button> : undefined}
+          action={!productId ? <Button onClick={() => setFormOpen(true)}>{t.recordAdjustment}</Button> : undefined}
         />
       ) : (
         <MovementsTable movements={movements} productNameById={productNameById} />

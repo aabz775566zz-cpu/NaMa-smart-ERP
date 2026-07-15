@@ -11,11 +11,18 @@ import { InvoicesTable } from '@/features/invoices/components/invoices-table';
 import { InvoicesToolbar } from '@/features/invoices/components/invoices-toolbar';
 import { useInvoices, useMarkInvoicePaid } from '@/features/invoices/hooks';
 import { exportToCsv } from '@/lib/csv-export';
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
 export default function InvoicesPage() {
   const permissions = usePermissions();
   const canRead = permissions.includes('INVOICES:READ');
+  const { messages } = useLocale();
+  const t = messages.invoices;
+  const STATUS_LABELS: Record<InvoiceStatus, string> = {
+    ISSUED: messages.invoice.paymentStatusIssued,
+    PAID: messages.invoice.paymentStatusPaid,
+  };
 
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | undefined>(undefined);
   const invoicesQuery = useInvoices(statusFilter, { enabled: canRead });
@@ -28,8 +35,8 @@ export default function InvoicesPage() {
       <div className="flex h-full min-h-[60vh] items-center justify-center">
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       </div>
     );
@@ -37,9 +44,9 @@ export default function InvoicesPage() {
 
   function handleMarkPaid(invoice: Invoice) {
     markPaidMutation.mutate(invoice.id, {
-      onSuccess: () => toast({ title: 'Invoice marked as paid' }),
+      onSuccess: () => toast({ title: t.markedPaid }),
       onError: (error) => {
-        toast({ variant: 'destructive', title: 'Failed to mark invoice as paid', description: error.message });
+        toast({ variant: 'destructive', title: t.markPaidFailed, description: error.message });
       },
     });
   }
@@ -48,19 +55,19 @@ export default function InvoicesPage() {
 
   function handleExport() {
     exportToCsv('invoices.csv', invoices, [
-      { header: 'Invoice #', value: (i) => i.invoiceNumber },
-      { header: 'Issue date', value: (i) => new Date(i.issueDate).toISOString().slice(0, 10) },
-      { header: 'Due date', value: (i) => (i.dueDate ? new Date(i.dueDate).toISOString().slice(0, 10) : '') },
-      { header: 'Status', value: (i) => i.status },
-      { header: 'Total', value: (i) => i.totalAmount },
+      { header: messages.invoice.invoiceNumber, value: (i) => i.invoiceNumber },
+      { header: t.issueDate, value: (i) => new Date(i.issueDate).toISOString().slice(0, 10) },
+      { header: t.dueDate, value: (i) => (i.dueDate ? new Date(i.dueDate).toISOString().slice(0, 10) : '') },
+      { header: messages.common.status, value: (i) => STATUS_LABELS[i.status] },
+      { header: t.total, value: (i) => i.totalAmount },
     ]);
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Invoices</h1>
-        <p className="text-sm text-muted-foreground">Invoices are generated automatically when a sale is completed.</p>
+        <h1 className="text-xl font-semibold text-foreground">{t.title}</h1>
+        <p className="text-sm text-muted-foreground">{t.subtitle}</p>
       </div>
 
       <InvoicesToolbar status={statusFilter} onStatusChange={setStatusFilter} onExport={handleExport} />
@@ -73,22 +80,20 @@ export default function InvoicesPage() {
         </div>
       ) : invoicesQuery.isError ? (
         <EmptyState
-          title="Couldn't load invoices"
-          description={invoicesQuery.error instanceof Error ? invoicesQuery.error.message : 'Please try again.'}
+          title={t.couldNotLoad}
+          description={invoicesQuery.error instanceof Error ? invoicesQuery.error.message : messages.common.pleaseTryAgain}
         />
       ) : invoices.length === 0 ? (
         <EmptyState
           icon={<FileText />}
-          title={statusFilter ? `No ${statusFilter.toLowerCase()} invoices` : 'No invoices yet'}
-          description={
-            statusFilter
-              ? 'Try a different status filter.'
-              : "Invoices are generated automatically when a sale is completed — complete a sale to see one here."
+          title={
+            statusFilter === 'ISSUED' ? t.noStatusIssued : statusFilter === 'PAID' ? t.noStatusPaid : t.noInvoicesYet
           }
+          description={statusFilter ? t.tryDifferentStatusFilter : t.emptyDescription}
           action={
             !statusFilter ? (
               <Button asChild variant="outline">
-                <Link href="/dashboard/sales">Go to Sales</Link>
+                <Link href="/dashboard/sales">{t.goToSales}</Link>
               </Button>
             ) : undefined
           }

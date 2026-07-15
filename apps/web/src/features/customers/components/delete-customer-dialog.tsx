@@ -12,6 +12,8 @@ import {
   toast,
 } from '@erp-smart/ui';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useDeleteCustomer } from '../hooks';
 
 export function DeleteCustomerDialog({
@@ -23,17 +25,19 @@ export function DeleteCustomerDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.customers;
   const deleteMutation = useDeleteCustomer();
 
   function handleConfirm() {
     if (!customer) return;
     deleteMutation.mutate(customer.id, {
       onSuccess: () => {
-        toast({ title: 'Customer deleted' });
+        toast({ title: t.customerDeleted });
         onOpenChange(false);
       },
       onError: (error) => {
-        toast({ variant: 'destructive', title: 'Failed to delete customer', description: error.message });
+        toast({ variant: 'destructive', title: t.deleteFailed, description: error.message });
       },
     });
   }
@@ -42,17 +46,17 @@ export function DeleteCustomerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Delete customer</DialogTitle>
+          <DialogTitle>{t.deleteCustomerTitle}</DialogTitle>
           <DialogDescription>
-            {customer ? `This will permanently delete "${customer.name}". This action cannot be undone.` : null}
+            {customer ? t.deleteCustomerDescription.replace('{{name}}', customer.name) : null}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {messages.common.cancel}
           </Button>
           <Button type="button" variant="destructive" onClick={handleConfirm} disabled={deleteMutation.isPending}>
-            {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+            {deleteMutation.isPending ? messages.common.deleting : messages.common.delete}
           </Button>
         </DialogFooter>
       </DialogContent>

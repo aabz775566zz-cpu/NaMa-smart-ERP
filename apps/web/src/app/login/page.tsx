@@ -23,7 +23,7 @@ export default function LoginPage() {
       {
         onSuccess: () => router.push('/dashboard'),
         onError: (error) => {
-          toast({ variant: 'destructive', title: 'Login failed', description: error.message });
+          toast({ variant: 'destructive', title: messages.auth.loginFailed, description: error.message });
         },
       },
     );

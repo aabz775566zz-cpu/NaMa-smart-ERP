@@ -5,7 +5,12 @@ import '@erp-smart/ui/globals.css';
 import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+// Named --font-inter (not --font-sans) to match the shared token contract
+// in packages/ui/src/globals.css, which derives --font-sans from
+// --font-inter/--font-tajawal based on html[lang] — apps/web loads both;
+// this app only loads Inter, so Arabic here still renders in Inter, same
+// as before this rename (unchanged behavior, just a consistent variable name).
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: brandConfig.productName,

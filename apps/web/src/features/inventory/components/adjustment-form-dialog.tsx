@@ -21,6 +21,8 @@ import {
 } from '@erp-smart/ui';
 import { useEffect, useState } from 'react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import type { AdjustableMovementType, CreateAdjustmentInput } from '../api';
 import { useCreateAdjustment } from '../hooks';
 
@@ -42,6 +44,13 @@ export function AdjustmentFormDialog({
   onOpenChange: (open: boolean) => void;
   products: Product[];
 }) {
+  const { messages } = useLocale();
+  const t = messages.inventory;
+  const TYPE_LABELS: Record<AdjustableMovementType, string> = {
+    PURCHASE: t.typePurchase,
+    ADJUSTMENT: t.typeAdjustment,
+    RETURN: t.typeReturn,
+  };
   const createMutation = useCreateAdjustment();
 
   const [productId, setProductId] = useState('');
@@ -64,13 +73,13 @@ export function AdjustmentFormDialog({
 
   function validate(): boolean {
     const nextErrors: FormErrors = {};
-    if (!productId) nextErrors.productId = 'Select a product.';
+    if (!productId) nextErrors.productId = t.selectProductError;
 
     const qty = Number(quantityChange);
     if (quantityChange.trim() === '' || !Number.isInteger(qty) || qty === 0) {
-      nextErrors.quantityChange = 'Enter a non-zero whole number.';
+      nextErrors.quantityChange = t.nonZeroError;
     } else if (requiresPositive && qty < 0) {
-      nextErrors.quantityChange = `${type} must be a positive quantity.`;
+      nextErrors.quantityChange = t.positiveQuantityError.replace('{{type}}', TYPE_LABELS[type]);
     }
 
     setErrors(nextErrors);
@@ -91,11 +100,11 @@ export function AdjustmentFormDialog({
     createMutation
       .mutateAsync(input)
       .then(() => {
-        toast({ title: 'Adjustment recorded' });
+        toast({ title: t.adjustmentRecorded });
         onOpenChange(false);
       })
       .catch((error: Error) => {
-        toast({ variant: 'destructive', title: 'Failed to record adjustment', description: error.message });
+        toast({ variant: 'destructive', title: t.adjustmentFailed, description: error.message });
       });
   }
 
@@ -103,14 +112,14 @@ export function AdjustmentFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>New stock adjustment</DialogTitle>
-          <DialogDescription>Posts a new movement to the inventory ledger — existing entries can't be edited.</DialogDescription>
+          <DialogTitle>{t.newAdjustmentTitle}</DialogTitle>
+          <DialogDescription>{t.newAdjustmentDescription}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Product" htmlFor="adjustment-product" required error={errors.productId}>
+          <FormField label={messages.common.product} htmlFor="adjustment-product" required error={errors.productId}>
             <Select value={productId} onValueChange={setProductId}>
               <SelectTrigger id="adjustment-product">
-                <SelectValue placeholder="Select a product" />
+                <SelectValue placeholder={t.selectProduct} />
               </SelectTrigger>
               <SelectContent>
                 {products.map((product) => (
@@ -124,7 +133,7 @@ export function AdjustmentFormDialog({
           </FormField>
 
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Type" htmlFor="adjustment-type">
+            <FormField label={t.type} htmlFor="adjustment-type">
               <Select value={type} onValueChange={(value) => setType(value as AdjustableMovementType)}>
                 <SelectTrigger id="adjustment-type">
                   <SelectValue />
@@ -132,18 +141,18 @@ export function AdjustmentFormDialog({
                 <SelectContent>
                   {ADJUSTABLE_TYPES.map((option) => (
                     <SelectItem key={option} value={option}>
-                      {option}
+                      {TYPE_LABELS[option]}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </FormField>
             <FormField
-              label={requiresPositive ? 'Quantity' : 'Quantity change (+/-)'}
+              label={requiresPositive ? t.quantity : t.quantityChangeSigned}
               htmlFor="adjustment-quantity"
               required
               error={errors.quantityChange}
-              description={requiresPositive ? undefined : 'Negative reduces stock, positive adds to it.'}
+              description={requiresPositive ? undefined : t.quantityChangeHint}
             >
               <Input
                 id="adjustment-quantity"
@@ -156,16 +165,16 @@ export function AdjustmentFormDialog({
             </FormField>
           </div>
 
-          <FormField label="Note" htmlFor="adjustment-note">
+          <FormField label={messages.common.note} htmlFor="adjustment-note">
             <Textarea id="adjustment-note" value={note} onChange={(event) => setNote(event.target.value)} />
           </FormField>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? 'Saving…' : 'Record adjustment'}
+              {createMutation.isPending ? messages.common.saving : t.recordAdjustment}
             </Button>
           </DialogFooter>
         </form>

@@ -13,6 +13,7 @@ import {
 } from '@erp-smart/ui';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import { useCancelSale } from '../hooks';
 
@@ -29,6 +30,8 @@ export function CancelSaleDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.sales;
   const cancelMutation = useCancelSale();
   const formatMoney = useFormatMoney();
 
@@ -36,11 +39,11 @@ export function CancelSaleDialog({
     if (!sale) return;
     cancelMutation.mutate(sale.id, {
       onSuccess: () => {
-        toast({ title: 'Sale cancelled' });
+        toast({ title: t.saleCancelled });
         onOpenChange(false);
       },
       onError: (error) => {
-        toast({ variant: 'destructive', title: 'Failed to cancel sale', description: error.message });
+        toast({ variant: 'destructive', title: t.cancelFailed, description: error.message });
       },
     });
   }
@@ -49,19 +52,19 @@ export function CancelSaleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Cancel sale</DialogTitle>
+          <DialogTitle>{t.cancelSaleTitle}</DialogTitle>
           <DialogDescription>
             {sale
-              ? `This will cancel this draft sale (total ${formatMoney(sale.totalAmount)}). This action cannot be undone.`
+              ? t.cancelSaleDescription.replace('{{amount}}', formatMoney(sale.totalAmount))
               : null}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Keep sale
+            {t.keepSale}
           </Button>
           <Button type="button" variant="destructive" onClick={handleConfirm} disabled={cancelMutation.isPending}>
-            {cancelMutation.isPending ? 'Cancelling…' : 'Cancel sale'}
+            {cancelMutation.isPending ? t.cancelling : t.cancelSaleTitle}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -19,7 +19,10 @@ import {
 } from '@erp-smart/ui';
 import { useEffect, useState } from 'react';
 
-import { useRoles, useUpdateMemberRole } from '../hooks';
+import { useLocale } from '@/lib/locale/locale-context';
+import { useRoleLabels } from '@/lib/locale/role-labels';
+
+import { useUpdateMemberRole } from '../hooks';
 
 const ASSIGNABLE_ROLES: AssignableRoleKey[] = ['MANAGER', 'ACCOUNTANT', 'EMPLOYEE'];
 
@@ -32,17 +35,17 @@ export function ChangeRoleDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { data: roles } = useRoles();
   const updateMutation = useUpdateMemberRole();
   const [roleKey, setRoleKey] = useState<AssignableRoleKey>('EMPLOYEE');
+  const { messages } = useLocale();
+  const t = messages.settings;
+  const roleLabels = useRoleLabels();
 
   useEffect(() => {
     if (open && member && member.role.key !== 'OWNER') {
       setRoleKey(member.role.key);
     }
   }, [open, member]);
-
-  const roleNameByKey = new Map((roles ?? []).map((role) => [role.key, role.name]));
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -52,11 +55,11 @@ export function ChangeRoleDialog({
       { membershipId: member.id, input: { roleKey } },
       {
         onSuccess: () => {
-          toast({ title: 'Role updated' });
+          toast({ title: t.roleUpdated });
           onOpenChange(false);
         },
         onError: (err) => {
-          toast({ variant: 'destructive', title: 'Failed to update role', description: err.message });
+          toast({ variant: 'destructive', title: t.updateRoleFailed, description: err.message });
         },
       },
     );
@@ -66,11 +69,13 @@ export function ChangeRoleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Change role</DialogTitle>
-          <DialogDescription>{member ? `Update the role for ${member.user.fullName}.` : null}</DialogDescription>
+          <DialogTitle>{t.changeRoleTitle}</DialogTitle>
+          <DialogDescription>
+            {member ? t.changeRoleDescription.replace('{{name}}', member.user.fullName) : null}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Role" htmlFor="change-role">
+          <FormField label={t.roleHeader} htmlFor="change-role">
             <Select value={roleKey} onValueChange={(value) => setRoleKey(value as AssignableRoleKey)}>
               <SelectTrigger id="change-role">
                 <SelectValue />
@@ -78,7 +83,7 @@ export function ChangeRoleDialog({
               <SelectContent>
                 {ASSIGNABLE_ROLES.map((key) => (
                   <SelectItem key={key} value={key}>
-                    {roleNameByKey.get(key) ?? key}
+                    {roleLabels[key]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -86,10 +91,10 @@ export function ChangeRoleDialog({
           </FormField>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
             <Button type="submit" disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? 'Saving…' : 'Save'}
+              {updateMutation.isPending ? messages.common.saving : messages.common.save}
             </Button>
           </DialogFooter>
         </form>

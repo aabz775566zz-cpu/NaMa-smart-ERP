@@ -5,6 +5,7 @@ import { Button, Input } from '@erp-smart/ui';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 export function CartLineItem({
   product,
@@ -17,6 +18,8 @@ export function CartLineItem({
   onQuantityChange: (quantity: number) => void;
   onRemove: () => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.sales;
   const formatMoney = useFormatMoney();
   const lineTotal = Number(product.sellingPrice) * quantity;
 
@@ -24,7 +27,7 @@ export function CartLineItem({
     <div className="flex items-center gap-3 rounded-md border border-border px-3 py-2">
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-foreground">{product.name}</p>
-        <p className="text-xs text-muted-foreground">{formatMoney(product.sellingPrice)} each</p>
+        <p className="text-xs text-muted-foreground">{formatMoney(product.sellingPrice)} {t.each}</p>
       </div>
       <div className="flex items-center gap-1">
         <Button
@@ -35,7 +38,7 @@ export function CartLineItem({
           onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
         >
           <Minus className="h-3.5 w-3.5" />
-          <span className="sr-only">Decrease quantity</span>
+          <span className="sr-only">{t.decreaseQuantity}</span>
         </Button>
         <Input
           type="number"
@@ -56,13 +59,13 @@ export function CartLineItem({
           onClick={() => onQuantityChange(quantity + 1)}
         >
           <Plus className="h-3.5 w-3.5" />
-          <span className="sr-only">Increase quantity</span>
+          <span className="sr-only">{t.increaseQuantity}</span>
         </Button>
       </div>
       <p className="w-20 shrink-0 text-end text-sm font-medium text-foreground">{formatMoney(lineTotal)}</p>
       <Button type="button" variant="ghost" size="icon" onClick={onRemove}>
         <Trash2 className="h-4 w-4" />
-        <span className="sr-only">Remove item</span>
+        <span className="sr-only">{t.removeItem}</span>
       </Button>
     </div>
   );

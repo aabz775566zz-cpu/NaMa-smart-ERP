@@ -12,20 +12,22 @@ import { ProductsReportView } from '@/features/reports/components/products-repor
 import type { ReportSection } from '@/features/reports/components/report-nav';
 import { ReportNav } from '@/features/reports/components/report-nav';
 import { SalesReportView } from '@/features/reports/components/sales-report-view';
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
 export default function ReportsPage() {
   const permissions = usePermissions();
   const canRead = permissions.includes('REPORTS:READ');
   const [section, setSection] = useState<ReportSection>('overview');
+  const { messages } = useLocale();
 
   if (!canRead) {
     return (
       <div className="flex h-full min-h-[60vh] items-center justify-center">
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       </div>
     );
@@ -34,8 +36,8 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Reports</h1>
-        <p className="text-sm text-muted-foreground">Read-only analytics across sales, products, customers, and inventory.</p>
+        <h1 className="text-xl font-semibold text-foreground">{messages.reports.title}</h1>
+        <p className="text-sm text-muted-foreground">{messages.reports.subtitle}</p>
       </div>
 
       <ReportNav active={section} onChange={setSection} />

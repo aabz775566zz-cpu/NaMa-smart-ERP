@@ -4,6 +4,7 @@ import type { SaleStatus } from '@erp-smart/types';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp-smart/ui';
 import { Download, Plus } from 'lucide-react';
 
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 const ALL_STATUSES = '__all__';
@@ -24,6 +25,13 @@ export function SalesToolbar({
   onAdd: () => void;
   onExport?: () => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.sales;
+  const STATUS_LABELS: Record<SaleStatus, string> = {
+    DRAFT: t.statusDraft,
+    COMPLETED: t.statusCompleted,
+    CANCELLED: t.statusCancelled,
+  };
   const canCreate = useHasPermission('SALES:CREATE');
   const canExport = useHasPermission('SALES:EXPORT');
 
@@ -37,10 +45,10 @@ export function SalesToolbar({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_STATUSES}>All statuses</SelectItem>
+          <SelectItem value={ALL_STATUSES}>{t.allStatuses}</SelectItem>
           {STATUS_OPTIONS.map((option) => (
             <SelectItem key={option} value={option}>
-              {option}
+              {STATUS_LABELS[option]}
             </SelectItem>
           ))}
         </SelectContent>
@@ -49,13 +57,13 @@ export function SalesToolbar({
         {canExport && onExport ? (
           <Button variant="outline" onClick={onExport}>
             <Download />
-            Export CSV
+            {messages.common.exportCsv}
           </Button>
         ) : null}
         {canCreate ? (
           <Button onClick={onAdd}>
             <Plus />
-            New sale
+            {t.newSaleButton}
           </Button>
         ) : null}
       </div>

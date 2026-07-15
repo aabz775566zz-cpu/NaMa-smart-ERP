@@ -15,6 +15,8 @@ import {
 } from '@erp-smart/ui';
 import { useEffect, useState } from 'react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useCreateCategory } from '../hooks';
 
 export function CategoryQuickCreateDialog({
@@ -26,6 +28,8 @@ export function CategoryQuickCreateDialog({
   onOpenChange: (open: boolean) => void;
   onCreated: (category: Category) => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.products;
   const createMutation = useCreateCategory();
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +44,7 @@ export function CategoryQuickCreateDialog({
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!name.trim()) {
-      setError('Category name is required.');
+      setError(t.categoryNameRequired);
       return;
     }
     setError(null);
@@ -49,12 +53,12 @@ export function CategoryQuickCreateDialog({
       { name: name.trim() },
       {
         onSuccess: (category) => {
-          toast({ title: 'Category created' });
+          toast({ title: t.categoryCreated });
           onCreated(category);
           onOpenChange(false);
         },
         onError: (err: Error) => {
-          toast({ variant: 'destructive', title: 'Failed to create category', description: err.message });
+          toast({ variant: 'destructive', title: t.categoryCreateFailed, description: err.message });
         },
       },
     );
@@ -64,19 +68,19 @@ export function CategoryQuickCreateDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>New category</DialogTitle>
-          <DialogDescription>Add a category to organize your products.</DialogDescription>
+          <DialogTitle>{t.newCategory}</DialogTitle>
+          <DialogDescription>{t.newCategoryDescription}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Category name" htmlFor="new-category-name" required error={error ?? undefined}>
+          <FormField label={t.categoryName} htmlFor="new-category-name" required error={error ?? undefined}>
             <Input id="new-category-name" autoFocus value={name} onChange={(event) => setName(event.target.value)} />
           </FormField>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? 'Creating…' : 'Create category'}
+              {createMutation.isPending ? t.creatingCategory : t.createCategory}
             </Button>
           </DialogFooter>
         </form>

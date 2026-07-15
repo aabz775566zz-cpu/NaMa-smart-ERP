@@ -4,6 +4,8 @@ import type { UserProfile } from '@erp-smart/types';
 import { Button, Card, CardContent, CardHeader, CardTitle, FormField, Input, toast } from '@erp-smart/ui';
 import { useEffect, useState } from 'react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useUpdateProfile } from '../hooks';
 
 export function ProfileForm({ profile }: { profile: UserProfile }) {
@@ -11,6 +13,8 @@ export function ProfileForm({ profile }: { profile: UserProfile }) {
   const [fullName, setFullName] = useState(profile.fullName);
   const [phone, setPhone] = useState(profile.phone ?? '');
   const [error, setError] = useState<string | null>(null);
+  const { messages } = useLocale();
+  const t = messages.profile;
 
   useEffect(() => {
     setFullName(profile.fullName);
@@ -20,7 +24,7 @@ export function ProfileForm({ profile }: { profile: UserProfile }) {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (fullName.trim().length < 2) {
-      setError('Full name must be at least 2 characters.');
+      setError(t.fullNameRequired);
       return;
     }
     setError(null);
@@ -28,8 +32,8 @@ export function ProfileForm({ profile }: { profile: UserProfile }) {
     updateMutation.mutate(
       { fullName: fullName.trim(), phone: phone.trim() || undefined },
       {
-        onSuccess: () => toast({ title: 'Profile updated' }),
-        onError: (err) => toast({ variant: 'destructive', title: 'Failed to update profile', description: err.message }),
+        onSuccess: () => toast({ title: t.profileUpdated }),
+        onError: (err) => toast({ variant: 'destructive', title: t.updateProfileFailed, description: err.message }),
       },
     );
   }
@@ -37,21 +41,21 @@ export function ProfileForm({ profile }: { profile: UserProfile }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Personal information</CardTitle>
+        <CardTitle className="text-base">{t.personalInfo}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Email" htmlFor="profile-email" description="Contact support to change your email.">
+          <FormField label={messages.common.email} htmlFor="profile-email" description={t.emailChangeHint}>
             <Input id="profile-email" value={profile.email} disabled />
           </FormField>
-          <FormField label="Full name" htmlFor="profile-full-name" required error={error ?? undefined}>
+          <FormField label={t.fullName} htmlFor="profile-full-name" required error={error ?? undefined}>
             <Input id="profile-full-name" value={fullName} onChange={(event) => setFullName(event.target.value)} />
           </FormField>
-          <FormField label="Phone" htmlFor="profile-phone">
+          <FormField label={messages.common.phone} htmlFor="profile-phone">
             <Input id="profile-phone" value={phone} onChange={(event) => setPhone(event.target.value)} />
           </FormField>
           <Button type="submit" disabled={updateMutation.isPending}>
-            {updateMutation.isPending ? 'Saving…' : 'Save changes'}
+            {updateMutation.isPending ? messages.common.saving : messages.common.saveChanges}
           </Button>
         </form>
       </CardContent>

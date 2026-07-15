@@ -21,6 +21,7 @@ import {
 import { useEffect, useState } from 'react';
 
 import { CURRENCY_OPTIONS } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import type { UpdateCompanyInput } from '../api';
 import { useUpdateCompany } from '../hooks';
@@ -55,6 +56,8 @@ export function CompanyEditDialog({
   const updateMutation = useUpdateCompany();
   const [values, setValues] = useState<FormValues>(() => valuesFromCompany(company));
   const [error, setError] = useState<string | null>(null);
+  const { messages } = useLocale();
+  const t = messages.settings;
 
   useEffect(() => {
     if (open) {
@@ -66,7 +69,7 @@ export function CompanyEditDialog({
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!values.name.trim()) {
-      setError('Company name is required.');
+      setError(t.companyNameRequired);
       return;
     }
     setError(null);
@@ -81,11 +84,11 @@ export function CompanyEditDialog({
 
     updateMutation.mutate(input, {
       onSuccess: () => {
-        toast({ title: 'Company updated' });
+        toast({ title: t.companyUpdated });
         onOpenChange(false);
       },
       onError: (err) => {
-        toast({ variant: 'destructive', title: 'Failed to update company', description: err.message });
+        toast({ variant: 'destructive', title: t.updateCompanyFailed, description: err.message });
       },
     });
   }
@@ -94,11 +97,11 @@ export function CompanyEditDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Edit company information</DialogTitle>
-          <DialogDescription>These details apply to your whole company.</DialogDescription>
+          <DialogTitle>{t.editCompanyTitle}</DialogTitle>
+          <DialogDescription>{t.editCompanyDescription}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Company name" htmlFor="company-name" required error={error ?? undefined}>
+          <FormField label={t.companyName} htmlFor="company-name" required error={error ?? undefined}>
             <Input
               id="company-name"
               value={values.name}
@@ -106,14 +109,14 @@ export function CompanyEditDialog({
             />
           </FormField>
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Business type" htmlFor="company-business-type">
+            <FormField label={t.businessType} htmlFor="company-business-type">
               <Input
                 id="company-business-type"
                 value={values.businessType}
                 onChange={(event) => setValues((v) => ({ ...v, businessType: event.target.value }))}
               />
             </FormField>
-            <FormField label="Country" htmlFor="company-country">
+            <FormField label={t.country} htmlFor="company-country">
               <Input
                 id="company-country"
                 value={values.country}
@@ -122,13 +125,13 @@ export function CompanyEditDialog({
             </FormField>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Currency" htmlFor="company-currency">
+            <FormField label={t.currency} htmlFor="company-currency">
               <Select
                 value={values.currency}
                 onValueChange={(value) => setValues((v) => ({ ...v, currency: value }))}
               >
                 <SelectTrigger id="company-currency">
-                  <SelectValue placeholder="Select currency" />
+                  <SelectValue placeholder={t.selectCurrency} />
                 </SelectTrigger>
                 <SelectContent>
                   {CURRENCY_OPTIONS.map((option) => (
@@ -139,7 +142,7 @@ export function CompanyEditDialog({
                 </SelectContent>
               </Select>
             </FormField>
-            <FormField label="Logo URL" htmlFor="company-logo-url">
+            <FormField label={t.logoUrl} htmlFor="company-logo-url">
               <Input
                 id="company-logo-url"
                 value={values.logoUrl}
@@ -149,10 +152,10 @@ export function CompanyEditDialog({
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
             <Button type="submit" disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? 'Saving…' : 'Save changes'}
+              {updateMutation.isPending ? messages.common.saving : messages.common.saveChanges}
             </Button>
           </DialogFooter>
         </form>

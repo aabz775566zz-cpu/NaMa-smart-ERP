@@ -4,6 +4,7 @@ import type { Product } from '@erp-smart/types';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp-smart/ui';
 import { Download, Plus } from 'lucide-react';
 
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 const ALL_PRODUCTS = '__all__';
@@ -22,6 +23,8 @@ export function InventoryToolbar({
   onAdd: () => void;
   onExport?: () => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.inventory;
   const canCreate = useHasPermission('INVENTORY:CREATE');
   const canExport = useHasPermission('INVENTORY:EXPORT');
 
@@ -32,10 +35,10 @@ export function InventoryToolbar({
         onValueChange={(value) => onProductChange(value === ALL_PRODUCTS ? undefined : value)}
       >
         <SelectTrigger className="w-full sm:w-64">
-          <SelectValue placeholder="All products" />
+          <SelectValue placeholder={t.allProducts} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_PRODUCTS}>All products</SelectItem>
+          <SelectItem value={ALL_PRODUCTS}>{t.allProducts}</SelectItem>
           {products.map((product) => (
             <SelectItem key={product.id} value={product.id}>
               {product.name}
@@ -47,13 +50,13 @@ export function InventoryToolbar({
         {canExport && onExport ? (
           <Button variant="outline" onClick={onExport}>
             <Download />
-            Export CSV
+            {messages.common.exportCsv}
           </Button>
         ) : null}
         {canCreate ? (
           <Button onClick={onAdd}>
             <Plus />
-            New adjustment
+            {t.newAdjustment}
           </Button>
         ) : null}
       </div>

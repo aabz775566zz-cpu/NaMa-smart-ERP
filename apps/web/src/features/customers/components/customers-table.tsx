@@ -17,6 +17,7 @@ import {
 import { MoreHorizontal, Pencil, Trash2, Wallet } from 'lucide-react';
 import Link from 'next/link';
 
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 export function CustomersTable({
@@ -28,6 +29,8 @@ export function CustomersTable({
   onEdit: (customer: Customer) => void;
   onDelete: (customer: Customer) => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.customers;
   const canUpdate = useHasPermission('CUSTOMERS:UPDATE');
   const canDelete = useHasPermission('CUSTOMERS:DELETE');
   const canAct = canUpdate || canDelete;
@@ -37,12 +40,12 @@ export function CustomersTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead>Created</TableHead>
-            {canAct ? <TableHead className="text-end">Actions</TableHead> : null}
+            <TableHead>{messages.common.name}</TableHead>
+            <TableHead>{messages.common.phone}</TableHead>
+            <TableHead>{messages.common.email}</TableHead>
+            <TableHead>{messages.common.address}</TableHead>
+            <TableHead>{t.created}</TableHead>
+            {canAct ? <TableHead className="text-end">{messages.common.actions}</TableHead> : null}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -65,20 +68,20 @@ export function CustomersTable({
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
                         <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open actions</span>
+                        <span className="sr-only">{messages.common.openActions}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
                         <Link href={`/dashboard/customers/${customer.id}`}>
                           <Wallet />
-                          Debt &amp; payments
+                          {t.debtAndPayments}
                         </Link>
                       </DropdownMenuItem>
                       {canUpdate ? (
                         <DropdownMenuItem onClick={() => onEdit(customer)}>
                           <Pencil />
-                          Edit
+                          {messages.common.edit}
                         </DropdownMenuItem>
                       ) : null}
                       {canDelete ? (
@@ -87,7 +90,7 @@ export function CustomersTable({
                           className="text-destructive focus:text-destructive"
                         >
                           <Trash2 />
-                          Delete
+                          {messages.common.delete}
                         </DropdownMenuItem>
                       ) : null}
                     </DropdownMenuContent>

@@ -1,6 +1,6 @@
 'use client';
 
-import type { Product } from '@erp-smart/types';
+import type { Product, ProductStatus } from '@erp-smart/types';
 import { Button, EmptyState, Skeleton } from '@erp-smart/ui';
 import { Package, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -12,9 +12,17 @@ import { ProductsTable } from '@/features/products/components/products-table';
 import { ProductsToolbar } from '@/features/products/components/products-toolbar';
 import { useCategories, useProducts } from '@/features/products/hooks';
 import { exportToCsv } from '@/lib/csv-export';
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
 export default function ProductsPage() {
+  const { messages } = useLocale();
+  const t = messages.products;
+  const STATUS_LABELS: Record<ProductStatus, string> = {
+    ACTIVE: t.statusActive,
+    INACTIVE: t.statusInactive,
+    DISCONTINUED: t.statusDiscontinued,
+  };
   const permissions = usePermissions();
   const canRead = permissions.includes('PRODUCTS:READ');
 
@@ -50,8 +58,8 @@ export default function ProductsPage() {
       <div className="flex h-full min-h-[60vh] items-center justify-center">
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       </div>
     );
@@ -69,21 +77,21 @@ export default function ProductsPage() {
 
   function handleExport() {
     exportToCsv('products.csv', filteredProducts, [
-      { header: 'Name', value: (p) => p.name },
-      { header: 'SKU', value: (p) => p.sku ?? '' },
-      { header: 'Category', value: (p) => (p.categoryId ? (categoryNameById.get(p.categoryId) ?? '') : '') },
-      { header: 'Purchase price', value: (p) => p.purchasePrice },
-      { header: 'Selling price', value: (p) => p.sellingPrice },
-      { header: 'Quantity on hand', value: (p) => p.quantityOnHand },
-      { header: 'Status', value: (p) => p.status },
+      { header: messages.common.name, value: (p) => p.name },
+      { header: t.sku, value: (p) => p.sku ?? '' },
+      { header: t.category, value: (p) => (p.categoryId ? (categoryNameById.get(p.categoryId) ?? '') : '') },
+      { header: t.purchasePrice, value: (p) => p.purchasePrice },
+      { header: t.sellingPrice, value: (p) => p.sellingPrice },
+      { header: t.quantityOnHand, value: (p) => p.quantityOnHand },
+      { header: messages.common.status, value: (p) => STATUS_LABELS[p.status] },
     ]);
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Products</h1>
-        <p className="text-sm text-muted-foreground">Manage your product catalog.</p>
+        <h1 className="text-xl font-semibold text-foreground">{t.title}</h1>
+        <p className="text-sm text-muted-foreground">{t.subtitle}</p>
       </div>
 
       <ProductsToolbar
@@ -102,21 +110,21 @@ export default function ProductsPage() {
         </div>
       ) : productsQuery.isError ? (
         <EmptyState
-          title="Couldn't load products"
-          description={productsQuery.error instanceof Error ? productsQuery.error.message : 'Please try again.'}
+          title={t.couldNotLoad}
+          description={productsQuery.error instanceof Error ? productsQuery.error.message : messages.common.pleaseTryAgain}
         />
       ) : filteredProducts.length === 0 ? (
         <EmptyState
           icon={<Package />}
-          title={productsQuery.data?.length ? 'No products match your search' : 'Add your first product'}
+          title={productsQuery.data?.length ? t.noMatch : t.addFirst}
           description={
             productsQuery.data?.length
-              ? 'Try a different search term.'
-              : "Your catalog is empty — add a product to start tracking stock and selling."
+              ? t.tryDifferentSearch
+              : t.emptyDescription
           }
           action={
             !productsQuery.data?.length ? (
-              <Button onClick={openCreateDialog}>Add product</Button>
+              <Button onClick={openCreateDialog}>{t.addProduct}</Button>
             ) : undefined
           }
         />

@@ -25,7 +25,7 @@ export default function RegisterPage() {
       {
         onSuccess: () => router.push('/dashboard'),
         onError: (error) => {
-          toast({ variant: 'destructive', title: 'Registration failed', description: error.message });
+          toast({ variant: 'destructive', title: messages.auth.registrationFailed, description: error.message });
         },
       },
     );

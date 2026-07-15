@@ -5,6 +5,7 @@ import { EmptyState } from '@erp-smart/ui';
 import type { LucideIcon } from 'lucide-react';
 import { ShieldAlert } from 'lucide-react';
 
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
 /**
@@ -26,6 +27,7 @@ export function ModulePlaceholderPage({
 }) {
   const permissions = usePermissions();
   const allowed = !requiredPermission || permissions.includes(requiredPermission);
+  const { messages } = useLocale();
 
   return (
     <div className="flex h-full min-h-[60vh] items-center justify-center">
@@ -34,8 +36,8 @@ export function ModulePlaceholderPage({
       ) : (
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       )}
     </div>

@@ -4,6 +4,7 @@ import type { InvoiceStatus } from '@erp-smart/types';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@erp-smart/ui';
 import { Download } from 'lucide-react';
 
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 const ALL_STATUSES = '__all__';
@@ -20,6 +21,12 @@ export function InvoicesToolbar({
   onStatusChange: (status: InvoiceStatus | undefined) => void;
   onExport?: () => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.invoices;
+  const STATUS_LABELS: Record<InvoiceStatus, string> = {
+    ISSUED: messages.invoice.paymentStatusIssued,
+    PAID: messages.invoice.paymentStatusPaid,
+  };
   const canExport = useHasPermission('INVOICES:EXPORT');
 
   return (
@@ -32,10 +39,10 @@ export function InvoicesToolbar({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_STATUSES}>All statuses</SelectItem>
+          <SelectItem value={ALL_STATUSES}>{t.allStatuses}</SelectItem>
           {STATUS_OPTIONS.map((option) => (
             <SelectItem key={option} value={option}>
-              {option}
+              {STATUS_LABELS[option]}
             </SelectItem>
           ))}
         </SelectContent>
@@ -43,7 +50,7 @@ export function InvoicesToolbar({
       {canExport && onExport ? (
         <Button variant="outline" onClick={onExport}>
           <Download />
-          Export CSV
+          {messages.common.exportCsv}
         </Button>
       ) : null}
     </div>

@@ -12,6 +12,8 @@ import {
   toast,
 } from '@erp-smart/ui';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useDeleteProduct } from '../hooks';
 
 export function DeleteProductDialog({
@@ -23,17 +25,19 @@ export function DeleteProductDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.products;
   const deleteMutation = useDeleteProduct();
 
   function handleConfirm() {
     if (!product) return;
     deleteMutation.mutate(product.id, {
       onSuccess: () => {
-        toast({ title: 'Product deleted' });
+        toast({ title: t.productDeleted });
         onOpenChange(false);
       },
       onError: (error) => {
-        toast({ variant: 'destructive', title: 'Failed to delete product', description: error.message });
+        toast({ variant: 'destructive', title: t.deleteFailed, description: error.message });
       },
     });
   }
@@ -42,17 +46,17 @@ export function DeleteProductDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Delete product</DialogTitle>
+          <DialogTitle>{t.deleteProductTitle}</DialogTitle>
           <DialogDescription>
-            {product ? `This will permanently delete "${product.name}". This action cannot be undone.` : null}
+            {product ? t.deleteProductDescription.replace('{{name}}', product.name) : null}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {messages.common.cancel}
           </Button>
           <Button type="button" variant="destructive" onClick={handleConfirm} disabled={deleteMutation.isPending}>
-            {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+            {deleteMutation.isPending ? messages.common.deleting : messages.common.delete}
           </Button>
         </DialogFooter>
       </DialogContent>

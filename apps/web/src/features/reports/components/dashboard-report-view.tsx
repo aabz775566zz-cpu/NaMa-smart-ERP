@@ -5,12 +5,15 @@ import { AlertTriangle, DollarSign, Package, ShoppingCart, Users } from 'lucide-
 import Link from 'next/link';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import { useDashboardReport } from '../hooks';
 
 export function DashboardReportView() {
   const { data, isLoading, isError, error } = useDashboardReport();
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
+  const t = messages.reports;
 
   if (isLoading) {
     return (
@@ -25,8 +28,8 @@ export function DashboardReportView() {
   if (isError || !data) {
     return (
       <EmptyState
-        title="Couldn't load the overview"
-        description={error instanceof Error ? error.message : 'Please try again.'}
+        title={t.couldNotLoadOverview}
+        description={error instanceof Error ? error.message : messages.common.pleaseTryAgain}
       />
     );
   }
@@ -35,7 +38,7 @@ export function DashboardReportView() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
       <Link href="/dashboard/reports">
         <StatCard
-          label="Revenue this month"
+          label={t.revenueThisMonth}
           value={formatMoney(data.revenueThisMonth)}
           icon={<DollarSign />}
           className="transition-colors hover:border-primary"
@@ -43,7 +46,7 @@ export function DashboardReportView() {
       </Link>
       <Link href="/dashboard/sales">
         <StatCard
-          label="Sales this month"
+          label={t.salesThisMonth}
           value={data.salesCountThisMonth}
           icon={<ShoppingCart />}
           className="transition-colors hover:border-primary"
@@ -51,7 +54,7 @@ export function DashboardReportView() {
       </Link>
       <Link href="/dashboard/customers">
         <StatCard
-          label="Total customers"
+          label={t.totalCustomers}
           value={data.totalCustomers}
           icon={<Users />}
           className="transition-colors hover:border-primary"
@@ -59,7 +62,7 @@ export function DashboardReportView() {
       </Link>
       <Link href="/dashboard/products">
         <StatCard
-          label="Active products"
+          label={t.activeProducts}
           value={data.totalActiveProducts}
           icon={<Package />}
           className="transition-colors hover:border-primary"
@@ -67,7 +70,7 @@ export function DashboardReportView() {
       </Link>
       <Link href="/dashboard/inventory">
         <StatCard
-          label="Low stock items"
+          label={t.lowStockItems}
           value={data.lowStockCount}
           icon={<AlertTriangle />}
           className="transition-colors hover:border-primary"

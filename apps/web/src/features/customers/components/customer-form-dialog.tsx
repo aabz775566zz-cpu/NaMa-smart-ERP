@@ -16,6 +16,8 @@ import {
 } from '@erp-smart/ui';
 import { useEffect, useState } from 'react';
 
+import { useLocale } from '@/lib/locale/locale-context';
+
 import { useCreateCustomer, useUpdateCustomer } from '../hooks';
 import type { CreateCustomerInput } from '../api';
 
@@ -57,6 +59,8 @@ export function CustomerFormDialog({
   /** Called with the new record after a successful create — not fired on edit. */
   onCreated?: (customer: Customer) => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.customers;
   const isEdit = Boolean(customer);
   const createMutation = useCreateCustomer();
   const updateMutation = useUpdateCustomer();
@@ -73,9 +77,9 @@ export function CustomerFormDialog({
 
   function validate(): boolean {
     const nextErrors: FormErrors = {};
-    if (!values.name.trim()) nextErrors.name = 'Name is required.';
+    if (!values.name.trim()) nextErrors.name = t.nameRequired;
     if (values.email.trim() && !EMAIL_PATTERN.test(values.email.trim())) {
-      nextErrors.email = 'Enter a valid email address.';
+      nextErrors.email = t.emailInvalid;
     }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -100,14 +104,14 @@ export function CustomerFormDialog({
 
     submit
       .then((result) => {
-        toast({ title: isEdit ? 'Customer updated' : 'Customer created' });
+        toast({ title: isEdit ? t.customerUpdated : t.customerCreated });
         if (!isEdit) onCreated?.(result);
         onOpenChange(false);
       })
       .catch((error: Error) => {
         toast({
           variant: 'destructive',
-          title: isEdit ? 'Failed to update customer' : 'Failed to create customer',
+          title: isEdit ? t.updateFailed : t.createFailed,
           description: error.message,
         });
       });
@@ -119,13 +123,13 @@ export function CustomerFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit customer' : 'Add customer'}</DialogTitle>
+          <DialogTitle>{isEdit ? t.editCustomer : t.addCustomer}</DialogTitle>
           <DialogDescription>
-            {isEdit ? "Update this customer's details." : 'Create a new customer record.'}
+            {isEdit ? t.updateDescription : t.createDescription}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Name" htmlFor="customer-name" required error={errors.name}>
+          <FormField label={messages.common.name} htmlFor="customer-name" required error={errors.name}>
             <Input
               id="customer-name"
               value={values.name}
@@ -134,14 +138,14 @@ export function CustomerFormDialog({
           </FormField>
 
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Phone" htmlFor="customer-phone">
+            <FormField label={messages.common.phone} htmlFor="customer-phone">
               <Input
                 id="customer-phone"
                 value={values.phone}
                 onChange={(event) => setValues((v) => ({ ...v, phone: event.target.value }))}
               />
             </FormField>
-            <FormField label="Email" htmlFor="customer-email" error={errors.email}>
+            <FormField label={messages.common.email} htmlFor="customer-email" error={errors.email}>
               <Input
                 id="customer-email"
                 type="email"
@@ -151,7 +155,7 @@ export function CustomerFormDialog({
             </FormField>
           </div>
 
-          <FormField label="Address" htmlFor="customer-address">
+          <FormField label={messages.common.address} htmlFor="customer-address">
             <Input
               id="customer-address"
               value={values.address}
@@ -159,7 +163,7 @@ export function CustomerFormDialog({
             />
           </FormField>
 
-          <FormField label="Notes" htmlFor="customer-notes">
+          <FormField label={messages.common.notes} htmlFor="customer-notes">
             <Textarea
               id="customer-notes"
               value={values.notes}
@@ -169,10 +173,10 @@ export function CustomerFormDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {messages.common.cancel}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create customer'}
+              {isPending ? messages.common.saving : isEdit ? messages.common.saveChanges : t.createCustomerButton}
             </Button>
           </DialogFooter>
         </form>

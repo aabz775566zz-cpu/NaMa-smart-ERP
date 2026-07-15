@@ -1,6 +1,6 @@
 'use client';
 
-import type { Sale } from '@erp-smart/types';
+import type { PaymentMethod, PaymentStatus, Sale } from '@erp-smart/types';
 import {
   Badge,
   Button,
@@ -18,6 +18,7 @@ import {
 import { CheckCircle2, MoreHorizontal, XCircle } from 'lucide-react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 import { SaleStatusBadge } from './sale-status-badge';
@@ -40,18 +41,31 @@ export function SalesTable({
   const canCancel = useHasPermission('SALES:DELETE');
   const canAct = canComplete || canCancel;
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
+  const t = messages.sales;
+  const METHOD_LABELS: Record<PaymentMethod, string> = {
+    CASH: messages.common.methodCash,
+    CARD: messages.common.methodCard,
+    TRANSFER: messages.common.methodTransfer,
+    OTHER: messages.common.methodOther,
+  };
+  const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+    PAID: messages.common.paymentStatusPaid,
+    PARTIAL: messages.common.paymentStatusPartial,
+    UNPAID: messages.common.paymentStatusUnpaid,
+  };
 
   return (
     <div className="rounded-lg border border-border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Payment</TableHead>
-            <TableHead>Status</TableHead>
-            {canAct ? <TableHead className="text-end">Actions</TableHead> : null}
+            <TableHead>{messages.common.date}</TableHead>
+            <TableHead>{t.customer}</TableHead>
+            <TableHead>{t.total}</TableHead>
+            <TableHead>{t.payment}</TableHead>
+            <TableHead>{messages.common.status}</TableHead>
+            {canAct ? <TableHead className="text-end">{messages.common.actions}</TableHead> : null}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -63,13 +77,13 @@ export function SalesTable({
                   {new Date(sale.createdAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="text-foreground">
-                  {sale.customerId ? (customerNameById.get(sale.customerId) ?? '—') : 'Walk-in customer'}
+                  {sale.customerId ? (customerNameById.get(sale.customerId) ?? '—') : t.walkInCustomer}
                 </TableCell>
                 <TableCell className="font-medium tabular-nums text-foreground">{formatMoney(sale.totalAmount)}</TableCell>
                 <TableCell className="text-muted-foreground">
                   <span className="inline-flex items-center gap-2">
-                    {sale.paymentMethod}
-                    <Badge variant="outline">{sale.paymentStatus}</Badge>
+                    {METHOD_LABELS[sale.paymentMethod]}
+                    <Badge variant="outline">{PAYMENT_STATUS_LABELS[sale.paymentStatus]}</Badge>
                   </span>
                 </TableCell>
                 <TableCell>
@@ -82,14 +96,14 @@ export function SalesTable({
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
                             <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Open actions</span>
+                            <span className="sr-only">{messages.common.openActions}</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           {canComplete ? (
                             <DropdownMenuItem onClick={() => onComplete(sale)}>
                               <CheckCircle2 />
-                              Complete
+                              {t.complete}
                             </DropdownMenuItem>
                           ) : null}
                           {canCancel ? (
@@ -98,7 +112,7 @@ export function SalesTable({
                               className="text-destructive focus:text-destructive"
                             >
                               <XCircle />
-                              Cancel
+                              {messages.common.cancel}
                             </DropdownMenuItem>
                           ) : null}
                         </DropdownMenuContent>

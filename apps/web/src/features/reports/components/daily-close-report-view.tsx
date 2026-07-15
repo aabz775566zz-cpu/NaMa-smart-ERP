@@ -5,6 +5,7 @@ import { Banknote, Handshake, HandCoins, Receipt } from 'lucide-react';
 import { useState } from 'react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 
 import { useDailyCloseReport } from '../hooks';
 
@@ -20,12 +21,14 @@ export function DailyCloseReportView() {
   const [date, setDate] = useState(todayLocalDateInput);
   const { data, isLoading, isError, error } = useDailyCloseReport({ date });
   const formatMoney = useFormatMoney();
+  const { messages } = useLocale();
+  const t = messages.reports;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <label htmlFor="daily-close-date" className="text-sm font-medium text-foreground">
-          Date
+          {messages.common.date}
         </label>
         <Input
           id="daily-close-date"
@@ -44,40 +47,38 @@ export function DailyCloseReportView() {
         </div>
       ) : isError || !data ? (
         <EmptyState
-          title="Couldn't load the daily close report"
-          description={error instanceof Error ? error.message : 'Please try again.'}
+          title={t.couldNotLoadDailyClose}
+          description={error instanceof Error ? error.message : messages.common.pleaseTryAgain}
         />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
-              label="Total sales"
+              label={t.totalSales}
               value={formatMoney(data.totalSales)}
               icon={<Receipt />}
-              description={`${data.salesCount} completed sale${data.salesCount === 1 ? '' : 's'}`}
+              description={t.completedSalesCount.replace('{{count}}', String(data.salesCount))}
             />
             <StatCard
-              label="Cash sales"
+              label={t.cashSales}
               value={formatMoney(data.cashSales)}
               icon={<Banknote />}
-              description="Paid in full at time of sale"
+              description={t.cashSalesDescription}
             />
             <StatCard
-              label="Credit sales"
+              label={t.creditSales}
               value={formatMoney(data.creditSales)}
               icon={<Handshake />}
-              description="Left partial or unpaid"
+              description={t.creditSalesDescription}
             />
             <StatCard
-              label="Payments collected"
+              label={t.paymentsCollected}
               value={formatMoney(data.paymentsCollected)}
               icon={<HandCoins />}
-              description="Includes debt collected from prior sales"
+              description={t.paymentsCollectedDescription}
             />
           </div>
-          {data.salesCount === 0 ? (
-            <p className="text-sm text-muted-foreground">No completed sales on this date.</p>
-          ) : null}
+          {data.salesCount === 0 ? <p className="text-sm text-muted-foreground">{t.noSalesOnDate}</p> : null}
         </>
       )}
     </div>

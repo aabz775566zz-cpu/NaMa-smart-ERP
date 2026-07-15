@@ -8,12 +8,15 @@ import { Suspense, useEffect, useRef } from 'react';
 
 import { useVerifyEmail } from '@/features/auth';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { useLocale } from '@/lib/locale/locale-context';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const verifyMutation = useVerifyEmail();
   const attempted = useRef(false);
+  const { messages } = useLocale();
+  const t = messages.auth;
 
   useEffect(() => {
     if (attempted.current || !token) return;
@@ -26,15 +29,15 @@ function VerifyEmailContent() {
     content = (
       <>
         <XCircle className="h-10 w-10 text-destructive" />
-        <CardTitle>Invalid verification link</CardTitle>
-        <CardDescription>This link is missing its verification token.</CardDescription>
+        <CardTitle>{t.invalidVerificationTitle}</CardTitle>
+        <CardDescription>{t.invalidVerificationDescription}</CardDescription>
       </>
     );
   } else if (verifyMutation.isError) {
     content = (
       <>
         <XCircle className="h-10 w-10 text-destructive" />
-        <CardTitle>Verification failed</CardTitle>
+        <CardTitle>{t.verificationFailedTitle}</CardTitle>
         <CardDescription>{verifyMutation.error.message}</CardDescription>
       </>
     );
@@ -42,8 +45,8 @@ function VerifyEmailContent() {
     content = (
       <>
         <CheckCircle2 className="h-10 w-10 text-success" />
-        <CardTitle>Email verified</CardTitle>
-        <CardDescription>Your email address has been confirmed.</CardDescription>
+        <CardTitle>{t.emailVerifiedTitle}</CardTitle>
+        <CardDescription>{t.emailVerifiedDescription}</CardDescription>
       </>
     );
   } else {
@@ -60,7 +63,7 @@ function VerifyEmailContent() {
       <CardHeader className="items-center text-center">{content}</CardHeader>
       <CardContent>
         <Button asChild className="w-full">
-          <Link href="/login">Go to sign in</Link>
+          <Link href="/login">{t.goToSignIn}</Link>
         </Button>
       </CardContent>
     </Card>

@@ -11,9 +11,12 @@ import { CustomersToolbar } from '@/features/customers/components/customers-tool
 import { DeleteCustomerDialog } from '@/features/customers/components/delete-customer-dialog';
 import { useCustomers } from '@/features/customers/hooks';
 import { exportToCsv } from '@/lib/csv-export';
+import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
 export default function CustomersPage() {
+  const { messages } = useLocale();
+  const t = messages.customers;
   const permissions = usePermissions();
   const canRead = permissions.includes('CUSTOMERS:READ');
 
@@ -44,8 +47,8 @@ export default function CustomersPage() {
       <div className="flex h-full min-h-[60vh] items-center justify-center">
         <EmptyState
           icon={<ShieldAlert />}
-          title="You don't have access to this section"
-          description="Ask a company owner or manager if you need this permission."
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
         />
       </div>
     );
@@ -63,18 +66,18 @@ export default function CustomersPage() {
 
   function handleExport() {
     exportToCsv('customers.csv', filteredCustomers, [
-      { header: 'Name', value: (c) => c.name },
-      { header: 'Phone', value: (c) => c.phone ?? '' },
-      { header: 'Email', value: (c) => c.email ?? '' },
-      { header: 'Address', value: (c) => c.address ?? '' },
+      { header: messages.common.name, value: (c) => c.name },
+      { header: messages.common.phone, value: (c) => c.phone ?? '' },
+      { header: messages.common.email, value: (c) => c.email ?? '' },
+      { header: messages.common.address, value: (c) => c.address ?? '' },
     ]);
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Customers</h1>
-        <p className="text-sm text-muted-foreground">Manage your customer records.</p>
+        <h1 className="text-xl font-semibold text-foreground">{t.title}</h1>
+        <p className="text-sm text-muted-foreground">{t.subtitle}</p>
       </div>
 
       <CustomersToolbar search={search} onSearchChange={setSearch} onAdd={openCreateDialog} onExport={handleExport} />
@@ -87,21 +90,21 @@ export default function CustomersPage() {
         </div>
       ) : customersQuery.isError ? (
         <EmptyState
-          title="Couldn't load customers"
-          description={customersQuery.error instanceof Error ? customersQuery.error.message : 'Please try again.'}
+          title={t.couldNotLoad}
+          description={customersQuery.error instanceof Error ? customersQuery.error.message : messages.common.pleaseTryAgain}
         />
       ) : filteredCustomers.length === 0 ? (
         <EmptyState
           icon={<Users />}
-          title={customersQuery.data?.length ? 'No customers match your search' : 'Add your first customer'}
+          title={customersQuery.data?.length ? t.noMatch : t.addFirst}
           description={
             customersQuery.data?.length
-              ? 'Try a different search term.'
-              : 'Keep track of who you sell to — add a customer to get started.'
+              ? t.tryDifferentSearch
+              : t.emptyDescription
           }
           action={
             !customersQuery.data?.length ? (
-              <Button onClick={openCreateDialog}>Add customer</Button>
+              <Button onClick={openCreateDialog}>{t.addCustomer}</Button>
             ) : undefined
           }
         />

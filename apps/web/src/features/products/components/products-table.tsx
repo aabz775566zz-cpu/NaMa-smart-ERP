@@ -18,6 +18,7 @@ import {
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
 import { useFormatMoney } from '@/lib/format/money';
+import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
 
 import { ProductStatusBadge } from './product-status-badge';
@@ -33,6 +34,8 @@ export function ProductsTable({
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
 }) {
+  const { messages } = useLocale();
+  const t = messages.products;
   const canUpdate = useHasPermission('PRODUCTS:UPDATE');
   const canDelete = useHasPermission('PRODUCTS:DELETE');
   const canAct = canUpdate || canDelete;
@@ -43,13 +46,13 @@ export function ProductsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>SKU</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Status</TableHead>
-            {canAct ? <TableHead className="text-end">Actions</TableHead> : null}
+            <TableHead>{messages.common.name}</TableHead>
+            <TableHead>{t.sku}</TableHead>
+            <TableHead>{t.category}</TableHead>
+            <TableHead>{t.price}</TableHead>
+            <TableHead>{t.stock}</TableHead>
+            <TableHead>{messages.common.status}</TableHead>
+            {canAct ? <TableHead className="text-end">{messages.common.actions}</TableHead> : null}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -67,7 +70,7 @@ export function ProductsTable({
                 <TableCell>
                   <span className="inline-flex items-center gap-2 tabular-nums">
                     {product.quantityOnHand} {product.unit}
-                    {isLowStock ? <Badge variant="warning">Low stock</Badge> : null}
+                    {isLowStock ? <Badge variant="warning">{t.lowStock}</Badge> : null}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -79,14 +82,14 @@ export function ProductsTable({
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open actions</span>
+                          <span className="sr-only">{messages.common.openActions}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {canUpdate ? (
                           <DropdownMenuItem onClick={() => onEdit(product)}>
                             <Pencil />
-                            Edit
+                            {messages.common.edit}
                           </DropdownMenuItem>
                         ) : null}
                         {canDelete ? (
@@ -95,7 +98,7 @@ export function ProductsTable({
                             className="text-destructive focus:text-destructive"
                           >
                             <Trash2 />
-                            Delete
+                            {messages.common.delete}
                           </DropdownMenuItem>
                         ) : null}
                       </DropdownMenuContent>

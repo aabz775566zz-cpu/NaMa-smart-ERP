@@ -7,6 +7,7 @@ import { ChatComposer } from '@/features/ai/components/chat-composer';
 import { ConversationSidebar } from '@/features/ai/components/conversation-sidebar';
 import { MessageList } from '@/features/ai/components/message-list';
 import { useConversation, useConversations, useSendChatMessage } from '@/features/ai/hooks';
+import { useLocale } from '@/lib/locale/locale-context';
 
 // No permission gate — AiController has no @RequirePermission, only the
 // global JwtAuthGuard (already enforced by the dashboard layout). Tool
@@ -14,6 +15,7 @@ import { useConversation, useConversations, useSendChatMessage } from '@/feature
 // the assistant can retrieve is already bounded without a client-side check.
 export default function AiPage() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const { messages } = useLocale();
 
   const conversationsQuery = useConversations();
   const conversationQuery = useConversation(activeConversationId);
@@ -27,7 +29,7 @@ export default function AiPage() {
           if (!activeConversationId) setActiveConversationId(data.conversationId);
         },
         onError: (error) => {
-          toast({ variant: 'destructive', title: 'Failed to send message', description: error.message });
+          toast({ variant: 'destructive', title: messages.ai.sendMessageFailed, description: error.message });
         },
       },
     );
