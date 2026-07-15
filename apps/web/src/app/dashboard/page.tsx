@@ -1,65 +1,74 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@erp-smart/ui';
-import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
+import { getDirection } from '@erp-smart/i18n';
+import { Badge } from '@erp-smart/ui';
 
-import { DASHBOARD_NAV_ITEMS } from '@/features/dashboard/nav-items';
-import { OnboardingChecklist, useOnboardingChecklistVisible } from '@/features/dashboard/onboarding-checklist';
-import { DashboardReportView } from '@/features/reports/components/dashboard-report-view';
+import { AiAssistantCard } from '@/features/dashboard/ai-assistant-card';
+import { AttentionList } from '@/features/dashboard/attention-list';
+import { KpiOverview } from '@/features/dashboard/kpi-overview';
+import { QuickActions } from '@/features/dashboard/quick-actions';
+import { SetupProgressCard, useSetupProgressVisible } from '@/features/dashboard/setup-progress-card';
 import { useCompany } from '@/features/settings/hooks';
 import { useLocale } from '@/lib/locale/locale-context';
+import { useRoleLabels } from '@/lib/locale/role-labels';
 import { useCurrentUser, usePermissions } from '@/lib/store';
+
+function useGreetingKey(): 'goodMorning' | 'goodAfternoon' | 'goodEvening' {
+  // Computed once per mount, not re-evaluated on a timer — a greeting that
+  // flips under the user mid-session would be more distracting than useful.
+  // Safe from hydration mismatches: DashboardLayout never renders this
+  // subtree during the initial (unauthenticated) server pass — it only
+  // mounts client-side once the auth status resolves to 'authenticated'.
+  const hour = new Date().getHours();
+  if (hour < 12) return 'goodMorning';
+  if (hour < 18) return 'goodAfternoon';
+  return 'goodEvening';
+}
 
 export default function DashboardHomePage() {
   const user = useCurrentUser();
   const permissions = usePermissions();
   const { data: company } = useCompany();
-  const { messages } = useLocale();
+  const { messages, locale } = useLocale();
+  const direction = getDirection(locale);
+  const roleLabels = useRoleLabels();
   const canViewReports = permissions.includes('REPORTS:READ');
-  const showChecklist = useOnboardingChecklistVisible();
+  const showSetupProgress = useSetupProgressVisible();
+  const greetingKey = useGreetingKey();
 
-  const quickLinks = DASHBOARD_NAV_ITEMS.filter(
-    (item) => item.href !== '/dashboard' && (!item.requiredPermission || permissions.includes(item.requiredPermission)),
-  );
+  const today = new Intl.DateTimeFormat(direction === 'rtl' ? 'ar' : 'en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date());
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Welcome back{company?.name ? `, ${company.name}` : ''}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {user?.email} · {user?.roleKey}
-        </p>
+    <div className="space-y-10">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-medium text-muted-foreground">{messages.dashboard[greetingKey]}</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            {company?.name ?? messages.dashboard.welcomeBack}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+          {user ? <Badge variant="outline">{roleLabels[user.roleKey]}</Badge> : null}
+          <span>{today}</span>
+        </div>
       </div>
 
-      {canViewReports ? <DashboardReportView /> : null}
+      <QuickActions />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        {showChecklist ? (
-          <div className="lg:col-span-3">
-            <OnboardingChecklist />
-          </div>
-        ) : null}
-        <Card className={showChecklist ? 'lg:col-span-2' : 'lg:col-span-5'}>
-          <CardHeader>
-            <CardTitle className="text-base">Explore</CardTitle>
-          </CardHeader>
-          <CardContent className={showChecklist ? 'space-y-1' : 'grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3'}>
-            {quickLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-accent"
-              >
-                <item.icon className="h-4 w-4 shrink-0 text-primary" />
-                <span className="flex-1 truncate">{messages.nav[item.labelKey]}</span>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-              </Link>
-            ))}
-          </CardContent>
-        </Card>
+      {canViewReports ? <KpiOverview /> : null}
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <AttentionList />
+        </div>
+        <div className="flex flex-col gap-6">
+          {showSetupProgress ? <SetupProgressCard /> : null}
+          <AiAssistantCard />
+        </div>
       </div>
     </div>
   );

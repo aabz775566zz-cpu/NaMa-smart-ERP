@@ -131,6 +131,22 @@
     "amountRequired": "أدخل مبلغاً أكبر من صفر.",
     "amountExceedsRemaining": "لا يمكن أن يتجاوز المبلغ الرصيد المتبقي."
   },
+  "dashboard": {
+    "attentionTitle": "ما يحتاج انتباهك",
+    "lowStockSectionTitle": "مخزون منخفض",
+    "overdueInvoicesSectionTitle": "فواتير متأخرة",
+    "nothingNeedsAttentionTitle": "كل شيء تحت السيطرة",
+    "nothingNeedsAttentionDescription": "لا توجد منتجات منخفضة المخزون أو فواتير متأخرة حالياً.",
+    "viewAllLowStock": "عرض جميع المنتجات منخفضة المخزون",
+    "viewAllOverdueInvoices": "عرض جميع الفواتير المتأخرة",
+    "couldNotLoadLowStock": "تعذّر تحميل المنتجات منخفضة المخزون",
+    "couldNotLoadOverdueInvoices": "تعذّر تحميل الفواتير المتأخرة",
+    "quickActions": {
+      "newSale": "عملية بيع جديدة",
+      "newCustomer": "عميل جديد",
+      "newProduct": "منتج جديد"
+    }
+  },
   "ai": {
     "askAiAssistant": "اسأل المساعد الذكي",
     "askAiLabel": "اسأل الذكاء الاصطناعي"

@@ -131,6 +131,22 @@
     "amountRequired": "Enter an amount greater than zero.",
     "amountExceedsRemaining": "Amount can't exceed the remaining balance."
   },
+  "dashboard": {
+    "attentionTitle": "What needs your attention",
+    "lowStockSectionTitle": "Low stock",
+    "overdueInvoicesSectionTitle": "Overdue invoices",
+    "nothingNeedsAttentionTitle": "You're all caught up",
+    "nothingNeedsAttentionDescription": "No low-stock products or overdue invoices right now.",
+    "viewAllLowStock": "View all low-stock products",
+    "viewAllOverdueInvoices": "View all overdue invoices",
+    "couldNotLoadLowStock": "Couldn't load low-stock products",
+    "couldNotLoadOverdueInvoices": "Couldn't load overdue invoices",
+    "quickActions": {
+      "newSale": "New sale",
+      "newCustomer": "New customer",
+      "newProduct": "New product"
+    }
+  },
   "ai": {
     "askAiAssistant": "Ask the AI assistant",
     "askAiLabel": "Ask AI"
