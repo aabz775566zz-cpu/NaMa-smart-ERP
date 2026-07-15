@@ -13,7 +13,33 @@
     "back": "Back",
     "next": "Next",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "accessDeniedTitle": "You don't have access to this section",
+    "accessDeniedDescription": "Ask a company owner or manager if you need this permission.",
+    "pleaseTryAgain": "Please try again.",
+    "exportCsv": "Export CSV",
+    "importCsv": "Import CSV",
+    "actions": "Actions",
+    "openActions": "Open actions",
+    "saving": "Saving…",
+    "deleting": "Deleting…",
+    "saveChanges": "Save changes",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "notes": "Notes",
+    "note": "Note",
+    "status": "Status",
+    "date": "Date",
+    "product": "Product",
+    "methodCash": "Cash",
+    "methodCard": "Card",
+    "methodTransfer": "Bank transfer",
+    "methodOther": "Other",
+    "paymentStatusPaid": "Paid",
+    "paymentStatusPartial": "Partially paid",
+    "paymentStatusUnpaid": "Unpaid"
   },
   "language": {
     "switch": "Language",
@@ -34,6 +60,44 @@
     "reports": "Reports",
     "aiAssistant": "AI Assistant",
     "settings": "Settings",
+    "purchasing": "Purchasing",
+    "productsInventory": "Products & Inventory",
+    "finance": "Finance",
+    "employees": "Employees",
+    "returns": "Returns",
+    "quotations": "Quotations",
+    "suppliers": "Suppliers",
+    "purchaseOrders": "Purchase Orders",
+    "purchaseInvoices": "Purchase Invoices",
+    "supplierPayments": "Supplier Payments",
+    "categories": "Categories",
+    "inventoryMovements": "Inventory Movements",
+    "stockCount": "Stock Count",
+    "contacts": "Contacts",
+    "customerHistory": "Customer History",
+    "cash": "Cash",
+    "bankAccounts": "Bank Accounts",
+    "expenses": "Expenses",
+    "revenue": "Revenue",
+    "journalEntries": "Journal Entries",
+    "payroll": "Payroll",
+    "attendance": "Attendance",
+    "leave": "Leave",
+    "salesReports": "Sales Reports",
+    "inventoryReports": "Inventory Reports",
+    "profitReports": "Profit Reports",
+    "customerReports": "Customer Reports",
+    "financialReports": "Financial Reports",
+    "company": "Company",
+    "users": "Users",
+    "rolesPermissions": "Roles & Permissions",
+    "taxes": "Taxes",
+    "currencies": "Currencies",
+    "units": "Units",
+    "numbering": "Numbering",
+    "integrations": "Integrations",
+    "backupRestore": "Backup & Restore",
+    "systemPreferences": "System Preferences",
     "groupOverview": "Overview",
     "groupOperations": "Operations",
     "groupInsights": "Insights"
@@ -64,7 +128,43 @@
     "createAccountButton": "Create account",
     "creatingAccount": "Creating…",
     "alreadyHaveAccount": "Already have an account?",
-    "signInLink": "Sign in"
+    "signInLink": "Sign in",
+    "loginFailed": "Login failed",
+    "registrationFailed": "Registration failed",
+    "invalidInviteTitle": "Invalid invitation link",
+    "invalidInviteDescription": "This link is missing its invitation token.",
+    "goToSignIn": "Go to sign in",
+    "confirmPassword": "Confirm password",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "invitationAccepted": "Invitation accepted",
+    "signInToGetStarted": "Sign in to get started.",
+    "acceptInviteFailed": "Failed to accept invitation",
+    "acceptInvitationTitle": "Accept invitation",
+    "acceptInvitationDescription": "Set a password to join your company.",
+    "joining": "Joining…",
+    "checkYourEmail": "Check your email",
+    "checkYourEmailDescription": "If an account exists for {{email}}, we've sent a password reset link.",
+    "backToSignIn": "Back to sign in",
+    "forgotPasswordTitle": "Forgot password",
+    "forgotPasswordDescription": "Enter your email and we'll send you a reset link.",
+    "sending": "Sending…",
+    "sendResetLink": "Send reset link",
+    "invalidResetTitle": "Invalid reset link",
+    "invalidResetDescription": "This link is missing its reset token.",
+    "requestNewLink": "Request a new link",
+    "passwordReset": "Password reset",
+    "signInWithNewPassword": "Sign in with your new password.",
+    "resetPasswordFailed": "Failed to reset password",
+    "resetPasswordTitle": "Reset password",
+    "resetPasswordDescription": "Choose a new password for your account.",
+    "newPasswordLabel": "New password",
+    "confirmNewPasswordLabel": "Confirm new password",
+    "resetting": "Resetting…",
+    "invalidVerificationTitle": "Invalid verification link",
+    "invalidVerificationDescription": "This link is missing its verification token.",
+    "verificationFailedTitle": "Verification failed",
+    "emailVerifiedTitle": "Email verified",
+    "emailVerifiedDescription": "Your email address has been confirmed."
   },
   "marketing": {
     "heroTitle": "Manage your business in one place",
@@ -93,6 +193,28 @@
     "downloadPdf": "Download PDF",
     "sendWhatsApp": "Send via WhatsApp",
     "whatsAppMessage": "Hello,\nHere is your invoice from {{company}}.\nInvoice #{{number}}\nTotal: {{total}}\nThank you for your business."
+  },
+  "invoices": {
+    "title": "Invoices",
+    "subtitle": "Invoices are generated automatically when a sale is completed.",
+    "couldNotLoad": "Couldn't load invoices",
+    "noInvoicesYet": "No invoices yet",
+    "noStatusIssued": "No unpaid invoices",
+    "noStatusPaid": "No paid invoices",
+    "tryDifferentStatusFilter": "Try a different status filter.",
+    "emptyDescription": "Invoices are generated automatically when a sale is completed — complete a sale to see one here.",
+    "goToSales": "Go to Sales",
+    "markedPaid": "Invoice marked as paid",
+    "markPaidFailed": "Failed to mark invoice as paid",
+    "markPaid": "Mark as paid",
+    "marking": "Marking…",
+    "issueDate": "Issue date",
+    "dueDate": "Due date",
+    "total": "Total",
+    "viewInvoice": "View invoice",
+    "allStatuses": "All statuses",
+    "issuedOn": "Issued {{date}}",
+    "loadingDetails": "Loading invoice details…"
   },
   "customers": {
     "backToCustomers": "Back to customers",
@@ -129,9 +251,364 @@
     "recordPaymentSuccess": "Payment recorded",
     "recordPaymentError": "Failed to record payment",
     "amountRequired": "Enter an amount greater than zero.",
-    "amountExceedsRemaining": "Amount can't exceed the remaining balance."
+    "amountExceedsRemaining": "Amount can't exceed the remaining balance.",
+    "title": "Customers",
+    "subtitle": "Manage your customer records.",
+    "couldNotLoad": "Couldn't load customers",
+    "noMatch": "No customers match your search",
+    "addFirst": "Add your first customer",
+    "tryDifferentSearch": "Try a different search term.",
+    "emptyDescription": "Keep track of who you sell to — add a customer to get started.",
+    "addCustomer": "Add customer",
+    "createCustomerButton": "Create customer",
+    "searchPlaceholder": "Search by name, phone, or email…",
+    "created": "Created",
+    "debtAndPayments": "Debt & payments",
+    "nameRequired": "Name is required.",
+    "emailInvalid": "Enter a valid email address.",
+    "customerUpdated": "Customer updated",
+    "customerCreated": "Customer created",
+    "updateFailed": "Failed to update customer",
+    "createFailed": "Failed to create customer",
+    "editCustomer": "Edit customer",
+    "updateDescription": "Update this customer's details.",
+    "createDescription": "Create a new customer record.",
+    "customerDeleted": "Customer deleted",
+    "deleteFailed": "Failed to delete customer",
+    "deleteCustomerTitle": "Delete customer",
+    "deleteCustomerDescription": "This will permanently delete \"{{name}}\". This action cannot be undone."
+  },
+  "products": {
+    "title": "Products",
+    "subtitle": "Manage your product catalog.",
+    "searchPlaceholder": "Search by name or SKU…",
+    "addProduct": "Add product",
+    "editProduct": "Edit product",
+    "updateDescription": "Update this product's details.",
+    "createDescription": "Create a new product in your catalog.",
+    "nameRequired": "Name is required.",
+    "purchasePriceInvalid": "Enter a valid purchase price.",
+    "sellingPriceInvalid": "Enter a valid selling price.",
+    "lowStockInvalid": "Must be zero or greater.",
+    "openingQuantityInvalid": "Must be a whole number, zero or greater.",
+    "productUpdated": "Product updated",
+    "productCreated": "Product created",
+    "updateFailed": "Failed to update product",
+    "createFailed": "Failed to create product",
+    "basicInfoSection": "Basic information",
+    "pricingSection": "Pricing",
+    "inventorySection": "Inventory",
+    "sku": "SKU",
+    "category": "Category",
+    "noCategory": "No category",
+    "newCategory": "New category",
+    "purchasePrice": "Purchase price",
+    "sellingPrice": "Selling price",
+    "unit": "Unit",
+    "unitHint": "e.g. pcs, kg, box",
+    "openingQuantity": "Opening quantity",
+    "openingQuantityHint": "Stock to start with — recorded as a purchase movement.",
+    "quantityOnHand": "Quantity on hand",
+    "lowStockThreshold": "Low stock threshold",
+    "description": "Description",
+    "createProductButton": "Create product",
+    "couldNotLoad": "Couldn't load products",
+    "noMatch": "No products match your search",
+    "addFirst": "Add your first product",
+    "tryDifferentSearch": "Try a different search term.",
+    "emptyDescription": "Your catalog is empty — add a product to start tracking stock and selling.",
+    "price": "Price",
+    "stock": "Stock",
+    "lowStock": "Low stock",
+    "categoryNameRequired": "Category name is required.",
+    "categoryCreated": "Category created",
+    "categoryCreateFailed": "Failed to create category",
+    "newCategoryDescription": "Add a category to organize your products.",
+    "categoryName": "Category name",
+    "creatingCategory": "Creating…",
+    "createCategory": "Create category",
+    "productDeleted": "Product deleted",
+    "deleteFailed": "Failed to delete product",
+    "deleteProductTitle": "Delete product",
+    "deleteProductDescription": "This will permanently delete \"{{name}}\". This action cannot be undone.",
+    "importTitle": "Import products from CSV",
+    "importDescription": "Bulk-add products from a spreadsheet — supports large catalogs, validates before importing.",
+    "downloadTemplate": "Download CSV template",
+    "requiredColumns": "Required columns: name, purchasePrice, sellingPrice.",
+    "optionalColumns": "Optional: sku, category, unit, openingQuantity, lowStockThreshold, description.",
+    "chooseFile": "Choose CSV file",
+    "rowsFound": "{{count}} rows found.",
+    "readyToImport": "ready to import",
+    "haveErrors": "have errors",
+    "row": "Row",
+    "validRow": "Valid",
+    "showingFirst": "Showing the first {{shown}} of {{total}} rows — all {{total}} will be validated and imported.",
+    "importingProgress": "Importing {{done}} of {{total}}…",
+    "productsCreatedCount": "products created.",
+    "rowsFailedCount": "rows failed.",
+    "error": "Error",
+    "chooseDifferentFile": "Choose a different file",
+    "importCount": "Import {{count}} products",
+    "done": "Done",
+    "rowNameRequired": "Name is required.",
+    "rowPurchasePriceInvalid": "Purchase price must be a number ≥ 0.",
+    "rowSellingPriceInvalid": "Selling price must be a number ≥ 0.",
+    "rowOpeningQuantityInvalid": "Opening quantity must be a whole number ≥ 0.",
+    "rowLowStockInvalid": "Low stock threshold must be a whole number ≥ 0.",
+    "duplicateSku": "Duplicate SKU \"{{sku}}\" elsewhere in this file.",
+    "importRequestFailed": "Import request failed.",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "statusDiscontinued": "Discontinued"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Track stock movements and post manual adjustments.",
+    "couldNotLoad": "Couldn't load inventory movements",
+    "noMovementsForProduct": "No movements for this product",
+    "noMovementsYet": "No stock movements yet",
+    "tryDifferentFilter": "Try a different product filter.",
+    "emptyDescription": "Movements appear here as stock is purchased, sold, or adjusted — post a manual adjustment to get started.",
+    "recordAdjustment": "Record adjustment",
+    "selectProductError": "Select a product.",
+    "nonZeroError": "Enter a non-zero whole number.",
+    "positiveQuantityError": "{{type}} must be a positive quantity.",
+    "adjustmentRecorded": "Adjustment recorded",
+    "adjustmentFailed": "Failed to record adjustment",
+    "newAdjustmentTitle": "New stock adjustment",
+    "newAdjustmentDescription": "Posts a new movement to the inventory ledger — existing entries can't be edited.",
+    "selectProduct": "Select a product",
+    "type": "Type",
+    "quantity": "Quantity",
+    "quantityChangeSigned": "Quantity change (+/-)",
+    "quantityChangeHint": "Negative reduces stock, positive adds to it.",
+    "allProducts": "All products",
+    "newAdjustment": "New adjustment",
+    "lowStockCount": "Low stock ({{count}})",
+    "onHand": "on hand",
+    "reference": "Reference",
+    "typePurchase": "Purchase",
+    "typeSale": "Sale",
+    "typeAdjustment": "Adjustment",
+    "typeReturn": "Return"
+  },
+  "sales": {
+    "title": "Sales",
+    "subtitle": "Create draft sales and complete them to generate invoices.",
+    "saleCompleted": "Sale completed",
+    "invoiceGenerated": "Invoice {{number}} generated.",
+    "completeFailed": "Failed to complete sale",
+    "walkIn": "Walk-in",
+    "couldNotLoad": "Couldn't load sales",
+    "noStatusSalesDraft": "No draft sales",
+    "noStatusSalesCompleted": "No completed sales",
+    "noStatusSalesCancelled": "No cancelled sales",
+    "recordFirstSale": "Record your first sale",
+    "tryDifferentStatusFilter": "Try a different status filter.",
+    "emptyDescription": "Sales you create here decrement stock and generate invoices once completed.",
+    "createSale": "Create sale",
+    "saleCancelled": "Sale cancelled",
+    "cancelFailed": "Failed to cancel sale",
+    "cancelSaleTitle": "Cancel sale",
+    "cancelSaleDescription": "This will cancel this draft sale (total {{amount}}). This action cannot be undone.",
+    "keepSale": "Keep sale",
+    "cancelling": "Cancelling…",
+    "each": "each",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "removeItem": "Remove item",
+    "searchPlaceholder": "Search by name or SKU — or scan a barcode",
+    "outOfStock": "Out of stock",
+    "inStock": "{{quantity}} {{unit}} in stock",
+    "noMatchingProducts": "No matching products.",
+    "addCustomerFailed": "Failed to add customer",
+    "addAtLeastOneProduct": "Add at least one product.",
+    "saleCreatedDraft": "Sale created as draft",
+    "createFailed": "Failed to create sale",
+    "savedAsDraftTitle": "Sale saved as draft — completion failed",
+    "newSale": "New sale",
+    "newSaleDescription": "Search or scan a product to add it, then complete the sale.",
+    "walkInCustomer": "Walk-in customer",
+    "customer": "Customer",
+    "newCustomer": "New customer",
+    "add": "Add",
+    "paymentMethod": "Payment method",
+    "paymentStatus": "Payment status",
+    "noProductsYet": "No products yet",
+    "addProductBeforeSale": "Add a product before creating a sale.",
+    "goToProducts": "Go to Products",
+    "cartEmpty": "Cart is empty — search above to add products.",
+    "discountTotal": "Discount total",
+    "taxTotal": "Tax total",
+    "estimatedTotal": "Estimated total:",
+    "estimatedTotalHint": "(the server computes the authoritative total from live prices)",
+    "saveAsDraft": "Save as draft",
+    "completing": "Completing…",
+    "completeSale": "Complete sale",
+    "total": "Total",
+    "payment": "Payment",
+    "complete": "Complete",
+    "allStatuses": "All statuses",
+    "newSaleButton": "New sale",
+    "statusDraft": "Draft",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Read-only analytics across sales, products, customers, and inventory.",
+    "navOverview": "Overview",
+    "navDailyClose": "Daily Close",
+    "navSales": "Sales",
+    "navProducts": "Products",
+    "navCustomers": "Customers",
+    "navInventory": "Inventory",
+    "presetToday": "Today",
+    "presetThisWeek": "This week",
+    "presetThisMonth": "This month",
+    "presetLastMonth": "Last month",
+    "presetThisYear": "This year",
+    "from": "From",
+    "to": "To",
+    "topN": "Top N",
+    "clear": "Clear",
+    "couldNotLoadOverview": "Couldn't load the overview",
+    "revenueThisMonth": "Revenue this month",
+    "salesThisMonth": "Sales this month",
+    "totalCustomers": "Total customers",
+    "activeProducts": "Active products",
+    "lowStockItems": "Low stock items",
+    "couldNotLoadSales": "Couldn't load the sales report",
+    "totalRevenue": "Total revenue",
+    "totalSales": "Total sales",
+    "averageSaleValue": "Average sale value",
+    "noSalesInRange": "No completed sales in this range",
+    "tryWideningRange": "Try widening the date range.",
+    "revenue": "Revenue",
+    "couldNotLoadProducts": "Couldn't load the products report",
+    "quantitySold": "Quantity sold",
+    "estimatedProfit": "Estimated profit",
+    "couldNotLoadCustomers": "Couldn't load the customers report",
+    "noAttributedSales": "No attributed sales in this range",
+    "walkInExcluded": "Walk-in sales without a customer aren't counted here.",
+    "customer": "Customer",
+    "totalSpent": "Total spent",
+    "purchases": "Purchases",
+    "couldNotLoadInventory": "Couldn't load the inventory report",
+    "totalProducts": "Total products",
+    "unitsInStock": "Units in stock",
+    "stockValue": "Stock value",
+    "nothingLowOnStock": "Nothing low on stock",
+    "allAboveThreshold": "All products are above their threshold.",
+    "onHand": "On hand",
+    "threshold": "Threshold",
+    "couldNotLoadDailyClose": "Couldn't load the daily close report",
+    "completedSalesCount": "{{count}} completed sales",
+    "cashSales": "Cash sales",
+    "cashSalesDescription": "Paid in full at time of sale",
+    "creditSales": "Credit sales",
+    "creditSalesDescription": "Left partial or unpaid",
+    "paymentsCollected": "Payments collected",
+    "paymentsCollectedDescription": "Includes debt collected from prior sales",
+    "noSalesOnDate": "No completed sales on this date."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your company information and team members.",
+    "couldNotLoadCompany": "Couldn't load company information",
+    "companyInfoTitle": "Company information",
+    "companyName": "Company name",
+    "businessType": "Business type",
+    "country": "Country",
+    "currency": "Currency",
+    "plan": "Plan",
+    "subscriptionStatus": "Subscription status",
+    "membersTitle": "Members",
+    "inviteMember": "Invite member",
+    "couldNotLoadMembers": "Couldn't load members",
+    "noMembersYet": "No members yet",
+    "inviteTeamToStart": "Invite your team to get started.",
+    "memberHeader": "Member",
+    "roleHeader": "Role",
+    "roleOwner": "Owner",
+    "roleManager": "Manager",
+    "roleAccountant": "Accountant",
+    "roleEmployee": "Employee",
+    "resendInvitation": "Resend invitation",
+    "changeRole": "Change role",
+    "remove": "Remove",
+    "invitationResent": "Invitation resent",
+    "invitationResentDescription": "A new invite link was sent to {{email}}.",
+    "resendInviteFailed": "Failed to resend invitation",
+    "statusActive": "Active",
+    "statusInvited": "Invited",
+    "statusSuspended": "Suspended",
+    "inviteMemberTitle": "Invite a member",
+    "inviteMemberDescription": "They'll receive an email with a link to join your company.",
+    "invalidEmail": "Enter a valid email address.",
+    "invitationSent": "Invitation sent",
+    "inviteFailed": "Failed to invite member",
+    "sendInvite": "Send invite",
+    "sending": "Sending…",
+    "changeRoleTitle": "Change role",
+    "changeRoleDescription": "Update the role for {{name}}.",
+    "roleUpdated": "Role updated",
+    "updateRoleFailed": "Failed to update role",
+    "removeMemberTitle": "Remove member",
+    "removeMemberDescription": "This will remove {{name}} from your company. They will lose access immediately.",
+    "memberRemoved": "Member removed",
+    "removeMemberFailed": "Failed to remove member",
+    "removing": "Removing…",
+    "editCompanyTitle": "Edit company information",
+    "editCompanyDescription": "These details apply to your whole company.",
+    "companyNameRequired": "Company name is required.",
+    "companyUpdated": "Company updated",
+    "updateCompanyFailed": "Failed to update company",
+    "selectCurrency": "Select currency",
+    "logoUrl": "Logo URL"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your personal information and account security.",
+    "couldNotLoadProfile": "Couldn't load your profile",
+    "personalInfo": "Personal information",
+    "emailChangeHint": "Contact support to change your email.",
+    "fullName": "Full name",
+    "fullNameRequired": "Full name must be at least 2 characters.",
+    "profileUpdated": "Profile updated",
+    "updateProfileFailed": "Failed to update profile",
+    "changePasswordTitle": "Change password",
+    "changePasswordDescription": "You'll be signed out of every session after changing your password.",
+    "currentPassword": "Current password",
+    "currentPasswordRequired": "Enter your current password.",
+    "newPassword": "New password",
+    "newPasswordHint": "At least 8 characters.",
+    "confirmNewPassword": "Confirm new password",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "passwordChanged": "Password changed",
+    "passwordChangedDescription": "You have been signed out of every session. Please sign in again.",
+    "changePasswordFailed": "Failed to change password",
+    "changing": "Changing…",
+    "changePasswordButton": "Change password"
   },
   "dashboard": {
+    "welcomeBack": "Welcome back",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "openMenu": "Open menu",
+    "navigationLabel": "Navigation",
+    "stepCreateProduct": "Create your first product",
+    "stepCreateCustomer": "Create your first customer",
+    "stepCreateSale": "Create your first sale",
+    "stepInviteMember": "Invite a team member",
+    "allSetUp": "You're all set up — nice work getting started.",
+    "setupProgressTitle": "Setup progress",
+    "continueSetup": "Continue setup",
+    "percentComplete": "{{percent}}% complete",
+    "recentActivity": "Recent activity",
+    "noActivityTitle": "No activity yet",
+    "noActivityDescription": "Your sales, invoices, customers, and inventory activities will appear here.",
     "attentionTitle": "What needs your attention",
     "lowStockSectionTitle": "Low stock",
     "overdueInvoicesSectionTitle": "Overdue invoices",
@@ -145,10 +622,355 @@
       "newSale": "New sale",
       "newCustomer": "New customer",
       "newProduct": "New product"
-    }
+    },
+    "toggleTheme": "Toggle theme",
+    "alreadyVerified": "Already verified",
+    "verificationEmailSent": "Verification email sent",
+    "alreadyVerifiedDescription": "Your email is already verified — refresh to update this banner.",
+    "checkEmailForLink": "Check {{email}} for the verification link.",
+    "resendFailed": "Failed to resend",
+    "verifyEmailMessage": "Please verify your email address ({{email}}) to secure your account.",
+    "sending": "Sending…",
+    "sent": "Sent",
+    "resendVerificationEmail": "Resend verification email"
   },
   "ai": {
+    "sendMessageFailed": "Failed to send message",
+    "askPlaceholder": "Ask about your sales, inventory, products, or customers…",
+    "sendMessage": "Send message",
+    "newChat": "New chat",
+    "noConversationsYet": "No conversations yet.",
+    "newConversation": "New conversation",
+    "deleteConversation": "Delete conversation",
+    "couldNotLoadConversation": "Couldn't load this conversation",
     "askAiAssistant": "Ask the AI assistant",
-    "askAiLabel": "Ask AI"
+    "askAiLabel": "Ask AI",
+    "askAiAssistantDescription": "Ask about your sales, inventory, products, or customers — it can only see what you have permission to see.",
+    "dashboardCardDescription": "Get instant answers about your sales, inventory, reports, and overall business performance — right from your dashboard.",
+    "openAssistant": "Chat with the assistant"
+  },
+  "comingSoon": {
+    "badge": "Coming Soon",
+    "heading": "This module is under development.",
+    "capabilitiesHeading": "Estimated future capabilities",
+    "subtext": "It will become available in a future update.",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "modules": {
+    "returns": {
+      "description": "Process and track returned items from completed sales.",
+      "capabilities": [
+        "Record full or partial sale returns",
+        "Automatically restock or write off returned items",
+        "Refund or credit the customer's account",
+        "Keep a full return history per sale"
+      ]
+    },
+    "quotations": {
+      "description": "Create price quotes for customers before they commit to a sale.",
+      "capabilities": [
+        "Draft itemized quotes with custom pricing",
+        "Send quotes to customers for approval",
+        "Convert an accepted quote into a sale in one click",
+        "Track quote expiry and follow-ups"
+      ]
+    },
+    "suppliers": {
+      "description": "Manage the vendors you purchase products and materials from.",
+      "capabilities": [
+        "Maintain supplier contact and payment details",
+        "Track outstanding balances per supplier",
+        "View full purchase history per supplier",
+        "Rate and categorize suppliers by reliability"
+      ]
+    },
+    "purchaseOrders": {
+      "description": "Create and track orders placed with your suppliers before goods arrive.",
+      "capabilities": [
+        "Draft purchase orders with expected delivery dates",
+        "Send orders directly to suppliers",
+        "Track order status from draft to received",
+        "Convert received orders into purchase invoices"
+      ]
+    },
+    "purchaseInvoices": {
+      "description": "Record and manage invoices received from your suppliers.",
+      "capabilities": [
+        "Log supplier invoices against purchase orders",
+        "Track payment status and due dates",
+        "Automatically update stock on receipt",
+        "Generate supplier payment records"
+      ]
+    },
+    "supplierPayments": {
+      "description": "Track payments made to suppliers and outstanding balances.",
+      "capabilities": [
+        "Record full or partial supplier payments",
+        "View a running ledger per supplier",
+        "Get reminders for upcoming due invoices",
+        "Export payment history for accounting"
+      ]
+    },
+    "categories": {
+      "description": "Organize your product catalog into structured categories.",
+      "capabilities": [
+        "Create nested category hierarchies",
+        "Bulk-assign products to categories",
+        "Filter reports and catalogs by category",
+        "Rename or merge categories safely"
+      ]
+    },
+    "inventoryMovements": {
+      "description": "A dedicated, filterable ledger of every stock movement across your business.",
+      "capabilities": [
+        "Filter movements by type, product, or date range",
+        "Drill into the source sale, purchase, or adjustment",
+        "Export movement history for audits",
+        "Spot unusual stock activity at a glance"
+      ]
+    },
+    "stockCount": {
+      "description": "Reconcile your physical stock against recorded inventory levels.",
+      "capabilities": [
+        "Schedule periodic stock count sessions",
+        "Enter counted quantities by location",
+        "Automatically generate adjustment entries for discrepancies",
+        "Keep a full audit trail of every count"
+      ]
+    },
+    "contacts": {
+      "description": "Manage additional contact people linked to your customers.",
+      "capabilities": [
+        "Add multiple contacts per customer account",
+        "Track roles like billing or purchasing contact",
+        "Reach contacts directly from a customer's profile",
+        "Import contacts in bulk"
+      ]
+    },
+    "customerHistory": {
+      "description": "A unified timeline of every interaction across all your customers.",
+      "capabilities": [
+        "Browse sales, payments, and communications in one timeline",
+        "Filter history by customer, date, or activity type",
+        "Spot buying patterns across your customer base",
+        "Export history for reporting"
+      ]
+    },
+    "cash": {
+      "description": "Track cash on hand and daily cash movements.",
+      "capabilities": [
+        "Record cash in and cash out entries",
+        "Reconcile daily cash drawer totals",
+        "Link cash entries to sales and expenses",
+        "View your real-time cash position"
+      ]
+    },
+    "bankAccounts": {
+      "description": "Manage your company's bank accounts and balances.",
+      "capabilities": [
+        "Track balances across multiple bank accounts",
+        "Record deposits, withdrawals, and transfers",
+        "Reconcile against bank statements",
+        "View account activity over any date range"
+      ]
+    },
+    "expenses": {
+      "description": "Record and categorize your business expenses.",
+      "capabilities": [
+        "Log expenses by category and vendor",
+        "Attach receipts to expense records",
+        "Track recurring expenses automatically",
+        "Break down spending in expense reports"
+      ]
+    },
+    "revenue": {
+      "description": "Track income across every revenue stream in your business.",
+      "capabilities": [
+        "View revenue broken down by source",
+        "Compare revenue across custom date ranges",
+        "Link revenue entries to sales and invoices",
+        "Export revenue data for accounting"
+      ]
+    },
+    "journalEntries": {
+      "description": "Record manual accounting entries for full double-entry bookkeeping.",
+      "capabilities": [
+        "Create balanced debit and credit entries",
+        "Post entries to a chart of accounts",
+        "Review and approve entries before posting",
+        "Generate a general ledger from journal history"
+      ]
+    },
+    "employees": {
+      "description": "Manage your team's employee records in one place.",
+      "capabilities": [
+        "Maintain employee profiles and contracts",
+        "Track roles, departments, and start dates",
+        "Link employees to payroll and attendance",
+        "Store employee documents securely"
+      ]
+    },
+    "payroll": {
+      "description": "Calculate and process employee pay each period.",
+      "capabilities": [
+        "Run payroll for custom pay periods",
+        "Automatically apply deductions and bonuses",
+        "Generate payslips for every employee",
+        "Export payroll data for accounting"
+      ]
+    },
+    "attendance": {
+      "description": "Track employee clock-ins, clock-outs, and work hours.",
+      "capabilities": [
+        "Record daily check-in and check-out times",
+        "Flag late arrivals and early departures",
+        "Summarize hours worked per pay period",
+        "Feed attendance data directly into payroll"
+      ]
+    },
+    "leave": {
+      "description": "Manage employee leave requests and balances.",
+      "capabilities": [
+        "Submit and approve leave requests",
+        "Track leave balances by type and employee",
+        "View a team-wide leave calendar",
+        "Set custom leave policies per role"
+      ]
+    },
+    "salesReports": {
+      "description": "Deep-dive analytics on sales performance over time.",
+      "capabilities": [
+        "Break down revenue by product, customer, or period",
+        "Compare performance across custom date ranges",
+        "Spot seasonal sales trends",
+        "Export detailed sales reports"
+      ]
+    },
+    "inventoryReports": {
+      "description": "Detailed reporting on stock levels, turnover, and value.",
+      "capabilities": [
+        "Track stock value trends over time",
+        "Identify slow-moving and fast-moving products",
+        "Monitor stockout and overstock risk",
+        "Export inventory reports for planning"
+      ]
+    },
+    "profitReports": {
+      "description": "Understand true profitability across products and periods.",
+      "capabilities": [
+        "Break down gross margin by product or category",
+        "Compare profit across custom date ranges",
+        "Factor in cost of goods sold automatically",
+        "Export profit reports for stakeholders"
+      ]
+    },
+    "customerReports": {
+      "description": "Insights into customer value, retention, and buying behavior.",
+      "capabilities": [
+        "Rank customers by lifetime value",
+        "Track repeat purchase rates",
+        "Segment customers by behavior or spend",
+        "Export customer insights for marketing"
+      ]
+    },
+    "financialReports": {
+      "description": "Company-wide financial statements at a glance.",
+      "capabilities": [
+        "Generate profit & loss statements",
+        "View balance sheets by period",
+        "Track cash flow across the business",
+        "Export statements for accountants and investors"
+      ]
+    },
+    "company": {
+      "description": "Manage your company's core profile and business details.",
+      "capabilities": [
+        "Update company name, logo, and contact details",
+        "Configure business type and industry",
+        "Set your default operating country",
+        "Manage company-wide branding"
+      ]
+    },
+    "users": {
+      "description": "Manage your team's accounts and access.",
+      "capabilities": [
+        "Invite and manage team members",
+        "Assign roles to control access",
+        "Suspend or remove accounts",
+        "Review member activity and login history"
+      ]
+    },
+    "rolesPermissions": {
+      "description": "Fine-tune exactly what each role can see and do.",
+      "capabilities": [
+        "Create custom roles beyond the defaults",
+        "Toggle permissions per module and action",
+        "Preview access as any given role",
+        "Audit permission changes over time"
+      ]
+    },
+    "taxes": {
+      "description": "Configure tax rates and rules applied to your sales and purchases.",
+      "capabilities": [
+        "Define multiple tax rates and rules",
+        "Apply taxes automatically by product or region",
+        "Generate tax summary reports",
+        "Stay ready for tax filing periods"
+      ]
+    },
+    "currencies": {
+      "description": "Manage the currencies your business operates in.",
+      "capabilities": [
+        "Support multiple currencies across sales and purchases",
+        "Set and update exchange rates",
+        "Choose a default currency per company",
+        "View reports converted to a base currency"
+      ]
+    },
+    "units": {
+      "description": "Define the units of measure used across your product catalog.",
+      "capabilities": [
+        "Create custom units beyond the built-in defaults",
+        "Set conversion rates between related units",
+        "Assign default units per product category",
+        "Keep inventory counts consistent across units"
+      ]
+    },
+    "numbering": {
+      "description": "Customize the numbering format for invoices, orders, and other documents.",
+      "capabilities": [
+        "Set custom prefixes and number sequences",
+        "Configure per-document numbering formats",
+        "Reset or adjust sequences per fiscal year",
+        "Preview generated numbers before saving"
+      ]
+    },
+    "integrations": {
+      "description": "Connect Smart ERP with the other tools your business relies on.",
+      "capabilities": [
+        "Connect payment and accounting providers",
+        "Sync data with e-commerce platforms",
+        "Set up webhooks for custom workflows",
+        "Manage API keys for external access"
+      ]
+    },
+    "backupRestore": {
+      "description": "Protect your business data with backups you control.",
+      "capabilities": [
+        "Schedule automatic recurring backups",
+        "Download on-demand backup snapshots",
+        "Restore your company data to a previous point",
+        "Review a full history of backup activity"
+      ]
+    },
+    "systemPreferences": {
+      "description": "Fine-tune system-wide defaults for how Smart ERP behaves.",
+      "capabilities": [
+        "Set default date, time, and number formats",
+        "Configure default language and timezone",
+        "Adjust notification preferences",
+        "Manage system-wide feature toggles"
+      ]
+    }
   }
 }

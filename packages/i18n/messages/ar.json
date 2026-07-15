@@ -13,7 +13,33 @@
     "back": "رجوع",
     "next": "التالي",
     "yes": "نعم",
-    "no": "لا"
+    "no": "لا",
+    "accessDeniedTitle": "ليست لديك صلاحية الوصول إلى هذا القسم",
+    "accessDeniedDescription": "اطلب من مالك الشركة أو المدير منحك هذه الصلاحية.",
+    "pleaseTryAgain": "يرجى المحاولة مرة أخرى.",
+    "exportCsv": "تصدير CSV",
+    "importCsv": "استيراد CSV",
+    "actions": "الإجراءات",
+    "openActions": "فتح الإجراءات",
+    "saving": "جارٍ الحفظ…",
+    "deleting": "جارٍ الحذف…",
+    "saveChanges": "حفظ التغييرات",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "address": "العنوان",
+    "notes": "ملاحظات",
+    "note": "ملاحظة",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "product": "المنتج",
+    "methodCash": "نقداً",
+    "methodCard": "بطاقة",
+    "methodTransfer": "حوالة بنكية",
+    "methodOther": "أخرى",
+    "paymentStatusPaid": "مدفوعة",
+    "paymentStatusPartial": "مدفوعة جزئياً",
+    "paymentStatusUnpaid": "غير مدفوعة"
   },
   "language": {
     "switch": "اللغة",
@@ -34,6 +60,44 @@
     "reports": "التقارير",
     "aiAssistant": "المساعد الذكي",
     "settings": "الإعدادات",
+    "purchasing": "المشتريات",
+    "productsInventory": "المنتجات والمخزون",
+    "finance": "المالية",
+    "employees": "الموظفون",
+    "returns": "المرتجعات",
+    "quotations": "عروض الأسعار",
+    "suppliers": "الموردون",
+    "purchaseOrders": "أوامر الشراء",
+    "purchaseInvoices": "فواتير المشتريات",
+    "supplierPayments": "مدفوعات الموردين",
+    "categories": "الفئات",
+    "inventoryMovements": "حركات المخزون",
+    "stockCount": "جرد المخزون",
+    "contacts": "جهات الاتصال",
+    "customerHistory": "سجل العملاء",
+    "cash": "النقدية",
+    "bankAccounts": "الحسابات البنكية",
+    "expenses": "المصروفات",
+    "revenue": "الإيرادات",
+    "journalEntries": "قيود اليومية",
+    "payroll": "الرواتب",
+    "attendance": "الحضور والانصراف",
+    "leave": "الإجازات",
+    "salesReports": "تقارير المبيعات",
+    "inventoryReports": "تقارير المخزون",
+    "profitReports": "تقارير الأرباح",
+    "customerReports": "تقارير العملاء",
+    "financialReports": "التقارير المالية",
+    "company": "الشركة",
+    "users": "المستخدمون",
+    "rolesPermissions": "الأدوار والصلاحيات",
+    "taxes": "الضرائب",
+    "currencies": "العملات",
+    "units": "الوحدات",
+    "numbering": "الترقيم",
+    "integrations": "التكاملات",
+    "backupRestore": "النسخ الاحتياطي والاستعادة",
+    "systemPreferences": "تفضيلات النظام",
     "groupOverview": "نظرة عامة",
     "groupOperations": "العمليات",
     "groupInsights": "التحليلات"
@@ -64,7 +128,43 @@
     "createAccountButton": "إنشاء الحساب",
     "creatingAccount": "جارٍ الإنشاء…",
     "alreadyHaveAccount": "لديك حساب بالفعل؟",
-    "signInLink": "تسجيل الدخول"
+    "signInLink": "تسجيل الدخول",
+    "loginFailed": "فشل تسجيل الدخول",
+    "registrationFailed": "فشل إنشاء الحساب",
+    "invalidInviteTitle": "رابط الدعوة غير صالح",
+    "invalidInviteDescription": "هذا الرابط لا يحتوي على رمز الدعوة.",
+    "goToSignIn": "الذهاب إلى تسجيل الدخول",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين.",
+    "invitationAccepted": "تم قبول الدعوة",
+    "signInToGetStarted": "سجّل الدخول للبدء.",
+    "acceptInviteFailed": "فشل قبول الدعوة",
+    "acceptInvitationTitle": "قبول الدعوة",
+    "acceptInvitationDescription": "اختر كلمة مرور للانضمام إلى شركتك.",
+    "joining": "جارٍ الانضمام…",
+    "checkYourEmail": "تحقق من بريدك الإلكتروني",
+    "checkYourEmailDescription": "إذا كان هناك حساب مرتبط بـ {{email}}، فقد أرسلنا رابط إعادة تعيين كلمة المرور.",
+    "backToSignIn": "العودة إلى تسجيل الدخول",
+    "forgotPasswordTitle": "نسيت كلمة المرور",
+    "forgotPasswordDescription": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.",
+    "sending": "جارٍ الإرسال…",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "invalidResetTitle": "رابط إعادة التعيين غير صالح",
+    "invalidResetDescription": "هذا الرابط لا يحتوي على رمز إعادة التعيين.",
+    "requestNewLink": "طلب رابط جديد",
+    "passwordReset": "تمت إعادة تعيين كلمة المرور",
+    "signInWithNewPassword": "سجّل الدخول بكلمة المرور الجديدة.",
+    "resetPasswordFailed": "فشل إعادة تعيين كلمة المرور",
+    "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+    "resetPasswordDescription": "اختر كلمة مرور جديدة لحسابك.",
+    "newPasswordLabel": "كلمة المرور الجديدة",
+    "confirmNewPasswordLabel": "تأكيد كلمة المرور الجديدة",
+    "resetting": "جارٍ إعادة التعيين…",
+    "invalidVerificationTitle": "رابط التحقق غير صالح",
+    "invalidVerificationDescription": "هذا الرابط لا يحتوي على رمز التحقق.",
+    "verificationFailedTitle": "فشل التحقق",
+    "emailVerifiedTitle": "تم التحقق من البريد الإلكتروني",
+    "emailVerifiedDescription": "تم تأكيد عنوان بريدك الإلكتروني."
   },
   "marketing": {
     "heroTitle": "أدر أعمالك من مكان واحد",
@@ -93,6 +193,28 @@
     "downloadPdf": "تحميل PDF",
     "sendWhatsApp": "إرسال عبر واتساب",
     "whatsAppMessage": "السلام عليكم،\nهذه فاتورتك من متجر {{company}}.\nرقم الفاتورة: {{number}}\nالإجمالي: {{total}}\nشكراً لتعاملك معنا"
+  },
+  "invoices": {
+    "title": "الفواتير",
+    "subtitle": "يتم إصدار الفواتير تلقائياً عند إتمام عملية بيع.",
+    "couldNotLoad": "تعذّر تحميل الفواتير",
+    "noInvoicesYet": "لا توجد فواتير بعد",
+    "noStatusIssued": "لا توجد فواتير غير مسددة",
+    "noStatusPaid": "لا توجد فواتير مسددة",
+    "tryDifferentStatusFilter": "جرّب فلتر حالة مختلف.",
+    "emptyDescription": "يتم إصدار الفواتير تلقائياً عند إتمام عملية بيع — أتمم عملية بيع لتظهر هنا.",
+    "goToSales": "الذهاب إلى المبيعات",
+    "markedPaid": "تم تحديد الفاتورة كمسددة",
+    "markPaidFailed": "فشل تحديد الفاتورة كمسددة",
+    "markPaid": "تحديد كمسددة",
+    "marking": "جارٍ التحديد…",
+    "issueDate": "تاريخ الإصدار",
+    "dueDate": "تاريخ الاستحقاق",
+    "total": "الإجمالي",
+    "viewInvoice": "عرض الفاتورة",
+    "allStatuses": "كل الحالات",
+    "issuedOn": "صدرت في {{date}}",
+    "loadingDetails": "جارٍ تحميل تفاصيل الفاتورة…"
   },
   "customers": {
     "backToCustomers": "الرجوع إلى العملاء",
@@ -129,9 +251,364 @@
     "recordPaymentSuccess": "تم تسجيل الدفعة",
     "recordPaymentError": "تعذر تسجيل الدفعة",
     "amountRequired": "أدخل مبلغاً أكبر من صفر.",
-    "amountExceedsRemaining": "لا يمكن أن يتجاوز المبلغ الرصيد المتبقي."
+    "amountExceedsRemaining": "لا يمكن أن يتجاوز المبلغ الرصيد المتبقي.",
+    "title": "العملاء",
+    "subtitle": "إدارة سجلات عملائك.",
+    "couldNotLoad": "تعذر تحميل العملاء",
+    "noMatch": "لا يوجد عملاء مطابقون لبحثك",
+    "addFirst": "أضف أول عميل لك",
+    "tryDifferentSearch": "جرّب كلمة بحث مختلفة.",
+    "emptyDescription": "تتبّع من تبيع لهم — أضف عميلاً للبدء.",
+    "addCustomer": "إضافة عميل",
+    "createCustomerButton": "إنشاء العميل",
+    "searchPlaceholder": "البحث بالاسم أو الهاتف أو البريد الإلكتروني…",
+    "created": "تاريخ الإنشاء",
+    "debtAndPayments": "الديون والمدفوعات",
+    "nameRequired": "الاسم مطلوب.",
+    "emailInvalid": "أدخل بريداً إلكترونياً صحيحاً.",
+    "customerUpdated": "تم تحديث العميل",
+    "customerCreated": "تم إنشاء العميل",
+    "updateFailed": "تعذر تحديث العميل",
+    "createFailed": "تعذر إنشاء العميل",
+    "editCustomer": "تعديل العميل",
+    "updateDescription": "تحديث بيانات هذا العميل.",
+    "createDescription": "إنشاء سجل عميل جديد.",
+    "customerDeleted": "تم حذف العميل",
+    "deleteFailed": "تعذر حذف العميل",
+    "deleteCustomerTitle": "حذف العميل",
+    "deleteCustomerDescription": "سيؤدي هذا إلى حذف «{{name}}» نهائياً. لا يمكن التراجع عن هذا الإجراء."
+  },
+  "products": {
+    "title": "المنتجات",
+    "subtitle": "إدارة كتالوج منتجاتك.",
+    "searchPlaceholder": "البحث بالاسم أو رمز المنتج…",
+    "addProduct": "إضافة منتج",
+    "editProduct": "تعديل المنتج",
+    "updateDescription": "تحديث بيانات هذا المنتج.",
+    "createDescription": "إنشاء منتج جديد في الكتالوج.",
+    "nameRequired": "الاسم مطلوب.",
+    "purchasePriceInvalid": "أدخل سعر شراء صحيح.",
+    "sellingPriceInvalid": "أدخل سعر بيع صحيح.",
+    "lowStockInvalid": "يجب أن يكون صفراً أو أكبر.",
+    "openingQuantityInvalid": "يجب أن يكون رقماً صحيحاً، صفراً أو أكبر.",
+    "productUpdated": "تم تحديث المنتج",
+    "productCreated": "تم إنشاء المنتج",
+    "updateFailed": "تعذر تحديث المنتج",
+    "createFailed": "تعذر إنشاء المنتج",
+    "basicInfoSection": "المعلومات الأساسية",
+    "pricingSection": "التسعير",
+    "inventorySection": "المخزون",
+    "sku": "رمز المنتج",
+    "category": "التصنيف",
+    "noCategory": "بدون تصنيف",
+    "newCategory": "تصنيف جديد",
+    "purchasePrice": "سعر الشراء",
+    "sellingPrice": "سعر البيع",
+    "unit": "الوحدة",
+    "unitHint": "مثال: قطعة، كجم، صندوق",
+    "openingQuantity": "الكمية الحالية",
+    "openingQuantityHint": "الكمية التي تبدأ بها — تُسجَّل كحركة شراء.",
+    "quantityOnHand": "الكمية المتوفرة",
+    "lowStockThreshold": "حد المخزون المنخفض",
+    "description": "الوصف",
+    "createProductButton": "إنشاء المنتج",
+    "couldNotLoad": "تعذر تحميل المنتجات",
+    "noMatch": "لا توجد منتجات مطابقة لبحثك",
+    "addFirst": "أضف أول منتج لك",
+    "tryDifferentSearch": "جرّب كلمة بحث مختلفة.",
+    "emptyDescription": "الكتالوج فارغ — أضف منتجاً لبدء تتبع المخزون والمبيعات.",
+    "price": "السعر",
+    "stock": "المخزون",
+    "lowStock": "مخزون منخفض",
+    "categoryNameRequired": "اسم التصنيف مطلوب.",
+    "categoryCreated": "تم إنشاء التصنيف",
+    "categoryCreateFailed": "تعذر إنشاء التصنيف",
+    "newCategoryDescription": "أضف تصنيفاً لتنظيم منتجاتك.",
+    "categoryName": "اسم التصنيف",
+    "creatingCategory": "جارٍ الإنشاء…",
+    "createCategory": "إنشاء التصنيف",
+    "productDeleted": "تم حذف المنتج",
+    "deleteFailed": "تعذر حذف المنتج",
+    "deleteProductTitle": "حذف المنتج",
+    "deleteProductDescription": "سيؤدي هذا إلى حذف «{{name}}» نهائياً. لا يمكن التراجع عن هذا الإجراء.",
+    "importTitle": "استيراد المنتجات من ملف CSV",
+    "importDescription": "إضافة عدة منتجات دفعة واحدة من جدول بيانات — يدعم الكتالوجات الكبيرة، ويتحقق من البيانات قبل الاستيراد.",
+    "downloadTemplate": "تحميل نموذج CSV",
+    "requiredColumns": "الأعمدة المطلوبة: الاسم، سعر الشراء، سعر البيع.",
+    "optionalColumns": "اختياري: رمز المنتج، التصنيف، الوحدة، الكمية الحالية، حد المخزون المنخفض، الوصف.",
+    "chooseFile": "اختيار ملف CSV",
+    "rowsFound": "تم العثور على {{count}} صف.",
+    "readyToImport": "جاهز للاستيراد",
+    "haveErrors": "به أخطاء",
+    "row": "الصف",
+    "validRow": "صحيح",
+    "showingFirst": "عرض أول {{shown}} من أصل {{total}} صف — سيتم التحقق من جميع الصفوف الـ {{total}} واستيرادها.",
+    "importingProgress": "جارٍ الاستيراد: {{done}} من {{total}}…",
+    "productsCreatedCount": "منتج تم إنشاؤه.",
+    "rowsFailedCount": "صف فشل.",
+    "error": "الخطأ",
+    "chooseDifferentFile": "اختيار ملف آخر",
+    "importCount": "استيراد {{count}} منتج",
+    "done": "تم",
+    "rowNameRequired": "الاسم مطلوب.",
+    "rowPurchasePriceInvalid": "يجب أن يكون سعر الشراء رقماً أكبر من أو يساوي 0.",
+    "rowSellingPriceInvalid": "يجب أن يكون سعر البيع رقماً أكبر من أو يساوي 0.",
+    "rowOpeningQuantityInvalid": "يجب أن تكون الكمية الحالية رقماً صحيحاً أكبر من أو يساوي 0.",
+    "rowLowStockInvalid": "يجب أن يكون حد المخزون المنخفض رقماً صحيحاً أكبر من أو يساوي 0.",
+    "duplicateSku": "رمز المنتج «{{sku}}» مكرر في مكان آخر من هذا الملف.",
+    "importRequestFailed": "فشل طلب الاستيراد.",
+    "statusActive": "نشط",
+    "statusInactive": "غير نشط",
+    "statusDiscontinued": "متوقف"
+  },
+  "inventory": {
+    "title": "المخزون",
+    "subtitle": "تتبّع حركات المخزون وتسجيل التعديلات اليدوية.",
+    "couldNotLoad": "تعذر تحميل حركات المخزون",
+    "noMovementsForProduct": "لا توجد حركات لهذا المنتج",
+    "noMovementsYet": "لا توجد حركات مخزون بعد",
+    "tryDifferentFilter": "جرّب فلترة منتج مختلف.",
+    "emptyDescription": "تظهر الحركات هنا عند شراء المخزون أو بيعه أو تعديله — سجّل تعديلاً يدوياً للبدء.",
+    "recordAdjustment": "تسجيل تعديل",
+    "selectProductError": "اختر منتجاً.",
+    "nonZeroError": "أدخل رقماً صحيحاً غير صفري.",
+    "positiveQuantityError": "يجب أن تكون كمية {{type}} موجبة.",
+    "adjustmentRecorded": "تم تسجيل التعديل",
+    "adjustmentFailed": "تعذر تسجيل التعديل",
+    "newAdjustmentTitle": "تعديل مخزون جديد",
+    "newAdjustmentDescription": "يسجّل حركة جديدة في سجل المخزون — لا يمكن تعديل الحركات الحالية.",
+    "selectProduct": "اختر منتجاً",
+    "type": "النوع",
+    "quantity": "الكمية",
+    "quantityChangeSigned": "تغيّر الكمية (+/-)",
+    "quantityChangeHint": "الرقم السالب يقلل المخزون، والموجب يزيده.",
+    "allProducts": "كل المنتجات",
+    "newAdjustment": "تعديل جديد",
+    "lowStockCount": "مخزون منخفض ({{count}})",
+    "onHand": "متوفر",
+    "reference": "المرجع",
+    "typePurchase": "شراء",
+    "typeSale": "بيع",
+    "typeAdjustment": "تعديل",
+    "typeReturn": "مرتجع"
+  },
+  "sales": {
+    "title": "المبيعات",
+    "subtitle": "أنشئ مبيعات مبدئية وأكملها لإصدار الفواتير.",
+    "saleCompleted": "تم إتمام البيع",
+    "invoiceGenerated": "تم إصدار الفاتورة {{number}}.",
+    "completeFailed": "تعذر إتمام البيع",
+    "walkIn": "عميل نقدي",
+    "couldNotLoad": "تعذر تحميل المبيعات",
+    "noStatusSalesDraft": "لا توجد مبيعات مبدئية",
+    "noStatusSalesCompleted": "لا توجد مبيعات مكتملة",
+    "noStatusSalesCancelled": "لا توجد مبيعات ملغاة",
+    "recordFirstSale": "سجّل أول عملية بيع لك",
+    "tryDifferentStatusFilter": "جرّب فلترة حالة مختلفة.",
+    "emptyDescription": "تقلل المبيعات التي تنشئها هنا المخزون وتُصدر فواتير عند إتمامها.",
+    "createSale": "إنشاء عملية بيع",
+    "saleCancelled": "تم إلغاء البيع",
+    "cancelFailed": "تعذر إلغاء البيع",
+    "cancelSaleTitle": "إلغاء البيع",
+    "cancelSaleDescription": "سيؤدي هذا إلى إلغاء عملية البيع المبدئية هذه (الإجمالي {{amount}}). لا يمكن التراجع عن هذا الإجراء.",
+    "keepSale": "الاحتفاظ بالبيع",
+    "cancelling": "جارٍ الإلغاء…",
+    "each": "لكل وحدة",
+    "decreaseQuantity": "تقليل الكمية",
+    "increaseQuantity": "زيادة الكمية",
+    "removeItem": "إزالة العنصر",
+    "searchPlaceholder": "البحث بالاسم أو رمز المنتج — أو مسح الباركود",
+    "outOfStock": "نفد من المخزون",
+    "inStock": "{{quantity}} {{unit}} متوفر",
+    "noMatchingProducts": "لا توجد منتجات مطابقة.",
+    "addCustomerFailed": "تعذرت إضافة العميل",
+    "addAtLeastOneProduct": "أضف منتجاً واحداً على الأقل.",
+    "saleCreatedDraft": "تم إنشاء البيع كمسودة",
+    "createFailed": "تعذر إنشاء عملية البيع",
+    "savedAsDraftTitle": "تم حفظ البيع كمسودة — تعذر إتمامه",
+    "newSale": "عملية بيع جديدة",
+    "newSaleDescription": "ابحث عن منتج أو امسحه لإضافته، ثم أتمم عملية البيع.",
+    "walkInCustomer": "عميل نقدي",
+    "customer": "العميل",
+    "newCustomer": "عميل جديد",
+    "add": "إضافة",
+    "paymentMethod": "طريقة الدفع",
+    "paymentStatus": "حالة الدفع",
+    "noProductsYet": "لا توجد منتجات بعد",
+    "addProductBeforeSale": "أضف منتجاً قبل إنشاء عملية بيع.",
+    "goToProducts": "الذهاب إلى المنتجات",
+    "cartEmpty": "السلة فارغة — ابحث أعلاه لإضافة المنتجات.",
+    "discountTotal": "إجمالي الخصم",
+    "taxTotal": "إجمالي الضريبة",
+    "estimatedTotal": "الإجمالي التقديري:",
+    "estimatedTotalHint": "(يحتسب الخادم الإجمالي الفعلي بناءً على الأسعار الحالية)",
+    "saveAsDraft": "حفظ كمسودة",
+    "completing": "جارٍ الإتمام…",
+    "completeSale": "إتمام البيع",
+    "total": "الإجمالي",
+    "payment": "الدفع",
+    "complete": "إتمام",
+    "allStatuses": "كل الحالات",
+    "newSaleButton": "عملية بيع جديدة",
+    "statusDraft": "مسودة",
+    "statusCompleted": "مكتملة",
+    "statusCancelled": "ملغاة"
+  },
+  "reports": {
+    "title": "التقارير",
+    "subtitle": "تحليلات للقراءة فقط عبر المبيعات والمنتجات والعملاء والمخزون.",
+    "navOverview": "نظرة عامة",
+    "navDailyClose": "الإغلاق اليومي",
+    "navSales": "المبيعات",
+    "navProducts": "المنتجات",
+    "navCustomers": "العملاء",
+    "navInventory": "المخزون",
+    "presetToday": "اليوم",
+    "presetThisWeek": "هذا الأسبوع",
+    "presetThisMonth": "هذا الشهر",
+    "presetLastMonth": "الشهر الماضي",
+    "presetThisYear": "هذه السنة",
+    "from": "من",
+    "to": "إلى",
+    "topN": "أعلى عدد",
+    "clear": "مسح",
+    "couldNotLoadOverview": "تعذّر تحميل النظرة العامة",
+    "revenueThisMonth": "إيرادات هذا الشهر",
+    "salesThisMonth": "مبيعات هذا الشهر",
+    "totalCustomers": "إجمالي العملاء",
+    "activeProducts": "المنتجات النشطة",
+    "lowStockItems": "عناصر منخفضة المخزون",
+    "couldNotLoadSales": "تعذّر تحميل تقرير المبيعات",
+    "totalRevenue": "إجمالي الإيرادات",
+    "totalSales": "إجمالي المبيعات",
+    "averageSaleValue": "متوسط قيمة البيع",
+    "noSalesInRange": "لا توجد مبيعات مكتملة في هذا النطاق",
+    "tryWideningRange": "جرّب توسيع النطاق الزمني.",
+    "revenue": "الإيرادات",
+    "couldNotLoadProducts": "تعذّر تحميل تقرير المنتجات",
+    "quantitySold": "الكمية المباعة",
+    "estimatedProfit": "الربح التقديري",
+    "couldNotLoadCustomers": "تعذّر تحميل تقرير العملاء",
+    "noAttributedSales": "لا توجد مبيعات منسوبة في هذا النطاق",
+    "walkInExcluded": "مبيعات العملاء النقديين بدون عميل محدد لا تُحتسب هنا.",
+    "customer": "العميل",
+    "totalSpent": "إجمالي الإنفاق",
+    "purchases": "عدد المشتريات",
+    "couldNotLoadInventory": "تعذّر تحميل تقرير المخزون",
+    "totalProducts": "إجمالي المنتجات",
+    "unitsInStock": "الوحدات في المخزون",
+    "stockValue": "قيمة المخزون",
+    "nothingLowOnStock": "لا يوجد عناصر منخفضة المخزون",
+    "allAboveThreshold": "جميع المنتجات أعلى من الحد الأدنى المحدد.",
+    "onHand": "الكمية المتوفرة",
+    "threshold": "الحد الأدنى",
+    "couldNotLoadDailyClose": "تعذّر تحميل تقرير الإغلاق اليومي",
+    "completedSalesCount": "{{count}} عملية بيع مكتملة",
+    "cashSales": "المبيعات النقدية",
+    "cashSalesDescription": "مدفوعة بالكامل وقت البيع",
+    "creditSales": "المبيعات الآجلة",
+    "creditSalesDescription": "متبقية جزئياً أو غير مسددة",
+    "paymentsCollected": "المدفوعات المحصّلة",
+    "paymentsCollectedDescription": "تشمل الديون المحصّلة من مبيعات سابقة",
+    "noSalesOnDate": "لا توجد مبيعات مكتملة في هذا التاريخ."
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "إدارة معلومات الشركة وأعضاء الفريق.",
+    "couldNotLoadCompany": "تعذّر تحميل معلومات الشركة",
+    "companyInfoTitle": "معلومات الشركة",
+    "companyName": "اسم الشركة",
+    "businessType": "نوع النشاط",
+    "country": "الدولة",
+    "currency": "العملة",
+    "plan": "الخطة",
+    "subscriptionStatus": "حالة الاشتراك",
+    "membersTitle": "الأعضاء",
+    "inviteMember": "دعوة عضو",
+    "couldNotLoadMembers": "تعذّر تحميل الأعضاء",
+    "noMembersYet": "لا يوجد أعضاء بعد",
+    "inviteTeamToStart": "ادعُ فريقك للبدء.",
+    "memberHeader": "العضو",
+    "roleHeader": "الدور",
+    "roleOwner": "مالك",
+    "roleManager": "مدير",
+    "roleAccountant": "محاسب",
+    "roleEmployee": "موظف",
+    "resendInvitation": "إعادة إرسال الدعوة",
+    "changeRole": "تغيير الدور",
+    "remove": "إزالة",
+    "invitationResent": "تم إعادة إرسال الدعوة",
+    "invitationResentDescription": "تم إرسال رابط دعوة جديد إلى {{email}}.",
+    "resendInviteFailed": "فشل إعادة إرسال الدعوة",
+    "statusActive": "نشط",
+    "statusInvited": "مدعو",
+    "statusSuspended": "موقوف",
+    "inviteMemberTitle": "دعوة عضو جديد",
+    "inviteMemberDescription": "سيتلقون بريداً إلكترونياً برابط للانضمام إلى شركتك.",
+    "invalidEmail": "أدخل بريداً إلكترونياً صحيحاً.",
+    "invitationSent": "تم إرسال الدعوة",
+    "inviteFailed": "فشل دعوة العضو",
+    "sendInvite": "إرسال الدعوة",
+    "sending": "جارٍ الإرسال…",
+    "changeRoleTitle": "تغيير الدور",
+    "changeRoleDescription": "تحديث دور {{name}}.",
+    "roleUpdated": "تم تحديث الدور",
+    "updateRoleFailed": "فشل تحديث الدور",
+    "removeMemberTitle": "إزالة العضو",
+    "removeMemberDescription": "سيؤدي هذا إلى إزالة {{name}} من شركتك. سيفقدون الوصول فوراً.",
+    "memberRemoved": "تمت إزالة العضو",
+    "removeMemberFailed": "فشل إزالة العضو",
+    "removing": "جارٍ الإزالة…",
+    "editCompanyTitle": "تعديل معلومات الشركة",
+    "editCompanyDescription": "تنطبق هذه التفاصيل على شركتك بالكامل.",
+    "companyNameRequired": "اسم الشركة مطلوب.",
+    "companyUpdated": "تم تحديث الشركة",
+    "updateCompanyFailed": "فشل تحديث الشركة",
+    "selectCurrency": "اختر العملة",
+    "logoUrl": "رابط الشعار"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "subtitle": "إدارة معلوماتك الشخصية وأمان حسابك.",
+    "couldNotLoadProfile": "تعذّر تحميل ملفك الشخصي",
+    "personalInfo": "المعلومات الشخصية",
+    "emailChangeHint": "تواصل مع الدعم لتغيير بريدك الإلكتروني.",
+    "fullName": "الاسم الكامل",
+    "fullNameRequired": "يجب أن يتكون الاسم الكامل من حرفين على الأقل.",
+    "profileUpdated": "تم تحديث الملف الشخصي",
+    "updateProfileFailed": "فشل تحديث الملف الشخصي",
+    "changePasswordTitle": "تغيير كلمة المرور",
+    "changePasswordDescription": "سيتم تسجيل خروجك من جميع الجلسات بعد تغيير كلمة المرور.",
+    "currentPassword": "كلمة المرور الحالية",
+    "currentPasswordRequired": "أدخل كلمة المرور الحالية.",
+    "newPassword": "كلمة المرور الجديدة",
+    "newPasswordHint": "8 أحرف على الأقل.",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين.",
+    "passwordChanged": "تم تغيير كلمة المرور",
+    "passwordChangedDescription": "تم تسجيل خروجك من جميع الجلسات. يرجى تسجيل الدخول مرة أخرى.",
+    "changePasswordFailed": "فشل تغيير كلمة المرور",
+    "changing": "جارٍ التغيير…",
+    "changePasswordButton": "تغيير كلمة المرور"
   },
   "dashboard": {
+    "welcomeBack": "مرحباً بعودتك",
+    "goodMorning": "صباح الخير",
+    "goodAfternoon": "طاب يومك",
+    "goodEvening": "مساء الخير",
+    "openMenu": "فتح القائمة",
+    "navigationLabel": "التنقل",
+    "stepCreateProduct": "أنشئ منتجك الأول",
+    "stepCreateCustomer": "أنشئ عميلك الأول",
+    "stepCreateSale": "أنشئ عملية بيعك الأولى",
+    "stepInviteMember": "ادعُ عضواً في الفريق",
+    "allSetUp": "كل شيء جاهز — أحسنت في البداية.",
+    "setupProgressTitle": "تقدّم الإعداد",
+    "continueSetup": "متابعة الإعداد",
+    "percentComplete": "اكتمال {{percent}}٪",
+    "recentActivity": "النشاط الأخير",
+    "noActivityTitle": "لا يوجد نشاط بعد",
+    "noActivityDescription": "ستظهر هنا أنشطة مبيعاتك وفواتيرك وعملائك ومخزونك.",
     "attentionTitle": "ما يحتاج انتباهك",
     "lowStockSectionTitle": "مخزون منخفض",
     "overdueInvoicesSectionTitle": "فواتير متأخرة",
@@ -145,10 +622,355 @@
       "newSale": "عملية بيع جديدة",
       "newCustomer": "عميل جديد",
       "newProduct": "منتج جديد"
-    }
+    },
+    "toggleTheme": "تبديل المظهر",
+    "alreadyVerified": "تم التحقق مسبقاً",
+    "verificationEmailSent": "تم إرسال بريد التحقق",
+    "alreadyVerifiedDescription": "تم التحقق من بريدك الإلكتروني مسبقاً — أعد تحميل الصفحة لتحديث هذا الشريط.",
+    "checkEmailForLink": "تحقق من {{email}} للحصول على رابط التحقق.",
+    "resendFailed": "فشل إعادة الإرسال",
+    "verifyEmailMessage": "يرجى التحقق من بريدك الإلكتروني ({{email}}) لتأمين حسابك.",
+    "sending": "جارٍ الإرسال…",
+    "sent": "تم الإرسال",
+    "resendVerificationEmail": "إعادة إرسال بريد التحقق"
   },
   "ai": {
+    "sendMessageFailed": "فشل إرسال الرسالة",
+    "askPlaceholder": "اسأل عن مبيعاتك أو مخزونك أو منتجاتك أو عملائك…",
+    "sendMessage": "إرسال الرسالة",
+    "newChat": "محادثة جديدة",
+    "noConversationsYet": "لا توجد محادثات بعد.",
+    "newConversation": "محادثة جديدة",
+    "deleteConversation": "حذف المحادثة",
+    "couldNotLoadConversation": "تعذّر تحميل هذه المحادثة",
     "askAiAssistant": "اسأل المساعد الذكي",
-    "askAiLabel": "اسأل الذكاء الاصطناعي"
+    "askAiLabel": "اسأل الذكاء الاصطناعي",
+    "askAiAssistantDescription": "اسأل عن مبيعاتك أو مخزونك أو منتجاتك أو عملائك — لن يرى إلا ما لديك صلاحية الاطلاع عليه.",
+    "dashboardCardDescription": "احصل على إجابات فورية حول مبيعاتك ومخزونك وتقاريرك وأداء عملك بشكل عام — مباشرة من لوحة التحكم.",
+    "openAssistant": "تحدّث مع المساعد"
+  },
+  "comingSoon": {
+    "badge": "قريباً",
+    "heading": "هذه الوحدة قيد التطوير.",
+    "capabilitiesHeading": "الإمكانيات المستقبلية المتوقعة",
+    "subtext": "ستكون متاحة في تحديث قادم.",
+    "backToDashboard": "العودة إلى لوحة التحكم"
+  },
+  "modules": {
+    "returns": {
+      "description": "معالجة وتتبع العناصر المرتجعة من عمليات البيع المكتملة.",
+      "capabilities": [
+        "تسجيل مرتجعات كاملة أو جزئية للمبيعات",
+        "إعادة العناصر المرتجعة إلى المخزون تلقائياً أو شطبها",
+        "استرداد المبلغ أو إضافته كرصيد لحساب العميل",
+        "الاحتفاظ بسجل كامل للمرتجعات لكل عملية بيع"
+      ]
+    },
+    "quotations": {
+      "description": "إنشاء عروض أسعار للعملاء قبل التزامهم بعملية شراء.",
+      "capabilities": [
+        "إعداد عروض أسعار تفصيلية بأسعار مخصصة",
+        "إرسال العروض إلى العملاء لاعتمادها",
+        "تحويل العرض المقبول إلى عملية بيع بنقرة واحدة",
+        "تتبع تاريخ انتهاء العروض ومتابعتها"
+      ]
+    },
+    "suppliers": {
+      "description": "إدارة الموردين الذين تشتري منهم المنتجات والمواد.",
+      "capabilities": [
+        "حفظ بيانات التواصل والدفع الخاصة بكل مورد",
+        "تتبع الأرصدة المستحقة لكل مورد",
+        "عرض سجل المشتريات الكامل لكل مورد",
+        "تقييم الموردين وتصنيفهم حسب الموثوقية"
+      ]
+    },
+    "purchaseOrders": {
+      "description": "إنشاء ومتابعة أوامر الشراء المرسلة إلى الموردين قبل وصول البضائع.",
+      "capabilities": [
+        "إعداد أوامر شراء بتواريخ تسليم متوقعة",
+        "إرسال الأوامر مباشرة إلى الموردين",
+        "تتبع حالة الأمر من المسودة حتى الاستلام",
+        "تحويل الأوامر المستلمة إلى فواتير مشتريات"
+      ]
+    },
+    "purchaseInvoices": {
+      "description": "تسجيل وإدارة الفواتير المستلمة من الموردين.",
+      "capabilities": [
+        "تسجيل فواتير الموردين مقابل أوامر الشراء",
+        "تتبع حالة السداد ومواعيد الاستحقاق",
+        "تحديث المخزون تلقائياً عند الاستلام",
+        "إنشاء سجلات مدفوعات الموردين"
+      ]
+    },
+    "supplierPayments": {
+      "description": "تتبع المدفوعات المسددة للموردين والأرصدة المستحقة.",
+      "capabilities": [
+        "تسجيل مدفوعات كاملة أو جزئية للموردين",
+        "عرض دفتر حسابات مستمر لكل مورد",
+        "الحصول على تذكيرات بالفواتير المستحقة القادمة",
+        "تصدير سجل المدفوعات لأغراض المحاسبة"
+      ]
+    },
+    "categories": {
+      "description": "تنظيم كتالوج المنتجات ضمن فئات مُهيكلة.",
+      "capabilities": [
+        "إنشاء تسلسل هرمي متداخل للفئات",
+        "تعيين المنتجات للفئات بشكل جماعي",
+        "تصفية التقارير والكتالوجات حسب الفئة",
+        "إعادة تسمية الفئات أو دمجها بأمان"
+      ]
+    },
+    "inventoryMovements": {
+      "description": "سجل مخصص وقابل للتصفية لكل حركة مخزون في عملك.",
+      "capabilities": [
+        "تصفية الحركات حسب النوع أو المنتج أو النطاق الزمني",
+        "الاطلاع على تفاصيل عملية البيع أو الشراء أو التعديل المصدر",
+        "تصدير سجل الحركات لأغراض التدقيق",
+        "رصد أي نشاط غير معتاد في المخزون بسرعة"
+      ]
+    },
+    "stockCount": {
+      "description": "مطابقة المخزون الفعلي مع الكميات المسجلة في النظام.",
+      "capabilities": [
+        "جدولة جلسات جرد دورية للمخزون",
+        "إدخال الكميات المجرودة حسب الموقع",
+        "إنشاء قيود تعديل تلقائية عند وجود فروقات",
+        "الاحتفاظ بسجل تدقيق كامل لكل عملية جرد"
+      ]
+    },
+    "contacts": {
+      "description": "إدارة جهات الاتصال الإضافية المرتبطة بعملائك.",
+      "capabilities": [
+        "إضافة عدة جهات اتصال لكل حساب عميل",
+        "تتبع الأدوار مثل جهة اتصال الفوترة أو الشراء",
+        "التواصل مع جهات الاتصال مباشرة من ملف العميل",
+        "استيراد جهات الاتصال دفعة واحدة"
+      ]
+    },
+    "customerHistory": {
+      "description": "خط زمني موحّد لكل تفاعل عبر جميع عملائك.",
+      "capabilities": [
+        "تصفح المبيعات والمدفوعات والمراسلات في خط زمني واحد",
+        "تصفية السجل حسب العميل أو التاريخ أو نوع النشاط",
+        "رصد أنماط الشراء عبر قاعدة عملائك",
+        "تصدير السجل لأغراض إعداد التقارير"
+      ]
+    },
+    "cash": {
+      "description": "تتبع النقدية المتوفرة وحركات النقد اليومية.",
+      "capabilities": [
+        "تسجيل حركات النقد الوارد والصادر",
+        "مطابقة إجمالي درج النقدية يومياً",
+        "ربط قيود النقد بالمبيعات والمصروفات",
+        "الاطلاع على وضع النقدية الحالي فورياً"
+      ]
+    },
+    "bankAccounts": {
+      "description": "إدارة الحسابات البنكية لشركتك وأرصدتها.",
+      "capabilities": [
+        "تتبع الأرصدة عبر عدة حسابات بنكية",
+        "تسجيل الإيداعات والسحوبات والتحويلات",
+        "المطابقة مع كشوف الحساب البنكي",
+        "عرض نشاط الحساب خلال أي نطاق زمني"
+      ]
+    },
+    "expenses": {
+      "description": "تسجيل مصروفات عملك وتصنيفها.",
+      "capabilities": [
+        "تسجيل المصروفات حسب الفئة والمورد",
+        "إرفاق الإيصالات بسجلات المصروفات",
+        "تتبع المصروفات المتكررة تلقائياً",
+        "تحليل الإنفاق ضمن تقارير المصروفات"
+      ]
+    },
+    "revenue": {
+      "description": "تتبع الدخل عبر كل مصادر الإيرادات في عملك.",
+      "capabilities": [
+        "عرض الإيرادات مقسّمة حسب المصدر",
+        "مقارنة الإيرادات عبر نطاقات زمنية مخصصة",
+        "ربط قيود الإيرادات بالمبيعات والفواتير",
+        "تصدير بيانات الإيرادات لأغراض المحاسبة"
+      ]
+    },
+    "journalEntries": {
+      "description": "تسجيل قيود محاسبية يدوية لنظام قيد مزدوج كامل.",
+      "capabilities": [
+        "إنشاء قيود مدينة ودائنة متوازنة",
+        "ترحيل القيود إلى دليل الحسابات",
+        "مراجعة القيود واعتمادها قبل الترحيل",
+        "إنشاء دفتر الأستاذ العام من سجل القيود"
+      ]
+    },
+    "employees": {
+      "description": "إدارة سجلات موظفي فريقك في مكان واحد.",
+      "capabilities": [
+        "حفظ ملفات الموظفين وعقودهم",
+        "تتبع الأدوار والأقسام وتواريخ الالتحاق",
+        "ربط الموظفين بالرواتب والحضور",
+        "تخزين مستندات الموظفين بأمان"
+      ]
+    },
+    "payroll": {
+      "description": "احتساب رواتب الموظفين ومعالجتها كل فترة.",
+      "capabilities": [
+        "تشغيل الرواتب لفترات دفع مخصصة",
+        "تطبيق الخصومات والمكافآت تلقائياً",
+        "إصدار قسائم رواتب لكل موظف",
+        "تصدير بيانات الرواتب لأغراض المحاسبة"
+      ]
+    },
+    "attendance": {
+      "description": "تتبع أوقات حضور وانصراف الموظفين وساعات العمل.",
+      "capabilities": [
+        "تسجيل أوقات الحضور والانصراف اليومية",
+        "رصد حالات التأخر والانصراف المبكر",
+        "تلخيص ساعات العمل لكل فترة دفع",
+        "تغذية بيانات الحضور مباشرة إلى الرواتب"
+      ]
+    },
+    "leave": {
+      "description": "إدارة طلبات إجازات الموظفين وأرصدتها.",
+      "capabilities": [
+        "تقديم طلبات الإجازة واعتمادها",
+        "تتبع أرصدة الإجازات حسب النوع والموظف",
+        "عرض تقويم إجازات الفريق بالكامل",
+        "تحديد سياسات إجازات مخصصة لكل دور"
+      ]
+    },
+    "salesReports": {
+      "description": "تحليلات معمّقة لأداء المبيعات عبر الزمن.",
+      "capabilities": [
+        "تحليل الإيرادات حسب المنتج أو العميل أو الفترة",
+        "مقارنة الأداء عبر نطاقات زمنية مخصصة",
+        "رصد اتجاهات المبيعات الموسمية",
+        "تصدير تقارير مبيعات تفصيلية"
+      ]
+    },
+    "inventoryReports": {
+      "description": "تقارير تفصيلية عن مستويات المخزون ودورانه وقيمته.",
+      "capabilities": [
+        "تتبع اتجاهات قيمة المخزون عبر الزمن",
+        "تحديد المنتجات بطيئة وسريعة الحركة",
+        "مراقبة مخاطر نفاد المخزون أو تراكمه",
+        "تصدير تقارير المخزون للتخطيط"
+      ]
+    },
+    "profitReports": {
+      "description": "فهم الربحية الحقيقية عبر المنتجات والفترات.",
+      "capabilities": [
+        "تحليل هامش الربح الإجمالي حسب المنتج أو الفئة",
+        "مقارنة الأرباح عبر نطاقات زمنية مخصصة",
+        "احتساب تكلفة البضاعة المباعة تلقائياً",
+        "تصدير تقارير الأرباح لأصحاب المصلحة"
+      ]
+    },
+    "customerReports": {
+      "description": "رؤى حول قيمة العملاء واستمراريتهم وسلوكهم الشرائي.",
+      "capabilities": [
+        "ترتيب العملاء حسب القيمة الدائمة",
+        "تتبع معدلات تكرار الشراء",
+        "تقسيم العملاء حسب السلوك أو الإنفاق",
+        "تصدير رؤى العملاء لأغراض التسويق"
+      ]
+    },
+    "financialReports": {
+      "description": "قوائم مالية شاملة للشركة في لمحة واحدة.",
+      "capabilities": [
+        "إصدار قوائم الأرباح والخسائر",
+        "عرض الميزانيات العمومية حسب الفترة",
+        "تتبع التدفقات النقدية عبر الشركة",
+        "تصدير القوائم للمحاسبين والمستثمرين"
+      ]
+    },
+    "company": {
+      "description": "إدارة الملف التعريفي الأساسي لشركتك وتفاصيلها.",
+      "capabilities": [
+        "تحديث اسم الشركة والشعار وبيانات التواصل",
+        "تحديد نوع النشاط التجاري والقطاع",
+        "تعيين دولة التشغيل الافتراضية",
+        "إدارة الهوية البصرية للشركة بالكامل"
+      ]
+    },
+    "users": {
+      "description": "إدارة حسابات فريقك وصلاحيات الوصول.",
+      "capabilities": [
+        "دعوة أعضاء الفريق وإدارتهم",
+        "تعيين الأدوار للتحكم في الوصول",
+        "إيقاف الحسابات أو إزالتها",
+        "مراجعة نشاط الأعضاء وسجل تسجيل الدخول"
+      ]
+    },
+    "rolesPermissions": {
+      "description": "ضبط دقيق لما يمكن لكل دور رؤيته والقيام به.",
+      "capabilities": [
+        "إنشاء أدوار مخصصة تتجاوز الأدوار الافتراضية",
+        "تفعيل أو إيقاف الصلاحيات لكل وحدة وإجراء",
+        "معاينة الوصول كما يظهر لأي دور",
+        "تدقيق التغييرات على الصلاحيات عبر الزمن"
+      ]
+    },
+    "taxes": {
+      "description": "إعداد نسب الضرائب والقواعد المطبقة على مبيعاتك ومشترياتك.",
+      "capabilities": [
+        "تحديد عدة نسب وقواعد ضريبية",
+        "تطبيق الضرائب تلقائياً حسب المنتج أو المنطقة",
+        "إنشاء تقارير ملخصة للضرائب",
+        "البقاء جاهزاً لفترات تقديم الإقرارات الضريبية"
+      ]
+    },
+    "currencies": {
+      "description": "إدارة العملات التي يعمل بها عملك.",
+      "capabilities": [
+        "دعم عملات متعددة عبر المبيعات والمشتريات",
+        "تحديد أسعار الصرف وتحديثها",
+        "اختيار عملة افتراضية لكل شركة",
+        "عرض التقارير محوّلة إلى العملة الأساسية"
+      ]
+    },
+    "units": {
+      "description": "تحديد وحدات القياس المستخدمة عبر كتالوج منتجاتك.",
+      "capabilities": [
+        "إنشاء وحدات مخصصة تتجاوز الوحدات الافتراضية",
+        "تحديد معدلات التحويل بين الوحدات المرتبطة",
+        "تعيين وحدات افتراضية لكل فئة منتجات",
+        "إبقاء عدّادات المخزون متسقة عبر الوحدات"
+      ]
+    },
+    "numbering": {
+      "description": "تخصيص صيغة الترقيم للفواتير والأوامر والمستندات الأخرى.",
+      "capabilities": [
+        "تحديد بادئات وتسلسلات ترقيم مخصصة",
+        "ضبط صيغ ترقيم مختلفة لكل نوع مستند",
+        "إعادة ضبط أو تعديل التسلسلات كل سنة مالية",
+        "معاينة الأرقام المولّدة قبل الحفظ"
+      ]
+    },
+    "integrations": {
+      "description": "ربط Smart ERP بالأدوات الأخرى التي يعتمد عليها عملك.",
+      "capabilities": [
+        "ربط مزودي الدفع والمحاسبة",
+        "مزامنة البيانات مع منصات التجارة الإلكترونية",
+        "إعداد Webhooks لسير عمل مخصص",
+        "إدارة مفاتيح API للوصول الخارجي"
+      ]
+    },
+    "backupRestore": {
+      "description": "حماية بيانات عملك بنسخ احتياطية تتحكم بها بنفسك.",
+      "capabilities": [
+        "جدولة نسخ احتياطية تلقائية ومتكررة",
+        "تنزيل لقطات نسخ احتياطي عند الطلب",
+        "استعادة بيانات شركتك إلى نقطة سابقة",
+        "مراجعة سجل كامل لنشاط النسخ الاحتياطي"
+      ]
+    },
+    "systemPreferences": {
+      "description": "ضبط الإعدادات الافتراضية على مستوى النظام لطريقة عمل Smart ERP.",
+      "capabilities": [
+        "تحديد صيغ افتراضية للتاريخ والوقت والأرقام",
+        "ضبط اللغة والمنطقة الزمنية الافتراضيتين",
+        "تعديل تفضيلات الإشعارات",
+        "إدارة مفاتيح تبديل الميزات على مستوى النظام"
+      ]
+    }
   }
 }
