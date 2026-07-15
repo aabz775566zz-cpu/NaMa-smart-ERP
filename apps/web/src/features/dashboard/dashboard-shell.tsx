@@ -2,11 +2,15 @@
 
 import { Sidebar } from '@erp-smart/ui';
 
+import { useCommandCenterShortcut } from '@/lib/command-center';
+
 import { DashboardHeader } from './header';
 import { DashboardSidebarNav } from './sidebar-nav';
 import { VerificationBanner } from './verification-banner';
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
+  useCommandCenterShortcut();
+
   return (
     <div className="flex h-screen overflow-hidden bg-muted/30">
       <Sidebar className="hidden md:flex">
