@@ -1,5 +1,7 @@
 'use client';
 
+import { CommandCenterTrigger } from '@/features/ai/components/command-center-trigger';
+
 import { LanguageSwitcher } from './language-switcher';
 import { MobileNav } from './mobile-nav';
 import { ThemeToggle } from './theme-toggle';
@@ -10,6 +12,7 @@ export function DashboardHeader() {
     <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-background px-4">
       <MobileNav />
       <div className="flex-1" />
+      <CommandCenterTrigger />
       <LanguageSwitcher />
       <ThemeToggle />
       <UserMenu />

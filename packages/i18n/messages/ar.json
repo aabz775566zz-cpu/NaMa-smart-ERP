@@ -130,5 +130,9 @@
     "recordPaymentError": "تعذر تسجيل الدفعة",
     "amountRequired": "أدخل مبلغاً أكبر من صفر.",
     "amountExceedsRemaining": "لا يمكن أن يتجاوز المبلغ الرصيد المتبقي."
+  },
+  "ai": {
+    "askAiAssistant": "اسأل المساعد الذكي",
+    "askAiLabel": "اسأل الذكاء الاصطناعي"
   }
 }

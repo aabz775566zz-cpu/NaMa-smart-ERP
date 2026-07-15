@@ -2,6 +2,7 @@
 
 import { Sidebar } from '@erp-smart/ui';
 
+import { CommandCenter } from '@/features/ai/components/command-center';
 import { useCommandCenterShortcut } from '@/lib/command-center';
 
 import { DashboardHeader } from './header';
@@ -21,6 +22,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <VerificationBanner />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+      <CommandCenter />
     </div>
   );
 }

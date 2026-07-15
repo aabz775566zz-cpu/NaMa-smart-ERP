@@ -130,5 +130,9 @@
     "recordPaymentError": "Failed to record payment",
     "amountRequired": "Enter an amount greater than zero.",
     "amountExceedsRemaining": "Amount can't exceed the remaining balance."
+  },
+  "ai": {
+    "askAiAssistant": "Ask the AI assistant",
+    "askAiLabel": "Ask AI"
   }
 }
