@@ -65,7 +65,7 @@ export function KpiOverview() {
           <Link
             key={tile.href}
             href={tile.href}
-            className={`group flex flex-col gap-2.5 p-5 transition-colors hover:bg-muted/40 sm:p-6 ${
+            className={`group flex flex-col gap-2.5 p-5 transition-all hover:bg-muted/40 active:scale-[0.99] sm:p-6 ${
               tile.lead ? 'bg-primary/[0.04]' : ''
             }`}
           >

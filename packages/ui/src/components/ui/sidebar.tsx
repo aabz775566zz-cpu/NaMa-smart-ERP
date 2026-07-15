@@ -73,8 +73,8 @@ const SidebarNavItem = React.forwardRef<HTMLButtonElement, SidebarNavItemProps>(
         ref={ref}
         data-active={active || undefined}
         className={cn(
-          'relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors [&_svg]:size-4 [&_svg]:shrink-0',
-          'hover:bg-accent hover:text-accent-foreground',
+          'relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-all [&_svg]:size-4 [&_svg]:shrink-0',
+          'hover:bg-accent hover:text-accent-foreground active:scale-[0.98]',
           'data-[active]:bg-primary/10 data-[active]:text-primary data-[active]:hover:bg-primary/10 data-[active]:hover:text-primary',
           // Left (logical: start-edge) accent bar on the active item, on top of the tint.
           "data-[active]:before:absolute data-[active]:before:inset-y-1 data-[active]:before:start-0 data-[active]:before:w-0.5 data-[active]:before:rounded-full data-[active]:before:bg-primary data-[active]:before:content-['']",
