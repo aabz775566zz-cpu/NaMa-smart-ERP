@@ -217,8 +217,8 @@ export const DASHBOARD_SETTINGS_SECTION: DashboardNavSection = {
   labelKey: 'settings',
   icon: Settings,
   items: [
-    { labelKey: 'company', href: '/dashboard/settings/company', icon: Building2 },
-    { labelKey: 'users', href: '/dashboard/settings/users', icon: Users },
+    { labelKey: 'company', href: '/dashboard/settings/company', icon: Building2, shipped: true },
+    { labelKey: 'users', href: '/dashboard/settings/users', icon: Users, requiredPermission: 'USERS:READ', shipped: true },
     { labelKey: 'rolesPermissions', href: '/dashboard/settings/roles-permissions', icon: ShieldCheck },
     { labelKey: 'taxes', href: '/dashboard/settings/taxes', icon: Percent },
     { labelKey: 'currencies', href: '/dashboard/settings/currencies', icon: DollarSign },
