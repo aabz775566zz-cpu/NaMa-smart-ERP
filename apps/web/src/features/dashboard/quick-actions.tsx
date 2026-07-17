@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@erp-smart/ui';
+import { buttonVariants } from '@erp-smart/ui';
 import { Package, ShoppingCart, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,12 +31,14 @@ export function QuickActions() {
   return (
     <div className="flex flex-wrap gap-2.5">
       {visible.map((action) => (
-        <Button key={action.href} asChild variant="outline" size="sm" className="gap-2">
-          <Link href={action.href}>
-            <action.icon className="h-4 w-4 text-primary" />
-            {t[action.labelKey]}
-          </Link>
-        </Button>
+        <Link
+          key={action.href}
+          href={action.href}
+          className={buttonVariants({ variant: 'outline', size: 'sm', className: 'gap-2' })}
+        >
+          <action.icon className="h-4 w-4 text-primary" />
+          {t[action.labelKey]}
+        </Link>
       ))}
     </div>
   );
