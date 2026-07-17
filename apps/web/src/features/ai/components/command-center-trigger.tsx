@@ -22,7 +22,9 @@ export function CommandCenterTrigger() {
 
   return (
     <Button variant="outline" size="sm" onClick={() => open()} className="gap-2">
-      <Sparkles className="h-4 w-4 text-primary" />
+      {/* Iris marks AI presence, never Saffron — Constitution ch.7/15. This is
+          the product's always-visible "the machine can think with you" cue. */}
+      <Sparkles className="h-4 w-4 text-accent-brand" />
       <span className="hidden sm:inline">{messages.ai.askAiLabel}</span>
       <kbd className="hidden rounded border border-border bg-muted px-1.5 py-0.5 text-[0.7rem] font-medium text-muted-foreground sm:inline-block">
         {getShortcutHint()}

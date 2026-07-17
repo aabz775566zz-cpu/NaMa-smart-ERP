@@ -12,7 +12,9 @@ export function MessageBubble({ message }: { message: AIMessage }) {
     <div className={`flex items-end gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser ? (
         <Avatar className="h-7 w-7 shrink-0">
-          <AvatarFallback className="bg-primary text-primary-foreground">
+          {/* The assistant's face wears Iris — the AI colour — never Saffron
+              (Constitution ch.7/15). */}
+          <AvatarFallback className="bg-accent-brand text-accent-brand-foreground">
             <Sparkles className="h-3.5 w-3.5" />
           </AvatarFallback>
         </Avatar>
