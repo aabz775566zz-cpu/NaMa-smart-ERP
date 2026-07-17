@@ -204,11 +204,11 @@ export const DASHBOARD_NAV_SECTIONS: DashboardNavSection[] = [
     labelKey: 'reports',
     icon: BarChart3,
     items: [
-      { labelKey: 'salesReports', href: '/dashboard/reports/sales', icon: TrendingUp },
-      { labelKey: 'inventoryReports', href: '/dashboard/reports/inventory', icon: Boxes },
-      { labelKey: 'profitReports', href: '/dashboard/reports/profit', icon: PiggyBank },
-      { labelKey: 'customerReports', href: '/dashboard/reports/customers', icon: UsersRound },
-      { labelKey: 'financialReports', href: '/dashboard/reports/financial', icon: FileBarChart },
+      { labelKey: 'salesReports', href: '/dashboard/reports/sales', icon: TrendingUp, shipped: true },
+      { labelKey: 'inventoryReports', href: '/dashboard/reports/inventory', icon: Boxes, shipped: true },
+      { labelKey: 'profitReports', href: '/dashboard/reports/profit', icon: PiggyBank, shipped: true },
+      { labelKey: 'customerReports', href: '/dashboard/reports/customers', icon: UsersRound, shipped: true },
+      { labelKey: 'financialReports', href: '/dashboard/reports/financial', icon: FileBarChart, shipped: true },
     ],
   },
 ];

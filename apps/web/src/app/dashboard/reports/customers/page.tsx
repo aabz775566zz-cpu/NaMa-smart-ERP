@@ -1,18 +1,36 @@
 'use client';
 
-import { UsersRound } from 'lucide-react';
+import { EmptyState } from '@erp-smart/ui';
+import { ShieldAlert } from 'lucide-react';
 
-import { UnderDevelopmentPage } from '@/components/under-development-page';
+import { CustomersReportView } from '@/features/reports/components/customers-report-view';
 import { useLocale } from '@/lib/locale/locale-context';
+import { usePermissions } from '@/lib/store';
 
-export default function CustomerReportsPage() {
+export default function CustomerReportPage() {
+  const permissions = usePermissions();
+  const canRead = permissions.includes('REPORTS:READ');
   const { messages } = useLocale();
+
+  if (!canRead) {
+    return (
+      <div className="flex h-full min-h-[60vh] items-center justify-center">
+        <EmptyState
+          icon={<ShieldAlert />}
+          title={messages.common.accessDeniedTitle}
+          description={messages.common.accessDeniedDescription}
+        />
+      </div>
+    );
+  }
+
   return (
-    <UnderDevelopmentPage
-      icon={UsersRound}
-      title={messages.nav.customerReports}
-      description={messages.modules.customerReports.description}
-      capabilities={messages.modules.customerReports.capabilities}
-    />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-semibold text-foreground">{messages.nav.customerReports}</h1>
+        <p className="text-sm text-muted-foreground">{messages.reports.subtitle}</p>
+      </div>
+      <CustomersReportView />
+    </div>
   );
 }
