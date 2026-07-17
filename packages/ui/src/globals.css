@@ -4,84 +4,114 @@
 
 @layer base {
   :root {
-    /* Smart ERP brand palette (Phase 2 design-system foundation) — every
-     * value below is the HSL conversion of an exact hex spec: background
-     * #F8FAFC, card #FFFFFF, border #E2E8F0, text #0F172A, secondary text
-     * #64748B, primary #3B82F6. Structural tokens (secondary/muted/accent —
-     * the hover-surface family, and input/ring) intentionally keep riding
-     * the same slate scale rather than introducing new ones, since the
-     * light background/border math above already lands on that scale. */
-    --background: 210 40% 98%;
-    --foreground: 222.2 47.4% 11.2%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 217.2 91.2% 59.8%;
+    /* ================================================================
+     * WARM CLARITY — the ERP Smart light theme ("luxurious").
+     * Governed by docs/ERP_SMART_CONSTITUTION.md ch.4, 14, 15.
+     *
+     * The category is uniformly cold (slate + blue). We are warm. EVERY
+     * neutral below leans warm (hue ~30-40) rather than cool — that single
+     * discipline, applied everywhere, is most of what makes a screenshot
+     * recognizable as ERP Smart with the logo cropped out. Light mode is
+     * warm Bone (fine paper in morning light), never clinical white.
+     * ================================================================ */
+
+    /* Bone: warm alabaster page base — never pure/cool white. */
+    --background: 38 36% 97%;
+    /* Ink: warm near-black text — the color of richness, not cold slate. */
+    --foreground: 28 24% 12%;
+    /* Card: warm near-white, a breath brighter than Bone so surfaces lift. */
+    --card: 40 44% 99%;
+    --card-foreground: 28 24% 12%;
+    --popover: 40 44% 99%;
+    --popover-foreground: 28 24% 12%;
+
+    /* Saffron: THE signature. A deep, burnished amber-gold — value, warmth,
+     * light. Drives primary buttons, focus rings, links, and active accents.
+     * Used like gold: a little, in the right place, makes everything feel
+     * valuable (Constitution ch.15). Deliberately DEEP in light mode (not a
+     * bright amber): with Ink foreground it reads as luxurious gold with dark
+     * text at ~4.7:1, and stays legible as link text on Bone (~3.3:1). Dark
+     * mode brightens it so it glows against warm night. */
+    --primary: 35 88% 42%;
+    --primary-foreground: 30 45% 11%;
+
+    /* Warm neutral surface family (hover tints, secondary chips, muted). */
+    --secondary: 38 30% 93%;
+    --secondary-foreground: 28 22% 18%;
+    --muted: 38 28% 94%;
+    --muted-foreground: 30 10% 40%;
+    --accent: 38 30% 93%;
+    --accent-foreground: 28 22% 18%;
+
+    /* Clay: warm terracotta red for danger — warm even in alarm. */
+    --destructive: 8 74% 47%;
+    --destructive-foreground: 40 40% 98%;
+
+    --border: 36 24% 88%;
+    --input: 36 24% 88%;
+    --ring: 35 88% 42%;
     --radius: 0.625rem;
 
-    /* Semantic status tones — extend the token system rather than hardcoding
-     * colors per-component. Used by Badge/status-pill variants; feature-level
-     * code maps its own domain enums (SaleStatus, InvoiceStatus, ...) onto
-     * these generic tones, never the other way around. */
-    --success: 160.1 84.1% 39.4%;
-    --success-foreground: 0 0% 100%;
-    --warning: 37.7 92.1% 50.2%;
-    --warning-foreground: 20 14% 12%;
-    --info: 217 91% 60%;
-    --info-foreground: 0 0% 100%;
+    /* Semantic voices, warmed. Feature code maps domain enums (SaleStatus,
+     * InvoiceStatus, ...) onto these generic tones, never the reverse.
+     * Warning leans burnt-orange (distinct from the Saffron brand hue). */
+    --success: 152 55% 36%;
+    --success-foreground: 40 40% 98%;
+    --warning: 26 88% 46%;
+    --warning-foreground: 40 44% 98%;
+    /* Info: the ONLY place blue is permitted, and only as neutral
+     * information — desaturated so it never reads as brand (ch.15). */
+    --info: 214 24% 46%;
+    --info-foreground: 40 40% 98%;
 
-    /* Brand accent (violet) — a distinct 5th brand color, separate from
-     * --accent above (which is a neutral hover-surface tint used by
-     * Button/DropdownMenu/Select/Sidebar, not a brand color). Keeping these
-     * as two different tokens means adding this doesn't recolor every
-     * hover state in the app. */
-    --accent-brand: 258.3 89.5% 66.3%;
-    --accent-brand-foreground: 0 0% 100%;
+    /* Iris: the dedicated AI colour. Used ONLY where the product's
+     * intelligence is present (Constitution ch.7, 15) — never decoratively.
+     * When a user sees Iris, the machine is thinking with them. */
+    --accent-brand: 256 74% 60%;
+    --accent-brand-foreground: 40 40% 98%;
   }
 
   .dark {
-    --background: 222.9 48.8% 8.4%;
-    --foreground: 210 40% 96.1%;
-    --card: 221.4 40.8% 13.9%;
-    --card-foreground: 210 40% 96.1%;
-    --popover: 221.4 40.8% 13.9%;
-    --popover-foreground: 210 40% 96.1%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 96.1%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 96.1%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 96.1%;
-    --border: 223.3 33.9% 24.9%;
-    --input: 223.3 33.9% 24.9%;
-    --ring: 217.2 91.2% 59.8%;
+    /* ================================================================
+     * WARM CLARITY — the ERP Smart dark theme ("cinematic").
+     * A warm, deep ink — the colour of night, not a switched-off screen —
+     * against which Saffron glows like a lamp. Designed with as much care
+     * as light; never a mechanical inversion (Constitution ch.4).
+     * ================================================================ */
+    --background: 30 18% 8%;
+    --foreground: 38 30% 91%;
+    --card: 28 15% 12%;
+    --card-foreground: 38 30% 91%;
+    --popover: 28 15% 13%;
+    --popover-foreground: 38 30% 91%;
 
-    --success: 160.1 84.1% 39.4%;
-    --success-foreground: 0 0% 100%;
-    --warning: 37.7 92.1% 50.2%;
-    --warning-foreground: 20 14% 12%;
-    --info: 217 91% 60%;
-    --info-foreground: 0 0% 100%;
+    /* Saffron glows a touch brighter against warm night. */
+    --primary: 40 94% 56%;
+    --primary-foreground: 30 50% 9%;
 
-    --accent-brand: 258.3 89.5% 66.3%;
-    --accent-brand-foreground: 0 0% 100%;
+    --secondary: 28 12% 18%;
+    --secondary-foreground: 38 30% 91%;
+    --muted: 28 12% 17%;
+    --muted-foreground: 36 14% 63%;
+    --accent: 28 12% 20%;
+    --accent-foreground: 38 30% 91%;
+
+    --destructive: 8 70% 52%;
+    --destructive-foreground: 40 40% 96%;
+
+    --border: 30 12% 22%;
+    --input: 30 12% 22%;
+    --ring: 40 94% 56%;
+
+    --success: 152 50% 45%;
+    --success-foreground: 30 50% 9%;
+    --warning: 30 88% 55%;
+    --warning-foreground: 30 50% 9%;
+    --info: 214 26% 62%;
+    --info-foreground: 30 50% 9%;
+
+    --accent-brand: 256 84% 74%;
+    --accent-brand-foreground: 30 50% 9%;
   }
 }
 
