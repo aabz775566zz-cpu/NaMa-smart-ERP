@@ -164,7 +164,7 @@ export const DASHBOARD_NAV_SECTIONS: DashboardNavSection[] = [
     icon: Package,
     items: [
       { labelKey: 'products', href: '/dashboard/products', icon: Package, requiredPermission: 'PRODUCTS:READ', shipped: true },
-      { labelKey: 'categories', href: '/dashboard/products/categories', icon: Tags },
+      { labelKey: 'categories', href: '/dashboard/products/categories', icon: Tags, requiredPermission: 'PRODUCTS:READ', shipped: true },
       { labelKey: 'inventory', href: '/dashboard/inventory', icon: Boxes, requiredPermission: 'INVENTORY:READ', shipped: true },
       { labelKey: 'inventoryMovements', href: '/dashboard/inventory/movements', icon: ArrowLeftRight },
       { labelKey: 'stockCount', href: '/dashboard/inventory/stock-count', icon: ClipboardCheck },

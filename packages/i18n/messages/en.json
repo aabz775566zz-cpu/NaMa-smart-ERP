@@ -327,6 +327,8 @@
     "categoryName": "Category name",
     "creatingCategory": "Creating…",
     "createCategory": "Create category",
+    "noCategoriesTitle": "No categories yet",
+    "noCategoriesDescription": "Create your first category to organize your products.",
     "productDeleted": "Product deleted",
     "deleteFailed": "Failed to delete product",
     "deleteProductTitle": "Delete product",

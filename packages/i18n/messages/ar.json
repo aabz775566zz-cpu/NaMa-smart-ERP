@@ -327,6 +327,8 @@
     "categoryName": "اسم التصنيف",
     "creatingCategory": "جارٍ الإنشاء…",
     "createCategory": "إنشاء التصنيف",
+    "noCategoriesTitle": "لا توجد تصنيفات بعد",
+    "noCategoriesDescription": "أنشئ تصنيفك الأول لتنظيم منتجاتك.",
     "productDeleted": "تم حذف المنتج",
     "deleteFailed": "تعذر حذف المنتج",
     "deleteProductTitle": "حذف المنتج",
