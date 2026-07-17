@@ -153,7 +153,7 @@ export const DASHBOARD_NAV_SECTIONS: DashboardNavSection[] = [
     labelKey: 'purchasing',
     icon: ShoppingBag,
     items: [
-      { labelKey: 'suppliers', href: '/dashboard/purchasing/suppliers', icon: Truck },
+      { labelKey: 'suppliers', href: '/dashboard/purchasing/suppliers', icon: Truck, requiredPermission: 'SUPPLIERS:READ', shipped: true },
       { labelKey: 'purchaseOrders', href: '/dashboard/purchasing/purchase-orders', icon: ClipboardList },
       { labelKey: 'purchaseInvoices', href: '/dashboard/purchasing/purchase-invoices', icon: Receipt },
       { labelKey: 'supplierPayments', href: '/dashboard/purchasing/supplier-payments', icon: HandCoins },
