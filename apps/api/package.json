@@ -10,6 +10,7 @@
     "test": "jest --config jest.config.ts --runInBand"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.3",
     "@erp-smart/types": "^0.0.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
