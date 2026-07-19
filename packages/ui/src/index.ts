@@ -16,6 +16,7 @@ export * from './components/ui/select';
 export * from './components/ui/sheet';
 export * from './components/ui/sidebar';
 export * from './components/ui/skeleton';
+export * from './components/ui/sparkline';
 export * from './components/ui/stat-card';
 export * from './components/ui/switch';
 export * from './components/ui/table';
