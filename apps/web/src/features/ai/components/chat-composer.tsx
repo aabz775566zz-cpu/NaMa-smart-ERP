@@ -9,7 +9,17 @@ import { useLocale } from '@/lib/locale/locale-context';
 // Matches SendChatMessageDto's @MaxLength(4000) exactly.
 const MAX_LENGTH = 4000;
 
-export function ChatComposer({ onSend, disabled }: { onSend: (message: string) => void; disabled?: boolean }) {
+export function ChatComposer({
+  onSend,
+  disabled,
+  textareaRef,
+}: {
+  onSend: (message: string) => void;
+  disabled?: boolean;
+  /** Lets a parent (the Command Center) drive focus, e.g. from Radix's
+   * onOpenAutoFocus, without reaching into the DOM. */
+  textareaRef?: React.Ref<HTMLTextAreaElement>;
+}) {
   const [value, setValue] = useState('');
   const { messages } = useLocale();
 
@@ -30,6 +40,7 @@ export function ChatComposer({ onSend, disabled }: { onSend: (message: string) =
   return (
     <div className="flex items-end gap-2 border-t border-border p-4">
       <Textarea
+        ref={textareaRef}
         value={value}
         onChange={(event) => setValue(event.target.value.slice(0, MAX_LENGTH))}
         onKeyDown={handleKeyDown}

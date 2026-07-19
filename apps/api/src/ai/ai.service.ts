@@ -73,10 +73,16 @@ export class AiService {
         where: { conversationId: conversation.id, companyId },
         orderBy: { sequence: 'asc' },
       });
-      const llmMessages: LlmMessage[] = priorMessages.map((m) => ({
-        role: m.role.toLowerCase() as LlmMessage['role'],
-        content: m.content,
-      }));
+      const llmMessages: LlmMessage[] = [
+        // Built fresh per turn, never persisted (AIMessageRole has no SYSTEM
+        // on purpose) — so identity/context updates apply to old
+        // conversations immediately.
+        { role: 'system', content: await this.buildSystemPrompt(companyId) },
+        ...priorMessages.map((m) => ({
+          role: m.role.toLowerCase() as LlmMessage['role'],
+          content: m.content,
+        })),
+      ];
 
       // Tools the model is even offered are pre-filtered by the caller's
       // permissions — deny by omission, not by asking the model to decline.
@@ -185,6 +191,28 @@ export class AiService {
   async deleteConversation(companyId: string, userId: string, id: string) {
     await this.getOwnedConversation(companyId, userId, id);
     await this.db.aIConversation.delete({ where: { id, companyId } });
+  }
+
+  /** The assistant's identity and business context. Grounded in the actual
+   * company record so answers use the right currency and "today", and
+   * bilingual by rule: it mirrors the user's language rather than defaulting
+   * to English — Arabic is a first-class citizen, not a translation. */
+  private async buildSystemPrompt(companyId: string): Promise<string> {
+    // Company is deliberately outside the tenant-guarded model set (see
+    // TenantGuardedPrismaService); this is a plain primary-key read.
+    const company = await this.db.company.findUnique({
+      where: { id: companyId },
+      select: { name: true, currency: true },
+    });
+
+    return [
+      `You are the ERP Smart assistant — the built-in business analyst for "${company?.name ?? 'this business'}".`,
+      `The company's currency is ${company?.currency ?? 'USD'}. Today's date is ${new Date().toISOString().slice(0, 10)}.`,
+      'Always answer in the language of the user\'s most recent message: Arabic in, Arabic out; English in, English out.',
+      'Be calm and concise: lead with the number or the answer, then at most two short supporting sentences. No filler.',
+      'For any question about actual business data (sales, revenue, inventory, customers), use the provided tools — never invent or estimate figures yourself.',
+      'If a tool fails or you have no tool for the data requested, say so plainly and point the user to the relevant section of the app.',
+    ].join('\n');
   }
 
   private async getOwnedConversation(companyId: string, userId: string, id: string) {

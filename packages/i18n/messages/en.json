@@ -695,7 +695,9 @@
     "askAiLabel": "Ask AI",
     "askAiAssistantDescription": "Ask about your sales, inventory, products, or customers — it can only see what you have permission to see.",
     "dashboardCardDescription": "Get instant answers about your sales, inventory, reports, and overall business performance — right from your dashboard.",
-    "openAssistant": "Chat with the assistant"
+    "openAssistant": "Chat with the assistant",
+    "openFullAssistant": "Open full assistant",
+    "thinking": "Thinking…"
   },
   "comingSoon": {
     "badge": "Coming Soon",
