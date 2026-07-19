@@ -3,13 +3,22 @@
  * is a per-product field inside the Products report. Named to match what
  * ReportsService actually exposes, not invented endpoint names. */
 
-/** GET /reports/dashboard */
+/** GET /reports/dashboard — the home-screen briefing payload.
+ * revenuePreviousMonth / salesCountPreviousMonth cover the SAME elapsed
+ * window of the previous month (pacing comparison, not the full month).
+ * receivablesOutstanding = SUM(completed customer-linked sale totals) -
+ * SUM(payments), floored at 0 — the company-wide "owed to you" figure.
+ * dailyRevenue is a zero-filled 14-day series (UTC days, oldest first). */
 export interface DashboardReport {
   revenueThisMonth: string;
+  revenuePreviousMonth: string;
   salesCountThisMonth: number;
+  salesCountPreviousMonth: number;
   totalCustomers: number;
   totalActiveProducts: number;
   lowStockCount: number;
+  receivablesOutstanding: string;
+  dailyRevenue: SalesReportDailyEntry[];
 }
 
 export interface SalesReportDailyEntry {

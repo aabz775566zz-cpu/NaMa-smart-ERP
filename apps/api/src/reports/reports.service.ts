@@ -26,27 +26,87 @@ export class ReportsService {
   }
 
   async getDashboard(companyId: string) {
-    const startOfMonth = new Date();
+    const now = new Date();
+    const startOfMonth = new Date(now);
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const [salesAgg, totalCustomers, totalActiveProducts, lowStock] = await Promise.all([
-      this.db.sale.aggregate({
-        where: { companyId, status: 'COMPLETED', createdAt: { gte: startOfMonth } },
-        _sum: { totalAmount: true },
-        _count: true,
-      }),
-      this.db.customer.count({ where: { companyId } }),
-      this.db.product.count({ where: { companyId, status: 'ACTIVE' } }),
-      this.inventoryService.listLowStock(companyId),
-    ]);
+    // Pacing comparison: month-to-date vs the SAME elapsed window of the
+    // previous month (1st → same point in time), never the full previous
+    // month — comparing 12 days of June against all of May would read as a
+    // false collapse every month until the final day. Clamped to the start
+    // of the current month so a long month never bleeds into a short one.
+    const startOfPrevMonth = new Date(startOfMonth);
+    startOfPrevMonth.setMonth(startOfPrevMonth.getMonth() - 1);
+    const elapsedThisMonth = now.getTime() - startOfMonth.getTime();
+    const prevWindowEnd = new Date(
+      Math.min(startOfPrevMonth.getTime() + elapsedThisMonth, startOfMonth.getTime()),
+    );
+
+    // 14-day revenue series for the briefing sparkline, bucketed by UTC day
+    // (same convention getSalesReport already uses for dailyBreakdown).
+    const SPARKLINE_DAYS = 14;
+    const sparklineStart = new Date(now);
+    sparklineStart.setUTCHours(0, 0, 0, 0);
+    sparklineStart.setUTCDate(sparklineStart.getUTCDate() - (SPARKLINE_DAYS - 1));
+
+    const [salesAgg, prevSalesAgg, totalCustomers, totalActiveProducts, lowStock, recentSales, invoicedAgg, paidAgg] =
+      await Promise.all([
+        this.db.sale.aggregate({
+          where: { companyId, status: 'COMPLETED', createdAt: { gte: startOfMonth } },
+          _sum: { totalAmount: true },
+          _count: true,
+        }),
+        this.db.sale.aggregate({
+          where: { companyId, status: 'COMPLETED', createdAt: { gte: startOfPrevMonth, lt: prevWindowEnd } },
+          _sum: { totalAmount: true },
+          _count: true,
+        }),
+        this.db.customer.count({ where: { companyId } }),
+        this.db.product.count({ where: { companyId, status: 'ACTIVE' } }),
+        this.inventoryService.listLowStock(companyId),
+        this.db.sale.findMany({
+          where: { companyId, status: 'COMPLETED', createdAt: { gte: sparklineStart } },
+          select: { totalAmount: true, createdAt: true },
+        }),
+        // Receivables: only customer-linked sales can be owed (walk-in sales
+        // have no debtor); payments are always customer-linked. Same "single
+        // source of truth" arithmetic as PaymentsService.computeLedger,
+        // aggregated company-wide.
+        this.db.sale.aggregate({
+          where: { companyId, status: 'COMPLETED', customerId: { not: null } },
+          _sum: { totalAmount: true },
+        }),
+        this.db.payment.aggregate({ where: { companyId }, _sum: { amount: true } }),
+      ]);
+
+    const dailyMap = new Map<string, Prisma.Decimal>();
+    for (const sale of recentSales) {
+      const day = sale.createdAt.toISOString().slice(0, 10);
+      dailyMap.set(day, (dailyMap.get(day) ?? new Prisma.Decimal(0)).plus(sale.totalAmount));
+    }
+    const dailyRevenue: { date: string; revenue: string }[] = [];
+    for (let i = 0; i < SPARKLINE_DAYS; i += 1) {
+      const day = new Date(sparklineStart);
+      day.setUTCDate(day.getUTCDate() + i);
+      const key = day.toISOString().slice(0, 10);
+      dailyRevenue.push({ date: key, revenue: (dailyMap.get(key) ?? new Prisma.Decimal(0)).toString() });
+    }
+
+    const totalInvoiced = invoicedAgg._sum.totalAmount ?? new Prisma.Decimal(0);
+    const totalPaid = paidAgg._sum.amount ?? new Prisma.Decimal(0);
+    const receivables = totalInvoiced.minus(totalPaid);
 
     return {
       revenueThisMonth: (salesAgg._sum.totalAmount ?? new Prisma.Decimal(0)).toString(),
+      revenuePreviousMonth: (prevSalesAgg._sum.totalAmount ?? new Prisma.Decimal(0)).toString(),
       salesCountThisMonth: salesAgg._count,
+      salesCountPreviousMonth: prevSalesAgg._count,
       totalCustomers,
       totalActiveProducts,
       lowStockCount: lowStock.length,
+      receivablesOutstanding: (receivables.isNegative() ? new Prisma.Decimal(0) : receivables).toString(),
+      dailyRevenue,
     };
   }
 
