@@ -21,7 +21,7 @@ export function DashboardHeader() {
   const labelKey = findActiveNavLabelKey(pathname);
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-background px-4 sm:px-6">
+    <header className="relative z-10 flex h-14 shrink-0 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur-md sm:px-6">
       <MobileNav />
       {labelKey ? (
         <h2 className="truncate text-sm font-semibold text-foreground">{messages.nav[labelKey]}</h2>

@@ -114,7 +114,9 @@ export function RevenueHero() {
               {tr.revenueThisMonth}
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-4xl font-bold tabular-nums tracking-tight text-foreground">
+              {/* In Golden Night the number itself is the lamp — a soft
+                  Saffron halo behind the month's revenue. */}
+              <span className="text-4xl font-bold tabular-nums tracking-tight text-foreground dark:[text-shadow:0_0_28px_hsl(var(--primary)/0.35)]">
                 {formatMoney(data.revenueThisMonth)}
               </span>
               <TrendBadge current={Number(data.revenueThisMonth)} previous={Number(data.revenuePreviousMonth)} />
@@ -122,7 +124,10 @@ export function RevenueHero() {
             <p className="text-xs text-muted-foreground">{t.vsLastMonth}</p>
           </div>
           <div className="space-y-1.5">
-            <Sparkline values={sparkValues} className="h-12 text-primary" />
+            <Sparkline
+              values={sparkValues}
+              className="h-12 text-primary dark:drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]"
+            />
             <p className="text-[0.7rem] uppercase tracking-wide text-muted-foreground/70">{t.last14Days}</p>
           </div>
         </Link>

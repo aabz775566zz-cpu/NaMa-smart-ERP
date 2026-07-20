@@ -32,7 +32,7 @@ export function AiCommandBar() {
       <button
         type="button"
         onClick={() => open()}
-        className="group flex w-full items-center gap-3 rounded-xl border border-accent-brand/25 bg-gradient-to-r from-accent-brand/[0.06] via-card to-card px-4 py-3.5 text-start shadow-xs transition-all hover:border-accent-brand/45 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-brand/60 active:scale-[0.995]"
+        className="group flex w-full items-center gap-3 rounded-xl border border-accent-brand/25 bg-gradient-to-r from-accent-brand/[0.06] via-card to-card px-4 py-3.5 text-start shadow-xs transition-all hover:border-accent-brand/45 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-brand/60 active:scale-[0.995] dark:hover:shadow-glow-iris"
       >
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-brand/12 text-accent-brand transition-colors group-hover:bg-accent-brand/18">
           <Sparkles className="h-4 w-4" />

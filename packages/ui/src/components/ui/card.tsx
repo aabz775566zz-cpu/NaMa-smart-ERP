@@ -14,7 +14,10 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       ref={ref}
       className={cn(
         'rounded-xl border border-border bg-card text-card-foreground shadow-xs transition-shadow duration-200',
-        interactive && 'hover:shadow-md',
+        // Golden Night: dark cards read as lifted glass — a faint warm wash
+        // from the top, a 1px rim light, and a true-black drop (card-dark).
+        'dark:bg-gradient-to-b dark:from-white/[0.03] dark:to-transparent dark:shadow-card-dark',
+        interactive && 'hover:shadow-md dark:hover:border-primary/20',
         className,
       )}
       {...props}

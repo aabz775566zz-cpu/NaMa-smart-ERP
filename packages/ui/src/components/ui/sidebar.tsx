@@ -13,7 +13,7 @@ const Sidebar = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
   ({ className, ...props }, ref) => (
     <aside
       ref={ref}
-      className={cn('flex h-full w-64 shrink-0 flex-col border-e border-border bg-card', className)}
+      className={cn('flex h-full w-64 shrink-0 flex-col border-e border-border bg-sidebar', className)}
       {...props}
     />
   ),
