@@ -19,7 +19,6 @@ import {
   FileBarChart,
   FileText,
   Hash,
-  HandCoins,
   History,
   Hourglass,
   Landmark,
@@ -32,6 +31,7 @@ import {
   Ruler,
   Settings,
   ShieldCheck,
+  ShoppingBag,
   ShoppingCart,
   SlidersHorizontal,
   Sparkles,
@@ -59,12 +59,12 @@ export type NavLabelKey =
   | 'settings'
   | 'comingSoon'
   | 'productsInventory'
+  | 'purchasing'
   | 'returns'
   | 'quotations'
   | 'suppliers'
   | 'purchaseOrders'
   | 'purchaseInvoices'
-  | 'supplierPayments'
   | 'categories'
   | 'inventoryMovements'
   | 'stockCount'
@@ -150,14 +150,6 @@ export const CUSTOMERS_NAV_ITEM: DashboardNavLeaf = {
   shipped: true,
 };
 
-export const SUPPLIERS_NAV_ITEM: DashboardNavLeaf = {
-  labelKey: 'suppliers',
-  href: '/dashboard/purchasing/suppliers',
-  icon: Truck,
-  requiredPermission: 'SUPPLIERS:READ',
-  shipped: true,
-};
-
 export const DASHBOARD_NAV_SECTIONS: DashboardNavSection[] = [
   {
     labelKey: 'sales',
@@ -165,6 +157,14 @@ export const DASHBOARD_NAV_SECTIONS: DashboardNavSection[] = [
     items: [
       { labelKey: 'sales', href: '/dashboard/sales', icon: ShoppingCart, requiredPermission: 'SALES:READ', shipped: true },
       { labelKey: 'invoices', href: '/dashboard/invoices', icon: FileText, requiredPermission: 'INVOICES:READ', shipped: true },
+    ],
+  },
+  {
+    labelKey: 'purchasing',
+    icon: ShoppingBag,
+    items: [
+      { labelKey: 'suppliers', href: '/dashboard/purchasing/suppliers', icon: Truck, requiredPermission: 'SUPPLIERS:READ', shipped: true },
+      { labelKey: 'purchaseInvoices', href: '/dashboard/purchasing/purchase-invoices', icon: Receipt, requiredPermission: 'PURCHASES:READ', shipped: true },
     ],
   },
   {
@@ -208,8 +208,6 @@ export const DASHBOARD_COMING_SOON_SECTION: DashboardNavSection = {
     { labelKey: 'returns', href: '/dashboard/sales/returns', icon: Undo2 },
     { labelKey: 'quotations', href: '/dashboard/sales/quotations', icon: ClipboardList },
     { labelKey: 'purchaseOrders', href: '/dashboard/purchasing/purchase-orders', icon: ClipboardList },
-    { labelKey: 'purchaseInvoices', href: '/dashboard/purchasing/purchase-invoices', icon: Receipt },
-    { labelKey: 'supplierPayments', href: '/dashboard/purchasing/supplier-payments', icon: HandCoins },
     { labelKey: 'inventoryMovements', href: '/dashboard/inventory/movements', icon: ArrowLeftRight },
     { labelKey: 'stockCount', href: '/dashboard/inventory/stock-count', icon: ClipboardCheck },
     { labelKey: 'contacts', href: '/dashboard/customers/contacts', icon: Contact },
@@ -237,7 +235,6 @@ const ALL_NAV_LEAVES: DashboardNavLeaf[] = [
   DASHBOARD_HOME_ITEM,
   DASHBOARD_AI_ITEM,
   CUSTOMERS_NAV_ITEM,
-  SUPPLIERS_NAV_ITEM,
   ...DASHBOARD_NAV_SECTIONS.flatMap((section) => section.items),
   ...DASHBOARD_SETTINGS_SECTION.items,
   ...DASHBOARD_COMING_SOON_SECTION.items,

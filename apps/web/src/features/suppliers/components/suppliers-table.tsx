@@ -14,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from '@erp-smart/ui';
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Wallet } from 'lucide-react';
+import Link from 'next/link';
 
 import { useLocale } from '@/lib/locale/locale-context';
 import { useHasPermission } from '@/lib/store';
@@ -50,7 +51,11 @@ export function SuppliersTable({
         <TableBody>
           {suppliers.map((supplier) => (
             <TableRow key={supplier.id}>
-              <TableCell className="font-medium text-foreground">{supplier.name}</TableCell>
+              <TableCell className="font-medium text-foreground">
+                <Link href={`/dashboard/purchasing/suppliers/${supplier.id}`} className="hover:underline">
+                  {supplier.name}
+                </Link>
+              </TableCell>
               <TableCell className="text-muted-foreground">{supplier.phone ?? '—'}</TableCell>
               <TableCell className="text-muted-foreground">{supplier.email ?? '—'}</TableCell>
               <TableCell className="max-w-xs truncate text-muted-foreground">{supplier.address ?? '—'}</TableCell>
@@ -67,6 +72,12 @@ export function SuppliersTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/purchasing/suppliers/${supplier.id}`}>
+                          <Wallet />
+                          {t.ledgerAndPayments}
+                        </Link>
+                      </DropdownMenuItem>
                       {canUpdate ? (
                         <DropdownMenuItem onClick={() => onEdit(supplier)}>
                           <Pencil />

@@ -24,7 +24,6 @@ import {
   DASHBOARD_HOME_ITEM,
   DASHBOARD_NAV_SECTIONS,
   DASHBOARD_SETTINGS_SECTION,
-  SUPPLIERS_NAV_ITEM,
   type DashboardNavLeaf,
   type DashboardNavSection,
 } from './nav-items';
@@ -142,7 +141,6 @@ export function DashboardSidebarNav({ onNavigate }: { onNavigate?: () => void })
           {renderLeaf(DASHBOARD_AI_ITEM)}
           {DASHBOARD_NAV_SECTIONS.map((section) => renderSection(section))}
           {permissions.includes('CUSTOMERS:READ') ? renderLeaf(CUSTOMERS_NAV_ITEM) : null}
-          {permissions.includes('SUPPLIERS:READ') ? renderLeaf(SUPPLIERS_NAV_ITEM) : null}
           {renderSection(DASHBOARD_SETTINGS_SECTION)}
           <div className="my-2 border-t border-border/60" />
           {renderSection(DASHBOARD_COMING_SOON_SECTION, { muted: true })}

@@ -61,6 +61,15 @@ export interface PurchaseInvoiceDetail extends PurchaseInvoice {
   supplier: Supplier;
 }
 
+/** Matches POST /purchase-invoices and POST /purchase-invoices/:id/receive —
+ * PurchaseInvoicesService.create()/receive() both include items (no product
+ * join, no supplier); the list endpoint above does not include items at
+ * all, and GET /:id includes both product and supplier. Mirrors
+ * SaleWithItems exactly. */
+export interface PurchaseInvoiceWithItems extends PurchaseInvoice {
+  items: PurchaseInvoiceItem[];
+}
+
 // Mirrors CreateSaleItemInput's shape, with one deliberate difference:
 // unitCost IS client-supplied here, unlike CreateSaleItemInput which has no
 // price field at all. A sale's price is always locked to the live

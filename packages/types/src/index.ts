@@ -45,6 +45,7 @@ export type {
   PurchaseInvoice,
   PurchaseInvoiceItemWithProduct,
   PurchaseInvoiceDetail,
+  PurchaseInvoiceWithItems,
   CreatePurchaseInvoiceItemInput,
   CreatePurchaseInvoiceInput,
 } from './purchase-invoice';
