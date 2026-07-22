@@ -1,8 +1,9 @@
 'use client';
 
-import { Card, EmptyState, Skeleton, Sparkline } from '@erp-smart/ui';
-import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
+import { AreaChart, Card, EmptyState, Skeleton } from '@erp-smart/ui';
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, HandCoins, Minus, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
+import type { LucideIcon } from 'lucide-react';
 
 import { useDashboardReport } from '@/features/reports/hooks';
 import { useFormatMoney } from '@/lib/format/money';
@@ -74,15 +75,27 @@ export function RevenueHero() {
   }
 
   const sparkValues = data.dailyRevenue.map((entry) => Number(entry.revenue));
+  const sparkLabels = data.dailyRevenue.map((entry) =>
+    new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(entry.date)),
+  );
 
-  const railItems = [
+  const railItems: {
+    key: string;
+    label: string;
+    value: string;
+    href: string;
+    badge: React.ReactNode;
+    icon: LucideIcon;
+    tone: 'primary' | 'info' | 'warning';
+  }[] = [
     {
       key: 'sales',
       label: tr.salesThisMonth,
       value: String(data.salesCountThisMonth),
       href: '/dashboard/sales',
       badge: <TrendBadge current={data.salesCountThisMonth} previous={data.salesCountPreviousMonth} />,
-      warn: false,
+      icon: ShoppingCart,
+      tone: 'primary',
     },
     {
       key: 'receivables',
@@ -90,7 +103,8 @@ export function RevenueHero() {
       value: formatMoney(data.receivablesOutstanding),
       href: '/dashboard/customers',
       badge: null,
-      warn: false,
+      icon: HandCoins,
+      tone: 'info',
     },
     {
       key: 'lowStock',
@@ -98,9 +112,16 @@ export function RevenueHero() {
       value: String(data.lowStockCount),
       href: '/dashboard/inventory',
       badge: null,
-      warn: data.lowStockCount > 0,
+      icon: AlertTriangle,
+      tone: data.lowStockCount > 0 ? 'warning' : 'info',
     },
   ];
+
+  const toneClasses: Record<(typeof railItems)[number]['tone'], string> = {
+    primary: 'bg-primary/10 text-primary',
+    info: 'bg-info/10 text-info',
+    warning: 'bg-warning/10 text-warning',
+  };
 
   return (
     <Card className="animate-in fade-in slide-in-from-bottom-2 overflow-hidden p-0 duration-500">
@@ -123,10 +144,11 @@ export function RevenueHero() {
             </div>
             <p className="text-xs text-muted-foreground">{t.vsLastMonth}</p>
           </div>
-          <div className="space-y-1.5">
-            <Sparkline
+          <div className="space-y-1">
+            <AreaChart
               values={sparkValues}
-              className="h-12 text-primary dark:drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]"
+              labels={sparkLabels}
+              className="text-primary dark:drop-shadow-[0_0_10px_hsl(var(--primary)/0.45)]"
             />
             <p className="text-[0.7rem] uppercase tracking-wide text-muted-foreground/70">{t.last14Days}</p>
           </div>
@@ -137,13 +159,16 @@ export function RevenueHero() {
             <Link
               key={item.key}
               href={item.href}
-              className="group flex flex-1 items-center justify-between gap-3 px-6 py-4 transition-colors hover:bg-muted/40"
+              className="group flex flex-1 items-center gap-3 px-6 py-4 transition-colors hover:bg-muted/40"
             >
-              <div className="min-w-0">
+              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${toneClasses[item.tone]}`}>
+                <item.icon className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{item.label}</p>
                 <p
                   className={`mt-0.5 truncate text-xl font-bold tabular-nums tracking-tight ${
-                    item.warn ? 'text-warning' : 'text-foreground'
+                    item.tone === 'warning' ? 'text-warning' : 'text-foreground'
                   }`}
                 >
                   {item.value}

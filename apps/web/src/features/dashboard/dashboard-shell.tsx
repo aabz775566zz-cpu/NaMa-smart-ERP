@@ -18,12 +18,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <DashboardSidebarNav />
       </Sidebar>
       <div className="relative flex flex-1 flex-col overflow-hidden">
-        {/* Golden Night ambience: a faint Saffron bloom bleeding from the top
-            edge, dark mode only — the room's lamplight, never a decoration
-            layer in Bone daylight. Pointer-transparent and behind content. */}
+        {/* Golden Night ambience, dark mode only — a fine dot-grid (the
+            quiet depth cue Linear/Vercel-style shells use) under a Saffron
+            bloom bleeding from the top edge, the room's lamplight. Both
+            pointer-transparent and behind content; invisible in Bone
+            daylight, never a decoration layer there. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-72 opacity-0 transition-opacity duration-500 dark:opacity-100 bg-[radial-gradient(55%_100%_at_50%_0%,hsl(var(--primary)/0.09),transparent_70%)]"
+          className="pointer-events-none absolute inset-0 z-0 opacity-0 dark:opacity-100 bg-[radial-gradient(hsl(var(--foreground)/0.06)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black_40%,transparent_100%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-80 opacity-0 transition-opacity duration-500 dark:opacity-100 bg-[radial-gradient(55%_100%_at_50%_0%,hsl(var(--primary)/0.12),transparent_70%)]"
         />
         <DashboardHeader />
         <VerificationBanner />

@@ -1,5 +1,6 @@
 export { cn } from './lib/utils';
 
+export * from './components/ui/area-chart';
 export * from './components/ui/avatar';
 export * from './components/ui/badge';
 export * from './components/ui/button';
