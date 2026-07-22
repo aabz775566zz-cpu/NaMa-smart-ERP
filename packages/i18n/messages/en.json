@@ -39,7 +39,8 @@
     "methodOther": "Other",
     "paymentStatusPaid": "Paid",
     "paymentStatusPartial": "Partially paid",
-    "paymentStatusUnpaid": "Unpaid"
+    "paymentStatusUnpaid": "Unpaid",
+    "loadMore": "Load more"
   },
   "language": {
     "switch": "Language",

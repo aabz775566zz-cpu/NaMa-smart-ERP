@@ -1,6 +1,6 @@
 'use client';
 
-import type { PurchaseInvoiceStatus } from '@erp-smart/types';
+import type { PaginationParams, PurchaseInvoiceStatus } from '@erp-smart/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { productsKeys } from '@/features/products/hooks';
@@ -13,16 +13,22 @@ export const purchaseInvoicesKeys = {
   all: ['purchase-invoices'] as const,
   lists: () => [...purchaseInvoicesKeys.all, 'list'] as const,
   // GET /purchase-invoices genuinely supports a ?status= filter server-side
-  // — same reasoning as salesKeys.list().
-  list: (status?: PurchaseInvoiceStatus) => [...purchaseInvoicesKeys.lists(), status ?? 'ALL'] as const,
+  // — same reasoning as salesKeys.list(), `limit` included for the same
+  // "Load more" caching reason.
+  list: (status?: PurchaseInvoiceStatus, pagination?: PaginationParams) =>
+    [...purchaseInvoicesKeys.lists(), status ?? 'ALL', pagination?.limit ?? 'ALL'] as const,
   detail: (id: string) => [...purchaseInvoicesKeys.all, 'detail', id] as const,
 };
 
-export function usePurchaseInvoices(status?: PurchaseInvoiceStatus, options?: { enabled?: boolean }) {
+export function usePurchaseInvoices(
+  status?: PurchaseInvoiceStatus,
+  options?: { enabled?: boolean } & PaginationParams,
+) {
+  const { enabled, ...pagination } = options ?? {};
   return useQuery({
-    queryKey: purchaseInvoicesKeys.list(status),
-    queryFn: () => purchaseInvoicesApi.listPurchaseInvoices(status),
-    enabled: options?.enabled ?? true,
+    queryKey: purchaseInvoicesKeys.list(status, pagination),
+    queryFn: () => purchaseInvoicesApi.listPurchaseInvoices(status, pagination),
+    enabled: enabled ?? true,
   });
 }
 

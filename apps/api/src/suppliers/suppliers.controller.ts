@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
@@ -14,8 +15,8 @@ export class SuppliersController {
 
   @RequirePermission('SUPPLIERS:READ')
   @Get()
-  list(@CurrentUser('companyId') companyId: string) {
-    return this.suppliersService.list(companyId);
+  list(@CurrentUser('companyId') companyId: string, @Query() pagination: PaginationDto) {
+    return this.suppliersService.list(companyId, pagination);
   }
 
   @RequirePermission('SUPPLIERS:READ')

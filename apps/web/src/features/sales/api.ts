@@ -1,6 +1,14 @@
-import type { CompletedSaleResult, PaymentMethod, PaymentStatus, Sale, SaleStatus, SaleWithItems } from '@erp-smart/types';
+import type {
+  CompletedSaleResult,
+  PaginationParams,
+  PaymentMethod,
+  PaymentStatus,
+  Sale,
+  SaleStatus,
+  SaleWithItems,
+} from '@erp-smart/types';
 
-import { apiClient } from '@/lib/api';
+import { apiClient, buildQueryString } from '@/lib/api';
 
 // Deliberately no unitPrice/lineTotal/subtotal/totalAmount fields — those are
 // always server-computed from live Product prices (SalesService.create()),
@@ -22,8 +30,10 @@ export interface CreateSaleInput {
 // GET /sales (list) does NOT include items — only GET /sales/:id and
 // POST /sales do. There is no PATCH/DELETE /sales/:id; a sale is either
 // completed or cancelled via dedicated sub-routes, never edited in place.
-export function listSales(status?: SaleStatus) {
-  const query = status ? `?status=${status}` : '';
+// pagination is optional — omitted entirely, this is the exact same
+// unbounded request it always was (see SalesService.list() on the backend).
+export function listSales(status?: SaleStatus, pagination?: PaginationParams) {
+  const query = buildQueryString({ status, limit: pagination?.limit, offset: pagination?.offset });
   return apiClient.get<Sale[]>(`/sales${query}`);
 }
 

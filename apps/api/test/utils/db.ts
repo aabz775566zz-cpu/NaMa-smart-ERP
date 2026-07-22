@@ -14,11 +14,22 @@ export async function cleanDatabase(prisma: PrismaClient): Promise<void> {
     prisma.aIMessage.deleteMany(),
     prisma.aIConversation.deleteMany(),
     prisma.companyCounter.deleteMany(),
+    // Purchasing (Phase 7): SupplierPayment/PurchaseInvoice both hold a
+    // Restrict FK to Supplier, and PurchaseInvoiceItem holds a Restrict FK
+    // to Product — all three must go before their parents below, same
+    // reasoning as Payment/Sale/InventoryMovement further down.
+    prisma.supplierPayment.deleteMany(),
+    prisma.purchaseInvoiceItem.deleteMany(),
+    prisma.purchaseInvoice.deleteMany(),
+    // Payment holds a Restrict FK to Customer — must go before
+    // customer.deleteMany() below, exactly like Sale already does.
+    prisma.payment.deleteMany(),
     prisma.invoice.deleteMany(),
     prisma.saleItem.deleteMany(),
     prisma.sale.deleteMany(),
     prisma.inventoryMovement.deleteMany(),
     prisma.customer.deleteMany(),
+    prisma.supplier.deleteMany(),
     prisma.product.deleteMany(),
     prisma.category.deleteMany(),
     prisma.activityLog.deleteMany(),

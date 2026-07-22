@@ -1,7 +1,7 @@
 'use client';
 
 import type { PaymentMethod, PaymentStatus, Sale, SaleStatus } from '@erp-smart/types';
-import { Button, EmptyState, Skeleton, ToastAction, toast } from '@erp-smart/ui';
+import { Button, EmptyState, LoadMoreButton, Skeleton, ToastAction, toast } from '@erp-smart/ui';
 import { ShieldAlert, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -18,13 +18,21 @@ import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 import { buildWhatsAppLink, interpolate } from '@/lib/whatsapp';
 
+// Loaded a page at a time via "Load more" rather than all at once — a shop
+// with a year of sales history would otherwise pull every row on every
+// visit to this page. 50 rows is enough to fill the table without scrolling
+// on a typical laptop screen.
+const PAGE_SIZE = 50;
+
 export default function SalesPage() {
   const permissions = usePermissions();
   const canRead = permissions.includes('SALES:READ');
   const canReadCustomers = permissions.includes('CUSTOMERS:READ');
 
   const [statusFilter, setStatusFilter] = useState<SaleStatus | undefined>(undefined);
-  const salesQuery = useSales(statusFilter, { enabled: canRead });
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const salesQuery = useSales(statusFilter, { enabled: canRead, limit: visibleCount });
+  const isLoadingMore = salesQuery.isFetching && !salesQuery.isLoading;
   const customersQuery = useCustomers({ enabled: canRead && canReadCustomers });
   const completeMutation = useCompleteSale();
   const { data: company } = useCompany();
@@ -107,6 +115,15 @@ export default function SalesPage() {
   }
 
   const sales = salesQuery.data ?? [];
+  // Exactly hitting the current page size is the only signal a limit/offset
+  // API gives for "there might be more" — the backend never returns a total
+  // count, so this is the same heuristic every list() endpoint's caller uses.
+  const hasMore = sales.length === visibleCount;
+
+  function handleStatusChange(status: SaleStatus | undefined) {
+    setStatusFilter(status);
+    setVisibleCount(PAGE_SIZE);
+  }
 
   function handleExport() {
     exportToCsv('sales.csv', sales, [
@@ -128,7 +145,7 @@ export default function SalesPage() {
 
       <SalesToolbar
         status={statusFilter}
-        onStatusChange={setStatusFilter}
+        onStatusChange={handleStatusChange}
         onAdd={() => setFormOpen(true)}
         onExport={handleExport}
       />
@@ -164,12 +181,21 @@ export default function SalesPage() {
           action={!statusFilter ? <Button onClick={() => setFormOpen(true)}>{t.createSale}</Button> : undefined}
         />
       ) : (
-        <SalesTable
-          sales={sales}
-          customerNameById={customerNameById}
-          onComplete={handleComplete}
-          onCancel={setCancellingSale}
-        />
+        <>
+          <SalesTable
+            sales={sales}
+            customerNameById={customerNameById}
+            onComplete={handleComplete}
+            onCancel={setCancellingSale}
+          />
+          {hasMore ? (
+            <LoadMoreButton
+              onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              loading={isLoadingMore}
+              label={messages.common.loadMore}
+            />
+          ) : null}
+        </>
       )}
 
       <SaleFormDialog open={formOpen} onOpenChange={setFormOpen} />

@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { InvoiceStatus, Prisma } from '@prisma/client';
 
+import type { PaginationDto } from '../common/dto/pagination.dto';
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
 import { PaymentsService } from '../payments/payments.service';
 
@@ -57,7 +58,8 @@ export class InvoicesService {
     });
   }
 
-  async list(companyId: string, status?: string) {
+  // See ProductsService.list() for why limit/offset are optional and additive.
+  async list(companyId: string, status?: string, pagination: PaginationDto = {}) {
     if (status && !INVOICE_STATUSES.includes(status as (typeof INVOICE_STATUSES)[number])) {
       throw new BadRequestException('Invalid status filter.');
     }
@@ -65,6 +67,8 @@ export class InvoicesService {
     return this.db.invoice.findMany({
       where: { companyId, ...(status ? { status: status as InvoiceStatus } : {}) },
       orderBy: { createdAt: 'desc' },
+      ...(pagination.offset ? { skip: pagination.offset } : {}),
+      ...(pagination.limit ? { take: pagination.limit } : {}),
     });
   }
 

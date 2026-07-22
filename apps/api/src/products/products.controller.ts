@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ImportProductsDto } from './dto/import-products.dto';
@@ -15,8 +16,8 @@ export class ProductsController {
 
   @RequirePermission('PRODUCTS:READ')
   @Get()
-  list(@CurrentUser('companyId') companyId: string) {
-    return this.productsService.list(companyId);
+  list(@CurrentUser('companyId') companyId: string, @Query() pagination: PaginationDto) {
+    return this.productsService.list(companyId, pagination);
   }
 
   @RequirePermission('PRODUCTS:READ')

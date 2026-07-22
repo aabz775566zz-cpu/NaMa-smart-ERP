@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
+import type { PaginationDto } from '../common/dto/pagination.dto';
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -12,8 +13,14 @@ export class CustomersService {
     return this.tenantPrisma.client;
   }
 
-  async list(companyId: string) {
-    return this.db.customer.findMany({ where: { companyId }, orderBy: { createdAt: 'desc' } });
+  // See ProductsService.list() for why limit/offset are optional and additive.
+  async list(companyId: string, pagination: PaginationDto = {}) {
+    return this.db.customer.findMany({
+      where: { companyId },
+      orderBy: { createdAt: 'desc' },
+      ...(pagination.offset ? { skip: pagination.offset } : {}),
+      ...(pagination.limit ? { take: pagination.limit } : {}),
+    });
   }
 
   async getById(companyId: string, id: string) {

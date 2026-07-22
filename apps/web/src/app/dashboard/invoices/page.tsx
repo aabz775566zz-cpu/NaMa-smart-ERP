@@ -1,7 +1,7 @@
 'use client';
 
 import type { Invoice, InvoiceStatus } from '@erp-smart/types';
-import { Button, EmptyState, Skeleton, toast } from '@erp-smart/ui';
+import { Button, EmptyState, LoadMoreButton, Skeleton, toast } from '@erp-smart/ui';
 import { FileText, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -14,6 +14,10 @@ import { exportToCsv } from '@/lib/csv-export';
 import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
+// See apps/web/src/app/dashboard/sales/page.tsx for why this pages instead
+// of loading every invoice at once.
+const PAGE_SIZE = 50;
+
 export default function InvoicesPage() {
   const permissions = usePermissions();
   const canRead = permissions.includes('INVOICES:READ');
@@ -25,7 +29,9 @@ export default function InvoicesPage() {
   };
 
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | undefined>(undefined);
-  const invoicesQuery = useInvoices(statusFilter, { enabled: canRead });
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const invoicesQuery = useInvoices(statusFilter, { enabled: canRead, limit: visibleCount });
+  const isLoadingMore = invoicesQuery.isFetching && !invoicesQuery.isLoading;
   const markPaidMutation = useMarkInvoicePaid();
 
   const [viewingInvoiceId, setViewingInvoiceId] = useState<string | null>(null);
@@ -52,6 +58,12 @@ export default function InvoicesPage() {
   }
 
   const invoices = invoicesQuery.data ?? [];
+  const hasMore = invoices.length === visibleCount;
+
+  function handleStatusChange(status: InvoiceStatus | undefined) {
+    setStatusFilter(status);
+    setVisibleCount(PAGE_SIZE);
+  }
 
   function handleExport() {
     exportToCsv('invoices.csv', invoices, [
@@ -70,7 +82,7 @@ export default function InvoicesPage() {
         <p className="text-sm text-muted-foreground">{t.subtitle}</p>
       </div>
 
-      <InvoicesToolbar status={statusFilter} onStatusChange={setStatusFilter} onExport={handleExport} />
+      <InvoicesToolbar status={statusFilter} onStatusChange={handleStatusChange} onExport={handleExport} />
 
       {invoicesQuery.isLoading ? (
         <div className="space-y-2">
@@ -99,11 +111,20 @@ export default function InvoicesPage() {
           }
         />
       ) : (
-        <InvoicesTable
-          invoices={invoices}
-          onView={(invoice) => setViewingInvoiceId(invoice.id)}
-          onMarkPaid={handleMarkPaid}
-        />
+        <>
+          <InvoicesTable
+            invoices={invoices}
+            onView={(invoice) => setViewingInvoiceId(invoice.id)}
+            onMarkPaid={handleMarkPaid}
+          />
+          {hasMore ? (
+            <LoadMoreButton
+              onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              loading={isLoadingMore}
+              label={messages.common.loadMore}
+            />
+          ) : null}
+        </>
       )}
 
       <InvoiceDetailDialog

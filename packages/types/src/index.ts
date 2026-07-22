@@ -1,6 +1,7 @@
 export type { Locale } from './locale';
 export type { ApiErrorBody } from './api-error';
 export type { SortOrder } from './sort';
+export type { PaginationParams } from './pagination';
 export type {
   MembershipRoleKey,
   PlatformRole,

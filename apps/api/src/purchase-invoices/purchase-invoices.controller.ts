@@ -4,6 +4,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { CreatePurchaseInvoiceDto } from './dto/create-purchase-invoice.dto';
+import { ListPurchaseInvoicesDto } from './dto/list-purchase-invoices.dto';
 import { PurchaseInvoicesService } from './purchase-invoices.service';
 
 @UseGuards(PermissionsGuard)
@@ -13,8 +14,8 @@ export class PurchaseInvoicesController {
 
   @RequirePermission('PURCHASES:READ')
   @Get()
-  list(@CurrentUser('companyId') companyId: string, @Query('status') status?: string) {
-    return this.purchaseInvoicesService.list(companyId, status);
+  list(@CurrentUser('companyId') companyId: string, @Query() query: ListPurchaseInvoicesDto) {
+    return this.purchaseInvoicesService.list(companyId, query.status, query);
   }
 
   @RequirePermission('PURCHASES:READ')

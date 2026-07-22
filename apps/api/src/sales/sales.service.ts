@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { Prisma } from '@prisma/client';
 import type { SaleStatus } from '@prisma/client';
 
+import type { PaginationDto } from '../common/dto/pagination.dto';
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { InvoicesService } from '../invoices/invoices.service';
@@ -21,7 +22,8 @@ export class SalesService {
     return this.tenantPrisma.client;
   }
 
-  async list(companyId: string, status?: string) {
+  // See ProductsService.list() for why limit/offset are optional and additive.
+  async list(companyId: string, status?: string, pagination: PaginationDto = {}) {
     if (status && !SALE_STATUSES.includes(status as (typeof SALE_STATUSES)[number])) {
       throw new BadRequestException('Invalid status filter.');
     }
@@ -29,6 +31,8 @@ export class SalesService {
     return this.db.sale.findMany({
       where: { companyId, ...(status ? { status: status as SaleStatus } : {}) },
       orderBy: { createdAt: 'desc' },
+      ...(pagination.offset ? { skip: pagination.offset } : {}),
+      ...(pagination.limit ? { take: pagination.limit } : {}),
     });
   }
 

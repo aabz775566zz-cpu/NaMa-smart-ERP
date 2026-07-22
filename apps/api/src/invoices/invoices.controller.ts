@@ -3,6 +3,7 @@ import { Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } 
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { ListInvoicesDto } from './dto/list-invoices.dto';
 import { InvoicesService } from './invoices.service';
 
 // No POST /invoices — invoices are only ever auto-generated when a Sale
@@ -14,8 +15,8 @@ export class InvoicesController {
 
   @RequirePermission('INVOICES:READ')
   @Get()
-  list(@CurrentUser('companyId') companyId: string, @Query('status') status?: string) {
-    return this.invoicesService.list(companyId, status);
+  list(@CurrentUser('companyId') companyId: string, @Query() query: ListInvoicesDto) {
+    return this.invoicesService.list(companyId, query.status, query);
   }
 
   @RequirePermission('INVOICES:READ')

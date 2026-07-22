@@ -1,7 +1,7 @@
 'use client';
 
 import type { PaymentStatus, PurchaseInvoice, PurchaseInvoiceStatus } from '@erp-smart/types';
-import { Button, EmptyState, Skeleton, toast } from '@erp-smart/ui';
+import { Button, EmptyState, LoadMoreButton, Skeleton, toast } from '@erp-smart/ui';
 import { Receipt, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -19,13 +19,19 @@ import { exportToCsv } from '@/lib/csv-export';
 import { useLocale } from '@/lib/locale/locale-context';
 import { usePermissions } from '@/lib/store';
 
+// See apps/web/src/app/dashboard/sales/page.tsx for why this pages instead
+// of loading every purchase invoice at once.
+const PAGE_SIZE = 50;
+
 export default function PurchaseInvoicesPage() {
   const permissions = usePermissions();
   const canRead = permissions.includes('PURCHASES:READ');
   const canReadSuppliers = permissions.includes('SUPPLIERS:READ');
 
   const [statusFilter, setStatusFilter] = useState<PurchaseInvoiceStatus | undefined>(undefined);
-  const purchaseInvoicesQuery = usePurchaseInvoices(statusFilter, { enabled: canRead });
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const purchaseInvoicesQuery = usePurchaseInvoices(statusFilter, { enabled: canRead, limit: visibleCount });
+  const isLoadingMore = purchaseInvoicesQuery.isFetching && !purchaseInvoicesQuery.isLoading;
   const suppliersQuery = useSuppliers({ enabled: canRead && canReadSuppliers });
   const receiveMutation = useReceivePurchaseInvoice();
   const markPaidMutation = useMarkPurchaseInvoicePaid();
@@ -72,6 +78,12 @@ export default function PurchaseInvoicesPage() {
   }
 
   const purchaseInvoices = purchaseInvoicesQuery.data ?? [];
+  const hasMore = purchaseInvoices.length === visibleCount;
+
+  function handleStatusChange(status: PurchaseInvoiceStatus | undefined) {
+    setStatusFilter(status);
+    setVisibleCount(PAGE_SIZE);
+  }
 
   function handleExport() {
     const STATUS_LABELS: Record<PurchaseInvoiceStatus, string> = {
@@ -102,7 +114,7 @@ export default function PurchaseInvoicesPage() {
 
       <PurchaseInvoicesToolbar
         status={statusFilter}
-        onStatusChange={setStatusFilter}
+        onStatusChange={handleStatusChange}
         onAdd={() => setFormOpen(true)}
         onExport={handleExport}
       />
@@ -138,13 +150,22 @@ export default function PurchaseInvoicesPage() {
           action={!statusFilter ? <Button onClick={() => setFormOpen(true)}>{t.newPurchaseInvoiceButton}</Button> : undefined}
         />
       ) : (
-        <PurchaseInvoicesTable
-          purchaseInvoices={purchaseInvoices}
-          supplierNameById={supplierNameById}
-          onReceive={handleReceive}
-          onCancel={setCancellingPurchaseInvoice}
-          onMarkPaid={handleMarkPaid}
-        />
+        <>
+          <PurchaseInvoicesTable
+            purchaseInvoices={purchaseInvoices}
+            supplierNameById={supplierNameById}
+            onReceive={handleReceive}
+            onCancel={setCancellingPurchaseInvoice}
+            onMarkPaid={handleMarkPaid}
+          />
+          {hasMore ? (
+            <LoadMoreButton
+              onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              loading={isLoadingMore}
+              label={messages.common.loadMore}
+            />
+          ) : null}
+        </>
       )}
 
       <PurchaseInvoiceFormDialog open={formOpen} onOpenChange={setFormOpen} />

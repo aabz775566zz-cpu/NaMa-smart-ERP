@@ -12,6 +12,7 @@ export * from './components/ui/empty-state';
 export * from './components/ui/form-field';
 export * from './components/ui/input';
 export * from './components/ui/label';
+export * from './components/ui/load-more-button';
 export * from './components/ui/logo';
 export * from './components/ui/select';
 export * from './components/ui/sheet';

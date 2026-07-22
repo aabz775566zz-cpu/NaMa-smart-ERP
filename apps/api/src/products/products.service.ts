@@ -1,6 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
+import type { PaginationDto } from '../common/dto/pagination.dto';
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { CategoriesService } from './categories.service';
@@ -27,8 +28,17 @@ export class ProductsService {
     return this.tenantPrisma.client;
   }
 
-  async list(companyId: string) {
-    return this.db.product.findMany({ where: { companyId }, orderBy: { createdAt: 'desc' } });
+  // limit/offset are optional — omitted entirely, this returns exactly what
+  // it always has (every product for the company). Only when a caller opts
+  // in does the query become bounded, so this is purely additive for every
+  // existing consumer.
+  async list(companyId: string, pagination: PaginationDto = {}) {
+    return this.db.product.findMany({
+      where: { companyId },
+      orderBy: { createdAt: 'desc' },
+      ...(pagination.offset ? { skip: pagination.offset } : {}),
+      ...(pagination.limit ? { take: pagination.limit } : {}),
+    });
   }
 
   async getById(companyId: string, id: string) {

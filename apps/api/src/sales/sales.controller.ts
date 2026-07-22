@@ -4,6 +4,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { CreateSaleDto } from './dto/create-sale.dto';
+import { ListSalesDto } from './dto/list-sales.dto';
 import { SalesService } from './sales.service';
 
 @UseGuards(PermissionsGuard)
@@ -13,8 +14,8 @@ export class SalesController {
 
   @RequirePermission('SALES:READ')
   @Get()
-  list(@CurrentUser('companyId') companyId: string, @Query('status') status?: string) {
-    return this.salesService.list(companyId, status);
+  list(@CurrentUser('companyId') companyId: string, @Query() query: ListSalesDto) {
+    return this.salesService.list(companyId, query.status, query);
   }
 
   @RequirePermission('SALES:READ')

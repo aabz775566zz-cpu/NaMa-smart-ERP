@@ -1,6 +1,6 @@
 'use client';
 
-import type { SaleStatus } from '@erp-smart/types';
+import type { PaginationParams, SaleStatus } from '@erp-smart/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { productsKeys } from '@/features/products/hooks';
@@ -13,15 +13,20 @@ export const salesKeys = {
   lists: () => [...salesKeys.all, 'list'] as const,
   // GET /sales genuinely supports a ?status= filter server-side (unlike
   // Products/Customers), so each status gets its own cache entry rather than
-  // filtering a single cached list client-side.
-  list: (status?: SaleStatus) => [...salesKeys.lists(), status ?? 'ALL'] as const,
+  // filtering a single cached list client-side. `limit` is part of the key
+  // too — SalesPage's "Load more" grows it, and each distinct value is
+  // legitimately a different query (a shorter cached page must never be
+  // served back once the user has asked for more).
+  list: (status?: SaleStatus, pagination?: PaginationParams) =>
+    [...salesKeys.lists(), status ?? 'ALL', pagination?.limit ?? 'ALL'] as const,
 };
 
-export function useSales(status?: SaleStatus, options?: { enabled?: boolean }) {
+export function useSales(status?: SaleStatus, options?: { enabled?: boolean } & PaginationParams) {
+  const { enabled, ...pagination } = options ?? {};
   return useQuery({
-    queryKey: salesKeys.list(status),
-    queryFn: () => salesApi.listSales(status),
-    enabled: options?.enabled ?? true,
+    queryKey: salesKeys.list(status, pagination),
+    queryFn: () => salesApi.listSales(status, pagination),
+    enabled: enabled ?? true,
   });
 }
 

@@ -1,12 +1,13 @@
 import type {
   CreatePurchaseInvoiceInput,
+  PaginationParams,
   PurchaseInvoice,
   PurchaseInvoiceDetail,
   PurchaseInvoiceStatus,
   PurchaseInvoiceWithItems,
 } from '@erp-smart/types';
 
-import { apiClient } from '@/lib/api';
+import { apiClient, buildQueryString } from '@/lib/api';
 
 // CreatePurchaseInvoiceInput is already declared in @erp-smart/types
 // (purchase-invoice.ts) — reused here rather than redeclared, since it
@@ -17,9 +18,9 @@ export type { CreatePurchaseInvoiceInput };
 // GET /purchase-invoices (list) does NOT include items — only GET /:id and
 // POST / do. There is no PATCH/DELETE — a purchase invoice moves through
 // receive/cancel/mark-paid sub-routes, never edited in place. Mirrors
-// features/sales/api.ts exactly.
-export function listPurchaseInvoices(status?: PurchaseInvoiceStatus) {
-  const query = status ? `?status=${status}` : '';
+// features/sales/api.ts exactly, including optional pagination.
+export function listPurchaseInvoices(status?: PurchaseInvoiceStatus, pagination?: PaginationParams) {
+  const query = buildQueryString({ status, limit: pagination?.limit, offset: pagination?.offset });
   return apiClient.get<PurchaseInvoice[]>(`/purchase-invoices${query}`);
 }
 

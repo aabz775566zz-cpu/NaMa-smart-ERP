@@ -39,7 +39,8 @@
     "methodOther": "أخرى",
     "paymentStatusPaid": "مدفوعة",
     "paymentStatusPartial": "مدفوعة جزئياً",
-    "paymentStatusUnpaid": "غير مدفوعة"
+    "paymentStatusUnpaid": "غير مدفوعة",
+    "loadMore": "تحميل المزيد"
   },
   "language": {
     "switch": "اللغة",
