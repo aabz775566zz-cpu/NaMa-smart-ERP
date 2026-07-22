@@ -23,6 +23,20 @@ export class CustomersService {
     });
   }
 
+  // Case-insensitive partial-name match, capped small — built for the AI
+  // tool registry's "resolve a name the user typed in chat" use case, not a
+  // general search endpoint (no route exposes this directly). Deliberately
+  // returns the raw match list rather than picking a "best" one: disambiguation
+  // between two customers sharing a name is a decision for the caller (the AI
+  // tool asks the user), never silently guessed here.
+  async searchByName(companyId: string, name: string, limit = 5) {
+    return this.db.customer.findMany({
+      where: { companyId, name: { contains: name, mode: 'insensitive' } },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  }
+
   async getById(companyId: string, id: string) {
     const customer = await this.db.customer.findFirst({ where: { id, companyId } });
     if (!customer) {

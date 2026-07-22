@@ -786,7 +786,11 @@
     "dashboardCardDescription": "احصل على إجابات فورية حول مبيعاتك ومخزونك وتقاريرك وأداء عملك بشكل عام — مباشرة من لوحة التحكم.",
     "openAssistant": "تحدّث مع المساعد",
     "openFullAssistant": "فتح المساعد الكامل",
-    "thinking": "يفكر…"
+    "thinking": "يفكر…",
+    "confirmAction": "تأكيد",
+    "cancelAction": "إلغاء",
+    "confirming": "جارٍ التأكيد…",
+    "actionFailed": "تعذر إتمام هذا الإجراء"
   },
   "comingSoon": {
     "badge": "قريباً",

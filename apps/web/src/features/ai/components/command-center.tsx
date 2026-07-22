@@ -7,11 +7,13 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 import { useConversation, useSendChatMessage } from '@/features/ai/hooks';
+import { buildAiTimeline } from '@/features/ai/timeline';
 import { useCommandCenter } from '@/lib/command-center';
 import { useLocale } from '@/lib/locale/locale-context';
 
 import { ChatComposer } from './chat-composer';
 import { MessageBubble } from './message-bubble';
+import { PendingActionCard } from './pending-action-card';
 
 /**
  * The Cmd+K Command Center — a real conversation surface, not a shell.
@@ -37,9 +39,8 @@ export function CommandCenter() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastSeedRef = useRef<string | null>(null);
 
-  const visibleMessages = (conversationQuery.data?.messages ?? []).filter(
-    (m) => m.role === 'USER' || m.role === 'ASSISTANT',
-  );
+  const timeline = conversationQuery.data ? buildAiTimeline(conversationQuery.data.messages) : [];
+  const visibleMessages = timeline.filter((item) => item.type === 'message').map((item) => item.message);
   const isSending = sendMutation.isPending;
   const thinking = isSending || pendingText != null;
 
@@ -108,9 +109,18 @@ export function CommandCenter() {
 
         {hasThread ? (
           <div className="max-h-[50vh] min-h-[10rem] space-y-4 overflow-y-auto p-4">
-            {visibleMessages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
+            {timeline.map((item) =>
+              item.type === 'message' ? (
+                <MessageBubble key={item.message.id} message={item.message} />
+              ) : (
+                <PendingActionCard
+                  key={item.toolMessageId}
+                  conversationId={conversationId!}
+                  toolMessageId={item.toolMessageId}
+                  action={item.action}
+                />
+              ),
+            )}
             {pendingMessage ? <MessageBubble message={pendingMessage} /> : null}
             {thinking ? (
               <div className="flex items-center gap-2" aria-live="polite">

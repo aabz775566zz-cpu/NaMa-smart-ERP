@@ -786,7 +786,11 @@
     "dashboardCardDescription": "Get instant answers about your sales, inventory, reports, and overall business performance — right from your dashboard.",
     "openAssistant": "Chat with the assistant",
     "openFullAssistant": "Open full assistant",
-    "thinking": "Thinking…"
+    "thinking": "Thinking…",
+    "confirmAction": "Confirm",
+    "cancelAction": "Cancel",
+    "confirming": "Confirming…",
+    "actionFailed": "Couldn't complete this action"
   },
   "comingSoon": {
     "badge": "Coming Soon",

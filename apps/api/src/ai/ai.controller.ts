@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import type { PermissionKey } from '@erp-smart/types';
 
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { RequirePermission } from '../common/decorators/require-permission.decorator';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { AiService } from './ai.service';
 import { ListConversationsDto } from './dto/list-conversations.dto';
 import { SendChatMessageDto } from './dto/send-chat-message.dto';
@@ -51,5 +53,23 @@ export class AiController {
     @Param('id') id: string,
   ) {
     return this.aiService.deleteConversation(companyId, userId, id);
+  }
+
+  // The one route in this controller that DOES need a permission gate — it
+  // executes a real write. Hardcoded to INVOICES:UPDATE (the only
+  // confirmable action right now, RECORD_CUSTOMER_PAYMENT — see
+  // AiToolRegistryService) rather than a generic permission lookup; revisit
+  // if/when a second action type with a different permission is added.
+  @UseGuards(PermissionsGuard)
+  @RequirePermission('INVOICES:UPDATE')
+  @HttpCode(HttpStatus.OK)
+  @Post('conversations/:conversationId/messages/:messageId/confirm')
+  confirmAction(
+    @CurrentUser('companyId') companyId: string,
+    @CurrentUser('sub') userId: string,
+    @Param('conversationId') conversationId: string,
+    @Param('messageId') messageId: string,
+  ) {
+    return this.aiService.confirmAction(companyId, userId, conversationId, messageId);
   }
 }

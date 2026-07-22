@@ -56,3 +56,27 @@ export interface AIConversationListParams {
   limit?: number;
   offset?: number;
 }
+
+/** Action types a `propose_*` AI tool can produce — currently just one.
+ * Add here as more write-capable tools are built (see
+ * AiToolRegistryService's class doc comment for the two-phase design). */
+export type AIPendingActionType = 'RECORD_CUSTOMER_PAYMENT';
+
+/** The shape a `propose_*` tool's execute() returns as `result` inside a
+ * TOOL message's AIToolCallResult — never written by the tool itself, only
+ * proposed. The frontend detects this shape (via `pendingConfirmation`) to
+ * render a Confirm/Cancel card instead of plain text. `params` is passed
+ * back to POST /ai/conversations/:id/messages/:messageId/confirm verbatim,
+ * but the backend never trusts it — it always re-reads and re-validates the
+ * persisted message content, not whatever the client sends. */
+export interface AIPendingActionResult {
+  pendingConfirmation: true;
+  action: AIPendingActionType;
+  summary: string;
+  params: Record<string, unknown>;
+}
+
+/** Matches POST /ai/conversations/:id/messages/:messageId/confirm. */
+export interface AIConfirmActionResponse {
+  message: AIMessage;
+}

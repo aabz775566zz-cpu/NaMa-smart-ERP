@@ -1,7 +1,8 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type { PermissionKey } from '@erp-smart/types';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { AIPendingActionResult, PaymentMethod, PermissionKey } from '@erp-smart/types';
 
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
+import { PaymentsService } from '../payments/payments.service';
 import { AiToolRegistryService } from './ai-tool-registry.service';
 import { SendChatMessageDto } from './dto/send-chat-message.dto';
 import { LLM_PROVIDER, LlmMessage, LlmProvider } from './llm/llm-provider.interface';
@@ -25,6 +26,7 @@ export class AiService {
   constructor(
     private readonly tenantPrisma: TenantGuardedPrismaService,
     private readonly toolRegistry: AiToolRegistryService,
+    private readonly paymentsService: PaymentsService,
     @Inject(LLM_PROVIDER) private readonly llmProvider: LlmProvider,
   ) {}
 
@@ -191,6 +193,82 @@ export class AiService {
   async deleteConversation(companyId: string, userId: string, id: string) {
     await this.getOwnedConversation(companyId, userId, id);
     await this.db.aIConversation.delete({ where: { id, companyId } });
+  }
+
+  /**
+   * Executes a previously-proposed write action — the only place in this
+   * service that ever mutates business data. Deliberately does not accept
+   * the action's params from the request body: it re-reads the persisted
+   * TOOL message (ownership-checked via getOwnedConversation, so a user can
+   * only confirm actions from their own conversation), re-parses the exact
+   * payload the tool produced, and re-dispatches through the same
+   * permission-checked service method a human would use from the regular
+   * UI. A client cannot forge or edit an action by posting arbitrary
+   * params — only a real, previously-proposed tool call can be confirmed.
+   */
+  async confirmAction(companyId: string, userId: string, conversationId: string, messageId: string) {
+    await this.getOwnedConversation(companyId, userId, conversationId);
+
+    const toolMessage = await this.db.aIMessage.findFirst({
+      where: { id: messageId, conversationId, companyId, role: 'TOOL' },
+    });
+    if (!toolMessage) {
+      throw new NotFoundException('Action not found.');
+    }
+
+    let parsed: { tool: string; arguments: unknown; result: Partial<AIPendingActionResult> };
+    try {
+      parsed = JSON.parse(toolMessage.content);
+    } catch {
+      throw new BadRequestException('This message is not a valid action.');
+    }
+
+    // Also the guard against double-confirmation: a successful confirm
+    // below flips this same field to false on the stored message, so a
+    // second attempt (double-click, stale tab) lands here instead of
+    // recording the payment twice.
+    if (!parsed.result?.pendingConfirmation) {
+      throw new ConflictException('This action is no longer pending — it may have already been confirmed.');
+    }
+
+    if (parsed.result.action === 'RECORD_CUSTOMER_PAYMENT') {
+      const params = parsed.result.params as {
+        customerId: string;
+        customerName: string;
+        amount: number;
+        method: PaymentMethod;
+        note?: string;
+      };
+
+      const ledger = await this.paymentsService.recordPayment(companyId, params.customerId, userId, {
+        amount: params.amount,
+        method: params.method,
+        note: params.note,
+      });
+
+      await this.db.aIMessage.update({
+        where: { id: toolMessage.id, companyId },
+        data: {
+          content: JSON.stringify({
+            ...parsed,
+            result: { ...parsed.result, pendingConfirmation: false, confirmed: true },
+          }),
+        },
+      });
+
+      const confirmationMessage = await this.db.aIMessage.create({
+        data: {
+          conversationId,
+          companyId,
+          role: 'ASSISTANT',
+          content: `✓ Recorded a ${params.method.toLowerCase()} payment of ${params.amount} from ${params.customerName}. Remaining balance: ${ledger.remaining}.`,
+        },
+      });
+
+      return { message: confirmationMessage };
+    }
+
+    throw new BadRequestException(`Unknown action type: ${String(parsed.result.action)}`);
   }
 
   /** The assistant's identity and business context. Grounded in the actual

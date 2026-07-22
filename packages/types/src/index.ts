@@ -74,4 +74,7 @@ export type {
   AIChatResponse,
   AIToolCallResult,
   AIConversationListParams,
+  AIPendingActionType,
+  AIPendingActionResult,
+  AIConfirmActionResponse,
 } from './ai';

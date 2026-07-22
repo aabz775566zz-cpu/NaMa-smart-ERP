@@ -29,6 +29,11 @@ const TOOL_KEYWORDS: Record<string, string[]> = {
   get_top_products: ['best sell', 'top product'],
 };
 
+// Narrow pattern exercising the write-capable propose_record_customer_payment
+// tool end-to-end (propose -> confirm) without a real LLM's argument
+// extraction — matches phrasing like "record a payment of 500 from Acme".
+const RECORD_PAYMENT_PATTERN = /record .*payment of\s+([\d.]+)\s+(?:from|for)\s+(.+?)[.?!]?$/i;
+
 @Injectable()
 export class StubLlmProvider implements LlmProvider {
   async complete(params: LlmCompletionParams): Promise<LlmCompletionResult> {
@@ -59,6 +64,18 @@ export class StubLlmProvider implements LlmProvider {
         ]);
       }
 
+      const paymentMatch = lastMessage.content.match(RECORD_PAYMENT_PATTERN);
+      if (paymentMatch && params.tools.some((t) => t.name === 'propose_record_customer_payment')) {
+        const [, amountText, customerName] = paymentMatch;
+        return this.toolCallResult(params, [
+          {
+            id: `stub-${Date.now()}`,
+            name: 'propose_record_customer_payment',
+            arguments: { amount: Number(amountText), customerName: customerName.trim() },
+          },
+        ]);
+      }
+
       const matchedTool = this.matchTool(text, params.tools);
       if (matchedTool) {
         return this.toolCallResult(params, [{ id: `stub-${Date.now()}`, name: matchedTool, arguments: {} }]);
@@ -70,7 +87,7 @@ export class StubLlmProvider implements LlmProvider {
 
   private narrate(params: LlmCompletionParams, toolResultContent: string | null): LlmCompletionResult {
     const content = toolResultContent
-      ? `Here is what I found: ${toolResultContent}`
+      ? this.narrateToolResult(toolResultContent)
       : "I'm a placeholder AI response — no real LLM provider is configured yet.";
 
     return {
@@ -82,6 +99,25 @@ export class StubLlmProvider implements LlmProvider {
         outputTokens: this.estimateTokens([{ role: 'assistant', content }]),
       },
     };
+  }
+
+  // Special-cases a propose_* tool's pendingConfirmation payload into a
+  // readable sentence (using the summary the tool already built) instead of
+  // dumping raw JSON — a real LLM would naturally phrase it this way too.
+  // Any other tool result just gets echoed verbatim, same as before.
+  private narrateToolResult(toolResultContent: string): string {
+    try {
+      const parsed = JSON.parse(toolResultContent) as { result?: { pendingConfirmation?: boolean; summary?: string; message?: string } };
+      if (parsed.result?.pendingConfirmation && parsed.result.summary) {
+        return `${parsed.result.summary} Shall I go ahead?`;
+      }
+      if (parsed.result?.message) {
+        return parsed.result.message;
+      }
+    } catch {
+      // Not JSON, or doesn't match the expected shape — fall through.
+    }
+    return `Here is what I found: ${toolResultContent}`;
   }
 
   private toolCallResult(params: LlmCompletionParams, toolCalls: LlmToolCallRequest[]): LlmCompletionResult {

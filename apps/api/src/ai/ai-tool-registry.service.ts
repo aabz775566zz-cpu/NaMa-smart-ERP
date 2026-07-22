@@ -1,8 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import type { PermissionKey } from '@erp-smart/types';
+import type { AIPendingActionResult, PaymentMethod, PermissionKey } from '@erp-smart/types';
 
+import { CustomersService } from '../customers/customers.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { PaymentsService } from '../payments/payments.service';
 import { ReportsService } from '../reports/reports.service';
+
+const PAYMENT_METHODS: PaymentMethod[] = ['CASH', 'CARD', 'TRANSFER', 'OTHER'];
+
+function parseRequiredAmount(value: unknown): number {
+  const amount = typeof value === 'string' ? Number(value) : value;
+  if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
+    throw new Error(`Invalid "amount" argument: ${JSON.stringify(value)}. Must be a positive number.`);
+  }
+  return Math.round(amount * 100) / 100;
+}
+
+function parseOptionalMethod(value: unknown): PaymentMethod {
+  if (value == null) return 'CASH';
+  if (typeof value === 'string' && (PAYMENT_METHODS as string[]).includes(value.toUpperCase())) {
+    return value.toUpperCase() as PaymentMethod;
+  }
+  throw new Error(`Invalid "method" argument: ${JSON.stringify(value)}. Must be one of ${PAYMENT_METHODS.join(', ')}.`);
+}
 
 export interface AiToolDefinition {
   name: string;
@@ -34,6 +54,16 @@ function parseOptionalLimit(value: unknown): number | undefined {
 // argument shaping and dispatch. requiredPermission is set to match exactly
 // what the equivalent REST route already requires for the same data, so AI
 // can never see more than the same user could already see via the API.
+//
+// Write-capable tools (currently just propose_record_customer_payment) never
+// mutate anything themselves — a tool named `propose_*` only validates and
+// returns a `{ pendingConfirmation: true, action, summary, params }` payload,
+// which the frontend renders as a Confirm/Cancel card. The actual write only
+// happens in AiService.confirmAction(), triggered by an explicit user click,
+// which re-reads the persisted tool-call message (never trusts a client-
+// supplied payload) and re-dispatches through the exact same permission-
+// checked service method a human would use from the regular UI. The LLM
+// proposes; it never gets to execute.
 @Injectable()
 export class AiToolRegistryService {
   private readonly tools: AiToolDefinition[];
@@ -41,6 +71,8 @@ export class AiToolRegistryService {
   constructor(
     private readonly reportsService: ReportsService,
     private readonly inventoryService: InventoryService,
+    private readonly customersService: CustomersService,
+    private readonly paymentsService: PaymentsService,
   ) {
     this.tools = [
       {
@@ -111,6 +143,68 @@ export class AiToolRegistryService {
         parameters: { type: 'object', properties: {} },
         requiredPermission: 'INVENTORY:READ', // matches GET /inventory/low-stock — this tool calls InventoryService directly, not via Reports
         execute: (companyId) => this.inventoryService.listLowStock(companyId),
+      },
+      {
+        // The one write-capable tool in the registry, and deliberately built
+        // to never write anything itself — see the class doc comment below
+        // for the two-phase design (propose here, execute only after the
+        // user clicks Confirm in AiService.confirmAction()). Gated
+        // INVOICES:UPDATE, matching PaymentsController.recordPayment()
+        // exactly — the eventual write goes through that exact same
+        // service method, so this tool can never do more than the REST
+        // route already allows.
+        name: 'propose_record_customer_payment',
+        description:
+          'Look up a customer by name and prepare a payment to record against their balance. This does NOT record the payment — it only prepares a confirmation card the user must approve. Use this whenever the user asks to record, log, collect, or take a payment from a customer.',
+        parameters: {
+          type: 'object',
+          properties: {
+            customerName: {
+              type: 'string',
+              description: "The customer's name (or partial name) as mentioned by the user.",
+            },
+            amount: { type: 'number', description: 'The payment amount, in the company currency.' },
+            method: { type: 'string', description: 'One of CASH, CARD, TRANSFER, OTHER. Defaults to CASH.' },
+            note: { type: 'string', description: 'Optional note about the payment.' },
+          },
+          required: ['customerName', 'amount'],
+        },
+        requiredPermission: 'INVOICES:UPDATE',
+        execute: async (companyId, args) => {
+          const customerName = String(args.customerName ?? '').trim();
+          if (!customerName) throw new Error('"customerName" is required.');
+          const amount = parseRequiredAmount(args.amount);
+          const method = parseOptionalMethod(args.method);
+          const note = args.note ? String(args.note) : undefined;
+
+          const matches = await this.customersService.searchByName(companyId, customerName);
+
+          // Not-found and ambiguous-match are normal outcomes, not failures
+          // — returned as ordinary (non-throwing) results so the model
+          // actually sees the message and can ask the user to clarify,
+          // instead of AiService's catch block swallowing it into a generic
+          // "This tool failed to execute."
+          if (matches.length === 0) {
+            return { pendingConfirmation: false, message: `No customer found matching "${customerName}".` };
+          }
+          if (matches.length > 1) {
+            return {
+              pendingConfirmation: false,
+              message: `Multiple customers match "${customerName}": ${matches.map((c) => c.name).join(', ')}. Ask the user which one they mean, then try again with the exact name.`,
+            };
+          }
+
+          const customer = matches[0];
+          const ledger = await this.paymentsService.getLedger(companyId, customer.id);
+
+          const result: AIPendingActionResult = {
+            pendingConfirmation: true,
+            action: 'RECORD_CUSTOMER_PAYMENT',
+            summary: `Record a ${method.toLowerCase()} payment of ${amount} from ${customer.name} (current remaining balance: ${ledger.remaining}).`,
+            params: { customerId: customer.id, customerName: customer.name, amount, method, note },
+          };
+          return result;
+        },
       },
     ];
   }

@@ -1,4 +1,10 @@
-import type { AIChatResponse, AIConversation, AIConversationDetail, AIConversationListParams } from '@erp-smart/types';
+import type {
+  AIChatResponse,
+  AIConfirmActionResponse,
+  AIConversation,
+  AIConversationDetail,
+  AIConversationListParams,
+} from '@erp-smart/types';
 
 import { apiClient } from '@/lib/api';
 
@@ -34,4 +40,11 @@ export function getConversation(id: string, params?: AIConversationListParams) {
 
 export function deleteConversation(id: string) {
   return apiClient.delete<void>(`/ai/conversations/${id}`);
+}
+
+// Confirms a previously-proposed write action (see AIPendingActionResult) —
+// no body: the backend re-reads the exact persisted tool-call message
+// referenced by messageId rather than trusting any client-supplied params.
+export function confirmAiAction(conversationId: string, messageId: string) {
+  return apiClient.post<AIConfirmActionResponse>(`/ai/conversations/${conversationId}/messages/${messageId}/confirm`);
 }
