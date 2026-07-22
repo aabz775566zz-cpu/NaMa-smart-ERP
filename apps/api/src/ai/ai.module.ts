@@ -9,15 +9,44 @@ import { AiToolRegistryService } from './ai-tool-registry.service';
 import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
 import { AnthropicLlmProvider } from './llm/anthropic-llm-provider';
+import { GeminiLlmProvider } from './llm/gemini-llm-provider';
 import { LLM_PROVIDER } from './llm/llm-provider.interface';
+import { OpenAiLlmProvider } from './llm/openai-llm-provider';
 import { StubLlmProvider } from './llm/stub-llm-provider';
 
-// Bind the real Claude adapter when an API key is configured; otherwise keep
-// the deterministic stub so local dev and CI (which have no key) still run the
-// full tool-calling pipeline. Swapping providers touches nothing but this line.
+// Three real vendor adapters, all implementing the same LlmProvider contract
+// (see llm-provider.interface.ts) — none of AiService, the tool registry, or
+// any other business logic knows or cares which one is bound here.
+const PROVIDERS = {
+  anthropic: AnthropicLlmProvider,
+  openai: OpenAiLlmProvider,
+  gemini: GeminiLlmProvider,
+} as const;
+
+// AI_PROVIDER picks a vendor explicitly. Without it, auto-detect by whichever
+// API key is actually set (Anthropic first, for backward compatibility with
+// deployments that predate this env var) — and fall back to the deterministic
+// stub only when no real key is configured, so local dev and CI still run the
+// full tool-calling pipeline without any vendor credentials.
+function resolveLlmProviderClass() {
+  const requested = process.env.AI_PROVIDER?.toLowerCase() as keyof typeof PROVIDERS | undefined;
+  if (requested) {
+    const provider = PROVIDERS[requested];
+    if (!provider) {
+      throw new Error(`Unknown AI_PROVIDER "${process.env.AI_PROVIDER}". Expected one of: ${Object.keys(PROVIDERS).join(', ')}.`);
+    }
+    return provider;
+  }
+
+  if (process.env.ANTHROPIC_API_KEY) return AnthropicLlmProvider;
+  if (process.env.OPENAI_API_KEY) return OpenAiLlmProvider;
+  if (process.env.GEMINI_API_KEY) return GeminiLlmProvider;
+  return StubLlmProvider;
+}
+
 const llmProvider = {
   provide: LLM_PROVIDER,
-  useClass: process.env.ANTHROPIC_API_KEY ? AnthropicLlmProvider : StubLlmProvider,
+  useClass: resolveLlmProviderClass(),
 };
 
 @Module({
