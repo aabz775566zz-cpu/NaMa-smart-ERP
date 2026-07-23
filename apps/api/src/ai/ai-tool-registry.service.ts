@@ -5,6 +5,8 @@ import { CustomersService } from '../customers/customers.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { PaymentsService } from '../payments/payments.service';
 import { ReportsService } from '../reports/reports.service';
+import { SupplierPaymentsService } from '../supplier-payments/supplier-payments.service';
+import { SuppliersService } from '../suppliers/suppliers.service';
 
 const PAYMENT_METHODS: PaymentMethod[] = ['CASH', 'CARD', 'TRANSFER', 'OTHER'];
 
@@ -55,8 +57,8 @@ function parseOptionalLimit(value: unknown): number | undefined {
 // what the equivalent REST route already requires for the same data, so AI
 // can never see more than the same user could already see via the API.
 //
-// Write-capable tools (currently just propose_record_customer_payment) never
-// mutate anything themselves — a tool named `propose_*` only validates and
+// Write-capable tools never mutate anything themselves — a tool named
+// `propose_*` only validates and
 // returns a `{ pendingConfirmation: true, action, summary, params }` payload,
 // which the frontend renders as a Confirm/Cancel card. The actual write only
 // happens in AiService.confirmAction(), triggered by an explicit user click,
@@ -73,6 +75,8 @@ export class AiToolRegistryService {
     private readonly inventoryService: InventoryService,
     private readonly customersService: CustomersService,
     private readonly paymentsService: PaymentsService,
+    private readonly suppliersService: SuppliersService,
+    private readonly supplierPaymentsService: SupplierPaymentsService,
   ) {
     this.tools = [
       {
@@ -202,6 +206,60 @@ export class AiToolRegistryService {
             action: 'RECORD_CUSTOMER_PAYMENT',
             summary: `Record a ${method.toLowerCase()} payment of ${amount} from ${customer.name} (current remaining balance: ${ledger.remaining}).`,
             params: { customerId: customer.id, customerName: customer.name, amount, method, note },
+          };
+          return result;
+        },
+      },
+      {
+        // Mirrors propose_record_customer_payment exactly, one direction
+        // reversed (paying a supplier instead of collecting from a
+        // customer) — same two-phase design, same
+        // AiService.confirmAction() dispatch pattern. Gated PURCHASES:UPDATE,
+        // matching SupplierPaymentsController.recordPayment() exactly.
+        name: 'propose_record_supplier_payment',
+        description:
+          'Look up a supplier by name and prepare a payment to record against what we owe them. This does NOT record the payment — it only prepares a confirmation card the user must approve. Use this whenever the user asks to pay, record, or log a payment to a supplier.',
+        parameters: {
+          type: 'object',
+          properties: {
+            supplierName: {
+              type: 'string',
+              description: "The supplier's name (or partial name) as mentioned by the user.",
+            },
+            amount: { type: 'number', description: 'The payment amount, in the company currency.' },
+            method: { type: 'string', description: 'One of CASH, CARD, TRANSFER, OTHER. Defaults to CASH.' },
+            note: { type: 'string', description: 'Optional note about the payment.' },
+          },
+          required: ['supplierName', 'amount'],
+        },
+        requiredPermission: 'PURCHASES:UPDATE',
+        execute: async (companyId, args) => {
+          const supplierName = String(args.supplierName ?? '').trim();
+          if (!supplierName) throw new Error('"supplierName" is required.');
+          const amount = parseRequiredAmount(args.amount);
+          const method = parseOptionalMethod(args.method);
+          const note = args.note ? String(args.note) : undefined;
+
+          const matches = await this.suppliersService.searchByName(companyId, supplierName);
+
+          if (matches.length === 0) {
+            return { pendingConfirmation: false, message: `No supplier found matching "${supplierName}".` };
+          }
+          if (matches.length > 1) {
+            return {
+              pendingConfirmation: false,
+              message: `Multiple suppliers match "${supplierName}": ${matches.map((s) => s.name).join(', ')}. Ask the user which one they mean, then try again with the exact name.`,
+            };
+          }
+
+          const supplier = matches[0];
+          const ledger = await this.supplierPaymentsService.getLedger(companyId, supplier.id);
+
+          const result: AIPendingActionResult = {
+            pendingConfirmation: true,
+            action: 'RECORD_SUPPLIER_PAYMENT',
+            summary: `Record a ${method.toLowerCase()} payment of ${amount} to ${supplier.name} (current remaining balance owed: ${ledger.remaining}).`,
+            params: { supplierId: supplier.id, supplierName: supplier.name, amount, method, note },
           };
           return result;
         },

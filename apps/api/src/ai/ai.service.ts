@@ -1,8 +1,16 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { AIPendingActionResult, PaymentMethod, PermissionKey } from '@erp-smart/types';
 
 import { TenantGuardedPrismaService } from '../common/prisma/tenant-guarded-prisma.service';
 import { PaymentsService } from '../payments/payments.service';
+import { SupplierPaymentsService } from '../supplier-payments/supplier-payments.service';
 import { AiToolRegistryService } from './ai-tool-registry.service';
 import { SendChatMessageDto } from './dto/send-chat-message.dto';
 import { LLM_PROVIDER, LlmMessage, LlmProvider } from './llm/llm-provider.interface';
@@ -27,6 +35,7 @@ export class AiService {
     private readonly tenantPrisma: TenantGuardedPrismaService,
     private readonly toolRegistry: AiToolRegistryService,
     private readonly paymentsService: PaymentsService,
+    private readonly supplierPaymentsService: SupplierPaymentsService,
     @Inject(LLM_PROVIDER) private readonly llmProvider: LlmProvider,
   ) {}
 
@@ -205,8 +214,21 @@ export class AiService {
    * permission-checked service method a human would use from the regular
    * UI. A client cannot forge or edit an action by posting arbitrary
    * params — only a real, previously-proposed tool call can be confirmed.
+   *
+   * userPermissions gates confirmation by the SAME requiredPermission the
+   * tool registry already used to decide whether the model could even see
+   * this tool (see AiToolRegistryService) — one source of truth for "can
+   * this user do this", reused instead of a second hardcoded permission at
+   * the controller, so adding another propose_* action never means touching
+   * the confirm endpoint again.
    */
-  async confirmAction(companyId: string, userId: string, conversationId: string, messageId: string) {
+  async confirmAction(
+    companyId: string,
+    userId: string,
+    userPermissions: PermissionKey[],
+    conversationId: string,
+    messageId: string,
+  ) {
     await this.getOwnedConversation(companyId, userId, conversationId);
 
     const toolMessage = await this.db.aIMessage.findFirst({
@@ -221,6 +243,11 @@ export class AiService {
       parsed = JSON.parse(toolMessage.content);
     } catch {
       throw new BadRequestException('This message is not a valid action.');
+    }
+
+    const tool = this.toolRegistry.findByName(parsed.tool);
+    if (!tool || !userPermissions.includes(tool.requiredPermission)) {
+      throw new ForbiddenException('You do not have permission to perform this action.');
     }
 
     // Also the guard against double-confirmation: a successful confirm
@@ -262,6 +289,43 @@ export class AiService {
           companyId,
           role: 'ASSISTANT',
           content: `✓ Recorded a ${params.method.toLowerCase()} payment of ${params.amount} from ${params.customerName}. Remaining balance: ${ledger.remaining}.`,
+        },
+      });
+
+      return { message: confirmationMessage };
+    }
+
+    if (parsed.result.action === 'RECORD_SUPPLIER_PAYMENT') {
+      const params = parsed.result.params as {
+        supplierId: string;
+        supplierName: string;
+        amount: number;
+        method: PaymentMethod;
+        note?: string;
+      };
+
+      const ledger = await this.supplierPaymentsService.recordPayment(companyId, params.supplierId, userId, {
+        amount: params.amount,
+        method: params.method,
+        note: params.note,
+      });
+
+      await this.db.aIMessage.update({
+        where: { id: toolMessage.id, companyId },
+        data: {
+          content: JSON.stringify({
+            ...parsed,
+            result: { ...parsed.result, pendingConfirmation: false, confirmed: true },
+          }),
+        },
+      });
+
+      const confirmationMessage = await this.db.aIMessage.create({
+        data: {
+          conversationId,
+          companyId,
+          role: 'ASSISTANT',
+          content: `✓ Recorded a ${params.method.toLowerCase()} payment of ${params.amount} to ${params.supplierName}. Remaining balance owed: ${ledger.remaining}.`,
         },
       });
 

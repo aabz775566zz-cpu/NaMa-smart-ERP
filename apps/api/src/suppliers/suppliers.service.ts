@@ -31,6 +31,17 @@ export class SuppliersService {
     return supplier;
   }
 
+  // Mirrors CustomersService.searchByName() — used by the AI tool registry's
+  // propose_record_supplier_payment tool to resolve a name the user typed
+  // into an actual supplier row before proposing a payment.
+  async searchByName(companyId: string, name: string, limit = 5) {
+    return this.db.supplier.findMany({
+      where: { companyId, name: { contains: name, mode: 'insensitive' } },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  }
+
   async create(companyId: string, dto: CreateSupplierDto) {
     return this.db.supplier.create({ data: { companyId, ...dto } });
   }

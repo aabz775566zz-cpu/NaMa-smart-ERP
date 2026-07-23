@@ -7,5 +7,6 @@ import { SuppliersService } from './suppliers.service';
 @Module({
   controllers: [SuppliersController],
   providers: [SuppliersService, TenantGuardedPrismaService],
+  exports: [SuppliersService],
 })
 export class SuppliersModule {}

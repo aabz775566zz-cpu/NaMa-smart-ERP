@@ -5,6 +5,8 @@ import { CustomersModule } from '../customers/customers.module';
 import { InventoryModule } from '../inventory/inventory.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { ReportsModule } from '../reports/reports.module';
+import { SupplierPaymentsModule } from '../supplier-payments/supplier-payments.module';
+import { SuppliersModule } from '../suppliers/suppliers.module';
 import { AiToolRegistryService } from './ai-tool-registry.service';
 import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
@@ -50,11 +52,12 @@ const llmProvider = {
 };
 
 @Module({
-  // CustomersModule/PaymentsModule: the write-capable propose_record_customer_payment
-  // tool (and its confirm step in AiService) reuse CustomersService.searchByName()
-  // and PaymentsService.recordPayment() directly — same "wrap an existing,
-  // already-tested service method" rule every other tool already follows.
-  imports: [ReportsModule, InventoryModule, CustomersModule, PaymentsModule],
+  // CustomersModule/PaymentsModule and SuppliersModule/SupplierPaymentsModule:
+  // the write-capable propose_* tools (and their confirm step in AiService)
+  // reuse *Service.searchByName() and *PaymentsService.recordPayment()
+  // directly — same "wrap an existing, already-tested service method" rule
+  // every other tool already follows.
+  imports: [ReportsModule, InventoryModule, CustomersModule, PaymentsModule, SuppliersModule, SupplierPaymentsModule],
   controllers: [AiController],
   providers: [AiService, AiToolRegistryService, TenantGuardedPrismaService, llmProvider],
 })

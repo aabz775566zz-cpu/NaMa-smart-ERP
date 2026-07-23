@@ -34,6 +34,11 @@ const TOOL_KEYWORDS: Record<string, string[]> = {
 // extraction — matches phrasing like "record a payment of 500 from Acme".
 const RECORD_PAYMENT_PATTERN = /record .*payment of\s+([\d.]+)\s+(?:from|for)\s+(.+?)[.?!]?$/i;
 
+// Same idea, reversed direction — paying a supplier rather than collecting
+// from a customer. Deliberately uses "to" (never "from"/"for") so the two
+// patterns never both match the same phrase.
+const RECORD_SUPPLIER_PAYMENT_PATTERN = /record .*payment of\s+([\d.]+)\s+to\s+(?:supplier\s+)?(.+?)[.?!]?$/i;
+
 @Injectable()
 export class StubLlmProvider implements LlmProvider {
   async complete(params: LlmCompletionParams): Promise<LlmCompletionResult> {
@@ -61,6 +66,21 @@ export class StubLlmProvider implements LlmProvider {
       if (text.includes('trigger error') && params.tools.some((t) => t.name === 'get_top_products')) {
         return this.toolCallResult(params, [
           { id: `stub-${Date.now()}`, name: 'get_top_products', arguments: { limit: 'not-a-number' } },
+        ]);
+      }
+
+      // Checked before the customer pattern: a supplier phrase like "...to
+      // supplier Acme" would otherwise also satisfy the looser customer
+      // regex's "for" alternative if it appeared earlier in the string.
+      const supplierPaymentMatch = lastMessage.content.match(RECORD_SUPPLIER_PAYMENT_PATTERN);
+      if (supplierPaymentMatch && params.tools.some((t) => t.name === 'propose_record_supplier_payment')) {
+        const [, amountText, supplierName] = supplierPaymentMatch;
+        return this.toolCallResult(params, [
+          {
+            id: `stub-${Date.now()}`,
+            name: 'propose_record_supplier_payment',
+            arguments: { amount: Number(amountText), supplierName: supplierName.trim() },
+          },
         ]);
       }
 

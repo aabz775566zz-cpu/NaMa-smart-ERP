@@ -57,10 +57,10 @@ export interface AIConversationListParams {
   offset?: number;
 }
 
-/** Action types a `propose_*` AI tool can produce — currently just one.
- * Add here as more write-capable tools are built (see
- * AiToolRegistryService's class doc comment for the two-phase design). */
-export type AIPendingActionType = 'RECORD_CUSTOMER_PAYMENT';
+/** Action types a `propose_*` AI tool can produce. Add here as more
+ * write-capable tools are built (see AiToolRegistryService's class doc
+ * comment for the two-phase design). */
+export type AIPendingActionType = 'RECORD_CUSTOMER_PAYMENT' | 'RECORD_SUPPLIER_PAYMENT';
 
 /** The shape a `propose_*` tool's execute() returns as `result` inside a
  * TOOL message's AIToolCallResult — never written by the tool itself, only
