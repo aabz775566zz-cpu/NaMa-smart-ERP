@@ -1,3 +1,16 @@
+import path from 'path';
+
+import * as dotenv from 'dotenv';
+
+// Must run before any other import — ai.module.ts and others read
+// process.env.* at module-evaluation time (not inside a function body), so
+// .env has to be loaded before those imports are require()'d, not merely
+// before bootstrap() runs. Silently a no-op in an environment (prod) that
+// has no .env file and already injects real env vars directly — dotenv
+// never overwrites a variable that's already set. Mirrors
+// test/setup-env.ts's approach, minus the test-only path override.
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 import 'reflect-metadata';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
